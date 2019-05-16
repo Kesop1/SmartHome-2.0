@@ -5,7 +5,7 @@ import javax.naming.OperationNotSupportedException;
 class SwitchController {
     
     String getCommand(String cmd) throws OperationNotSupportedException {
-        if(!"ON".equalsIgnoreCase(cmd) || !"OFF".equalsIgnoreCase(cmd)){
+        if(!"ON".equalsIgnoreCase(cmd) && !"OFF".equalsIgnoreCase(cmd)){
             throw new OperationNotSupportedException("Invalid command send for Switch Element");
         }
         return cmd.toUpperCase();
