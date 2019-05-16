@@ -40,6 +40,9 @@ public class MQTTConnection implements Connection {
     
     @Override
     public void send(Command command) throws ConnectionException {
+        if(!(command instanceof MQTTCommand)){
+            throw new ConnectionException("Unable to send command through MQTTConnection");
+        }
         System.out.println("Send command");//TODO
     }
     

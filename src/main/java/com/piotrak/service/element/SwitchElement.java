@@ -6,6 +6,8 @@ import com.piotrak.service.technology.ConnectionException;
 
 public class SwitchElement extends Element {
     
+    private boolean on = false;
+    
     public SwitchElement(Connection connection) {
         super(connection);
     }
@@ -28,5 +30,13 @@ public class SwitchElement extends Element {
             e.printStackTrace();
         }
         return command;
+    }
+    
+    public boolean isOn() {
+        return on;
+    }
+    
+    public void setOn(boolean on) {
+        this.on = on;
     }
 }
