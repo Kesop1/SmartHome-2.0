@@ -3,18 +3,21 @@
     height: 50px;
     margin-left: 20px;
     border: 1px solid yellowgreen;
+    vertical-align: top;
 }
 .menu {
     margin-left: 20px;
     float: left;
     width: 180px;
+    height:600px;
     border: 1px solid darkgreen;
 }
 .content {
     margin-left: 20px;
-    height: 500px;
-    float: left;
+    width: available;
     border: 1px solid black;
+    position: relative;
+    height:600px;
 }
 .footer {
     margin: 20px;
@@ -22,4 +25,7 @@
     float: bottom;
     clear: both;
     border: 1px solid darkred;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
 }
