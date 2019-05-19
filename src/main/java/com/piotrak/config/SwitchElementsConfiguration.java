@@ -1,4 +1,4 @@
-package com.piotrak;
+package com.piotrak.config;
 
 import com.piotrak.service.element.SwitchElement;
 import com.piotrak.service.technology.mqtt.MQTTConnection;

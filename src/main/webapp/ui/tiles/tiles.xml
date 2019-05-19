@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+        "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+
+    <definition name="dashboard2" template="/ui/jsp/layout/main.jsp">
+        <put-attribute name="header" value="/ui/jsp/layout/header.jsp" />
+        <put-attribute name="body" value="" />
+        <put-attribute name="footer" value="/ui/jsp/layout/footer.jsp" />
+    </definition>
+
+    <definition name="dashboard1" extends="dashboard2">
+        <put-attribute name="body" value="/ui/jsp/layout/dashboard.jsp" />
+    </definition>
+
+</tiles-definitions>
