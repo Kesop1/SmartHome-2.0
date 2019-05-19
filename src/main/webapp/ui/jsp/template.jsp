@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 <html>
         <head>
-                <spring:url value="/ui/static/css/template.css" var="templateCss" />
+                <spring:url value="/ui/static/css/stylesheets.css" var="stylesheetsCss" />
                 <title>SmartHome by Krys</title>
         </head>
 <body>
-        <link href="${templateCss}" rel="stylesheet" />
+        <link href="${stylesheetsCss}" rel="stylesheet" />
         <div>
                 <div class="container" style="margin:50px">
                 <div class="header">
