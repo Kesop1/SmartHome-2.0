@@ -1,0 +1,1 @@
+<h2>Zegar i status</h2>

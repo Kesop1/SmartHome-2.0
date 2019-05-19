@@ -5,14 +5,15 @@
 
 <tiles-definitions>
 
-    <definition name="dashboard2" template="/ui/jsp/layout/main.jsp">
-        <put-attribute name="header" value="/ui/jsp/layout/header.jsp" />
-        <put-attribute name="body" value="" />
-        <put-attribute name="footer" value="/ui/jsp/layout/footer.jsp" />
+    <definition name="template" template="/ui/jsp/template.jsp">
+        <put-attribute name="header" value="Main menu" />
+        <put-attribute name="menu" value="/ui/jsp/menu.jsp" />
+        <put-attribute name="content" value="" />
+        <put-attribute name="footer" value="/ui/jsp/footer.jsp" />
     </definition>
 
-    <definition name="dashboard1" extends="dashboard2">
-        <put-attribute name="body" value="/ui/jsp/layout/dashboard.jsp" />
+    <definition name="main" extends="template">
+        <put-attribute name="content" value="/ui/jsp/main.jsp" />
     </definition>
 
 </tiles-definitions>
