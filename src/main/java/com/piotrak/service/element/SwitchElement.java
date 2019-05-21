@@ -31,7 +31,7 @@ public class SwitchElement extends Element {
         }
         return command;
     }
-    
+
     public boolean isOn() {
         return on;
     }

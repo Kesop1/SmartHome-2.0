@@ -1,1 +1,1 @@
-	<jsp:include page="things.jsp" />
+<jsp:include page="things.jsp"/>
