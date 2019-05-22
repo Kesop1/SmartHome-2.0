@@ -2,6 +2,7 @@ package com.piotrak.service.element;
 
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.Connection;
+import com.piotrak.service.technology.ConnectionException;
 
 public abstract class Element {
     
@@ -10,10 +11,14 @@ public abstract class Element {
     public Element(Connection connection) {
         this.connection = connection;
     }
-    
-    public abstract void sendCommand(Command command);
-    
-    public abstract Command receiveCommand();
+
+    public void sendCommand(Command command) throws ConnectionException {
+        getConnection().send(command);
+    }
+
+    public Command receiveCommand() throws ConnectionException {
+        return getConnection().receive();
+    }
     
     public Connection getConnection() {
         return connection;

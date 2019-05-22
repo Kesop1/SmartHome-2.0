@@ -5,23 +5,26 @@ import com.piotrak.service.technology.mqtt.MQTTCommand;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 @RestController
-@RequestMapping("/tv")
-public class TvController extends SwitchController implements MQTTCommunication {
-    
-    private SwitchElement tv;
-    
-    @Value("${mqtt.topic.subscribe.tv}")
+@RequestMapping("/amplituner")
+public class AmplitunerController extends SwitchController implements MQTTCommunication {
+
+    private SwitchElement amplituner;
+
+    @Value("${mqtt.topic.subscribe.amplituner}")
     private String subscribeTopic;
-    
-    @Value("${mqtt.topic.publish.tv}")
+
+    @Value("${mqtt.topic.publish.amplituner}")
     private String publishTopic;
 
-    public TvController(@Autowired SwitchElement tv) {
-        this.tv = tv;
+    public AmplitunerController(@Autowired SwitchElement amplituner) {
+        this.amplituner = amplituner;
     }
 
     @Override
@@ -37,7 +40,7 @@ public class TvController extends SwitchController implements MQTTCommunication 
 
     @Override
     SwitchElement getElement() {
-        return tv;
+        return amplituner;
     }
 
     @Override
