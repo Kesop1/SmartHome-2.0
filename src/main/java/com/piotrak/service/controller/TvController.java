@@ -24,7 +24,7 @@ public class TvController extends SwitchController{
     @Value("${mqtt.topic.publish.tv}")
     private String publishTopic;
     
-    @GetMapping("/tv")
+    @GetMapping
     public String switchTv(@RequestParam(value = "cmd", required = false, defaultValue = "OFF") String cmd) {
         try{
             String command = super.getCommand(cmd);
