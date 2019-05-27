@@ -1,30 +1,28 @@
-package com.piotrak.service.controller;
+package com.piotrak.service.controller.element;
 
+import com.piotrak.service.controller.SwitchController;
 import com.piotrak.service.element.SwitchElement;
 import com.piotrak.service.technology.mqtt.MQTTCommand;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 @RestController
-@RequestMapping("/amplituner")
-public class AmplitunerController extends SwitchController implements MQTTCommunication {
-
-    private SwitchElement amplituner;
-
-    @Value("${mqtt.topic.subscribe.amplituner}")
+@RequestMapping("/tv")
+public class TvController extends SwitchController implements MQTTCommunication {
+    
+    private SwitchElement tv;
+    
+    @Value("${mqtt.topic.subscribe.tv}")
     private String subscribeTopic;
-
-    @Value("${mqtt.topic.publish.amplituner}")
+    
+    @Value("${mqtt.topic.publish.tv}")
     private String publishTopic;
 
-    public AmplitunerController(@Autowired SwitchElement amplituner) {
-        this.amplituner = amplituner;
+    public TvController(@Autowired SwitchElement tv) {
+        this.tv = tv;
     }
 
     @Override
@@ -34,13 +32,13 @@ public class AmplitunerController extends SwitchController implements MQTTCommun
     }
 
     @Override
-    MQTTCommand getCommand(String cmd) {
+    protected MQTTCommand getCommand(String cmd) {
         return createPublishCommand(cmd);//TODO: mapowanie "ON" na kod pilota
     }
 
     @Override
-    SwitchElement getElement() {
-        return amplituner;
+    protected SwitchElement getElement() {
+        return tv;
     }
 
     @Override

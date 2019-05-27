@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MQTTConnection implements Connection {
-    
-    private List<String> subscriptions = new ArrayList<>();
-    
+
+    private List<String> mqttSubscriptionTopics = new ArrayList<>();
+
     @Value("${connection.mqtt.host}")
     private String host;
     
@@ -23,11 +23,7 @@ public class MQTTConnection implements Connection {
     
     public MQTTConnection() {
     }
-    
-    public MQTTConnection(List<String> subscriptions) {
-        this.subscriptions = subscriptions;
-    }
-    
+
     @Override
     public void connect() throws ConnectionException {
         System.out.println("Connect");//TODO

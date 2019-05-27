@@ -7,13 +7,13 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.naming.OperationNotSupportedException;
 
-abstract class SwitchController extends AbstractController {
+public abstract class SwitchController extends AbstractController {
 
-    abstract Command getCommand(String cmd);
+    protected abstract Command getCommand(String cmd);
 
-    abstract SwitchElement getElement();
+    protected abstract SwitchElement getElement();
 
-    ModelAndView handleSwitchRequest(String cmd){
+    protected ModelAndView handleSwitchRequest(String cmd){
         ModelAndView model = super.getModelAndView();
         try {
             String commandValue = getCommandValue(cmd);
