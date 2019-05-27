@@ -4,13 +4,10 @@ import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.Connection;
 import com.piotrak.service.technology.ConnectionException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class MQTTConnection implements Connection {
-
-    private List<String> mqttSubscriptionTopics = new ArrayList<>();
+@Component("mqttConnection")
+public class MQTTConnection extends Connection {
 
     @Value("${connection.mqtt.host}")
     private String host;
@@ -20,9 +17,6 @@ public class MQTTConnection implements Connection {
     
     @Value("${connection.mqtt.protocol}")
     private String protocol;
-    
-    public MQTTConnection() {
-    }
 
     @Override
     public void connect() throws ConnectionException {
@@ -46,5 +40,9 @@ public class MQTTConnection implements Connection {
     public Command receive() throws ConnectionException {
         System.out.println("Receive command");//TODO
         return null;
+    }
+
+    public void subscribeToTopic(String topic){
+        System.out.println("Subscribe to " + topic);//TODO
     }
 }

@@ -1,10 +1,20 @@
 package com.piotrak.service.technology.mqtt;
 
-public interface MQTTCommunication {
+import com.piotrak.service.technology.Command;
+import com.piotrak.service.technology.Communication;
+
+import javax.annotation.PostConstruct;
+
+public interface MQTTCommunication extends Communication {
 
     String getPublishTopic();
 
-    default MQTTCommand createPublishCommand(String cmd){
-        return new MQTTCommand(getPublishTopic(), cmd);
+    String getSubscribeTopic();
+
+    @PostConstruct
+    void subscribeToTopic(String topic);
+
+    default MQTTCommand getPublishCommand(Command command){
+        return new MQTTCommand(getPublishTopic(), command.getValue());
     }
 }

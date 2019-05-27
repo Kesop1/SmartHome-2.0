@@ -4,20 +4,15 @@ import com.piotrak.service.technology.Command;
 
 public class MQTTCommand extends Command {
     
-    private String topic;
-    
-    private String message;
-    
-    public MQTTCommand(String topic, String message) {
+    private final String topic;
+
+    public MQTTCommand(String topic, String command) {
+        super(command);
         this.topic = topic;
-        this.message = message;
     }
     
     public String getTopic() {
         return topic;
     }
-    
-    public String getMessage() {
-        return message;
-    }
+
 }

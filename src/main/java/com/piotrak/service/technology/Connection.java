@@ -1,12 +1,12 @@
 package com.piotrak.service.technology;
 
-public interface Connection {
+public abstract class Connection {
     
-    void connect() throws ConnectionException;
+    public abstract void connect() throws ConnectionException;
     
-    void disconnect();
+    public abstract void disconnect();
     
-    void send(Command command) throws ConnectionException;
+    public abstract void send(Command command) throws ConnectionException;
     
-    Command receive() throws ConnectionException;
+    public abstract Command receive() throws ConnectionException;
 }

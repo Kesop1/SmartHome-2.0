@@ -1,30 +1,20 @@
 package com.piotrak.service.element;
 
 import com.piotrak.service.technology.Command;
-import com.piotrak.service.technology.Connection;
-import com.piotrak.service.technology.ConnectionException;
+
+import javax.validation.constraints.NotNull;
 
 public abstract class Element {
-    
-    private Connection connection;
-    
-    public Element(Connection connection) {
-        this.connection = connection;
+
+    private final String name;
+
+    public Element(@NotNull String name) {
+        this.name = name;
     }
 
-    public void sendCommand(Command command) throws ConnectionException {
-        getConnection().send(command);
+    public String getName() {
+        return name;
     }
 
-    public Command receiveCommand() throws ConnectionException {
-        return getConnection().receive();
-    }
-    
-    public Connection getConnection() {
-        return connection;
-    }
-    
-    public void setConnection(Connection connection) {
-        this.connection = connection;
-    }
+    public abstract void actOnCommand(Command command);
 }

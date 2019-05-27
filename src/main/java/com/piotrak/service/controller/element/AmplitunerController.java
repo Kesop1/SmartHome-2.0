@@ -1,11 +1,9 @@
 package com.piotrak.service.controller.element;
 
 import com.piotrak.service.controller.SwitchController;
-import com.piotrak.service.element.SwitchElement;
-import com.piotrak.service.technology.mqtt.MQTTCommand;
-import com.piotrak.service.technology.mqtt.MQTTCommunication;
+import com.piotrak.service.service.AmplitunerElementService;
+import com.piotrak.service.service.ElementService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,39 +12,23 @@ import org.springframework.web.servlet.ModelAndView;
 
 @RestController
 @RequestMapping("/amplituner")
-public class AmplitunerController extends SwitchController implements MQTTCommunication {
+public class AmplitunerController extends SwitchController {
 
-    private SwitchElement amplituner;
+    private AmplitunerElementService amplitunerElementService;
 
-    @Value("${mqtt.topic.subscribe.amplituner}")
-    private String subscribeTopic;
+    public AmplitunerController(@Autowired AmplitunerElementService amplitunerElementService) {
+        this.amplitunerElementService = amplitunerElementService;
+    }
 
-    @Value("${mqtt.topic.publish.amplituner}")
-    private String publishTopic;
-
-    public AmplitunerController(@Autowired SwitchElement amplituner) {
-        this.amplituner = amplituner;
+    @Override
+    protected ElementService getService() {
+        return amplitunerElementService;
     }
 
     @Override
     @PostMapping
     public ModelAndView handleSwitchRequest(@RequestParam String cmd) {
         return super.handleSwitchRequest(cmd);
-    }
-
-    @Override
-    protected MQTTCommand getCommand(String cmd) {
-        return createPublishCommand(cmd);//TODO: mapowanie "ON" na kod pilota
-    }
-
-    @Override
-    protected SwitchElement getElement() {
-        return amplituner;
-    }
-
-    @Override
-    public String getPublishTopic() {
-        return publishTopic;
     }
 }
 

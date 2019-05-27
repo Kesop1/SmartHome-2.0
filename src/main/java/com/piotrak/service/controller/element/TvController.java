@@ -1,28 +1,25 @@
 package com.piotrak.service.controller.element;
 
 import com.piotrak.service.controller.SwitchController;
-import com.piotrak.service.element.SwitchElement;
-import com.piotrak.service.technology.mqtt.MQTTCommand;
-import com.piotrak.service.technology.mqtt.MQTTCommunication;
+import com.piotrak.service.service.ElementService;
+import com.piotrak.service.service.TvElementService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 @RestController
 @RequestMapping("/tv")
-public class TvController extends SwitchController implements MQTTCommunication {
-    
-    private SwitchElement tv;
-    
-    @Value("${mqtt.topic.subscribe.tv}")
-    private String subscribeTopic;
-    
-    @Value("${mqtt.topic.publish.tv}")
-    private String publishTopic;
+public class TvController extends SwitchController {
 
-    public TvController(@Autowired SwitchElement tv) {
-        this.tv = tv;
+    private TvElementService tvElementService;
+
+    public TvController(@Autowired TvElementService tvElementService) {
+        this.tvElementService = tvElementService;
+    }
+
+    @Override
+    protected ElementService getService() {
+        return tvElementService;
     }
 
     @Override
@@ -31,20 +28,6 @@ public class TvController extends SwitchController implements MQTTCommunication 
         return super.handleSwitchRequest(cmd);
     }
 
-    @Override
-    protected MQTTCommand getCommand(String cmd) {
-        return createPublishCommand(cmd);//TODO: mapowanie "ON" na kod pilota
-    }
-
-    @Override
-    protected SwitchElement getElement() {
-        return tv;
-    }
-
-    @Override
-    public String getPublishTopic() {
-        return publishTopic;
-    }
 }
 
 

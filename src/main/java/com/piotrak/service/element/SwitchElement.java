@@ -1,13 +1,15 @@
 package com.piotrak.service.element;
 
-import com.piotrak.service.technology.Connection;
+import com.piotrak.service.technology.Command;
+
+import javax.validation.constraints.NotNull;
 
 public class SwitchElement extends Element {
     
     private boolean on = false;
-    
-    public SwitchElement(Connection connection) {
-        super(connection);
+
+    public SwitchElement(@NotNull String name) {
+        super(name);
     }
 
     public boolean isOn() {
@@ -16,5 +18,10 @@ public class SwitchElement extends Element {
     
     public void setOn(boolean on) {
         this.on = on;
+    }
+
+    @Override
+    public void actOnCommand(Command command) {
+        setOn("ON".equals(command.getValue()));
     }
 }
