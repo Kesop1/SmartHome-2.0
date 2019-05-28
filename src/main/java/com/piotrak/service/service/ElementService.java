@@ -5,6 +5,8 @@ import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.Communication;
 import com.piotrak.service.technology.ConnectionService;
 import com.piotrak.service.technology.gui.GuiCommand;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 
 public abstract class ElementService implements Communication {
 
@@ -37,5 +39,18 @@ public abstract class ElementService implements Communication {
     }
 
     protected abstract void actOnConnection(Command command);
+
+    @Scheduled(fixedDelay = 1000)
+    @Async
+    protected void checkCommandFromConnection(){
+        Command command;
+        do {
+            command = getConnectionService().checkForCommand();
+            if(command != null) {
+                commandReceived(command);
+            }
+        }
+        while(command != null);
+    }
 
 }

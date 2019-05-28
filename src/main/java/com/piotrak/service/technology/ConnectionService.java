@@ -18,4 +18,8 @@ public abstract class ConnectionService {
     }
 
     public abstract void actOnCommand(Command command);
+
+    public Command checkForCommand(){
+        return getConnection().getCommandQueue().poll();
+    }
 }

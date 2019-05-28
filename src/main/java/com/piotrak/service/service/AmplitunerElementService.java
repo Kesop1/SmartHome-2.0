@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+
 @Service("amplitunerElementService")
 public class AmplitunerElementService extends ElementService implements MQTTCommunication {
 
@@ -22,22 +24,23 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
     }
 
     @Override
-    public String getPublishTopic() {
+    public String getMQTTPublishTopic() {
         return publishTopic;
     }
 
     @Override
-    public String getSubscribeTopic() {
+    public String getMQTTSubscribeTopic() {
         return subscribeTopic;
     }
 
     @Override
     protected void actOnConnection(Command command) {
-        getConnectionService().actOnCommand(getPublishCommand(command));//TODO: mapowanie "ON" na kod pilota
+        getConnectionService().actOnCommand(getMQTTPublishCommand(command));//TODO: mapowanie "ON" na kod pilota
     }
 
+    @PostConstruct
     @Override
-    public void subscribeToTopic(String topic) {
-        ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getSubscribeTopic());//TODO
+    public void subscribeToMQTTTopic() {
+        ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getMQTTSubscribeTopic(), getElement());//TODO
     }
 }

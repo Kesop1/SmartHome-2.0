@@ -7,14 +7,14 @@ import javax.annotation.PostConstruct;
 
 public interface MQTTCommunication extends Communication {
 
-    String getPublishTopic();
+    String getMQTTPublishTopic();
 
-    String getSubscribeTopic();
+    String getMQTTSubscribeTopic();
 
     @PostConstruct
-    void subscribeToTopic(String topic);
+    void subscribeToMQTTTopic();
 
-    default MQTTCommand getPublishCommand(Command command){
-        return new MQTTCommand(getPublishTopic(), command.getValue());
+    default MQTTCommand getMQTTPublishCommand(Command command){
+        return new MQTTCommand(getMQTTPublishTopic(), command.getValue());
     }
 }
