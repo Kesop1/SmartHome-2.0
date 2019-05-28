@@ -5,8 +5,9 @@ import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.Communication;
 import com.piotrak.service.technology.ConnectionService;
 import com.piotrak.service.technology.web.WebCommand;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
+
+import javax.naming.OperationNotSupportedException;
+import javax.validation.constraints.NotNull;
 
 public abstract class ElementService implements Communication {
 
@@ -14,7 +15,7 @@ public abstract class ElementService implements Communication {
 
     private ConnectionService connectionService;
 
-    public ElementService(Element element, ConnectionService connectionService) {
+    public ElementService(@NotNull Element element, @NotNull ConnectionService connectionService) {
         this.element = element;
         this.connectionService = connectionService;
     }
@@ -27,30 +28,17 @@ public abstract class ElementService implements Communication {
         return connectionService;
     }
 
-    public void commandReceived(Command command){
-        actOnElement(command);
-        if(command instanceof WebCommand) {
-            actOnConnection(command);
+    public void commandReceived(Command command) {
+        try {
+            getElement().actOnCommand(command);
+            if(command instanceof WebCommand) {
+                actOnConnection(command);
+            }
+        } catch (OperationNotSupportedException e) {
+            e.printStackTrace();//TODO
         }
-    }
-
-    protected void actOnElement(Command command){
-        getElement().actOnCommand(command);
     }
 
     protected abstract void actOnConnection(Command command);
-
-    @Scheduled(fixedDelay = 1000)
-    @Async
-    protected void checkCommandFromConnection(){
-        Command command;
-        do {
-            command = getConnectionService().checkForCommand();
-            if(command != null) {
-                commandReceived(command);
-            }
-        }
-        while(command != null);
-    }
 
 }

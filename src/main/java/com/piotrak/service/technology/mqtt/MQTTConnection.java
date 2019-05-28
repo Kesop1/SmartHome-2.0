@@ -24,7 +24,7 @@ public class MQTTConnection extends Connection {
 
     private MqttClient mqttClient;
 
-    Set<String> subscribeTopics = new HashSet<>();
+    private Set<String> subscribeTopics = new HashSet<>();
 
     @Override
     public void connect() throws ConnectionException {
@@ -34,6 +34,7 @@ public class MQTTConnection extends Connection {
             mqttClient = new MqttClient(uri, MqttClient.generateClientId(), new MemoryPersistence());
             setCallback();
             mqttClient.connect();
+            subscribeTopics.forEach(this::subscribe);
         } catch (MqttException e) {
             throw new ConnectionException(e.getMessage());
         }
@@ -74,11 +75,11 @@ public class MQTTConnection extends Connection {
     
     @Override
     public Command receive() throws ConnectionException {
-        System.out.println("Receive command");//TODO
+        //dealt with inside setCallback() -> messageArrived() method
         return null;
     }
 
-    public void subscribe(String topic){
+    void subscribe(String topic){
         subscribeTopics.add(topic);
         try {
             mqttClient.subscribe(topic);
@@ -93,15 +94,16 @@ public class MQTTConnection extends Connection {
 
                 @Override
                 public void connectionLost(Throwable throwable) {
-//                    LOGGER.error("MQTTClient got disconnected");//TODO
-                    while (!isConnected()){
+                    if(!isConnected()){
                         try {
                             connect();
                         } catch (ConnectionException e) {
                             e.printStackTrace();//TODO
                         }
                     }
-                    subscribeTopics.forEach(t-> subscribe(t));
+                    if(!isConnected()){
+//                        LOGGER.error("MQTTClient got disconnected", throwable);//TODO
+                    }
                 }
 
                 @Override
@@ -110,7 +112,6 @@ public class MQTTConnection extends Connection {
 //                    LOGGER.info("MQTTMessage received in topic " + s + ": " + message);
                     MQTTCommand command = new MQTTCommand(topic, message);
                     getCommandQueue().add(command);
-//                    rules.act(command);
                 }
 
                 @Override

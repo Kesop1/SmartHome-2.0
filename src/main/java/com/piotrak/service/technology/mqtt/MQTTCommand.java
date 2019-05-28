@@ -2,11 +2,13 @@ package com.piotrak.service.technology.mqtt;
 
 import com.piotrak.service.technology.Command;
 
+import javax.validation.constraints.NotBlank;
+
 public class MQTTCommand extends Command {
     
     private final String topic;
 
-    public MQTTCommand(String topic, String command) {
+    public MQTTCommand(@NotBlank String topic, @NotBlank String command) {
         super(command);
         this.topic = topic;
     }

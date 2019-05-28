@@ -7,6 +7,7 @@ import com.piotrak.service.technology.mqtt.MQTTConnectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 
@@ -35,12 +36,14 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
 
     @Override
     protected void actOnConnection(Command command) {
-        getConnectionService().actOnCommand(getMQTTPublishCommand(command));//TODO: mapowanie "ON" na kod pilota
+        getConnectionService().actOnConnection(getMQTTPublishCommand(command));//TODO: mapowanie "ON" na kod pilota
     }
 
     @PostConstruct
     @Override
-    public void subscribeToMQTTTopic() {
-        ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getMQTTSubscribeTopic(), getElement());//TODO
+    public void setUpElementForMQTT() {
+        //TODO: sciagnij status elementu
+        assert !StringUtils.isEmpty(getMQTTSubscribeTopic());
+        ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getMQTTSubscribeTopic(), this);
     }
 }

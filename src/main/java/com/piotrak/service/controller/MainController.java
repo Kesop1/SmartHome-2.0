@@ -15,6 +15,7 @@ public class MainController extends AbstractController {
 
     @GetMapping({"/", "/home", "/main"})
     public ModelAndView main() {
+        //TODO: logger
         ModelAndView model = super.getModelAndView();
         model.setViewName("main");
         return model;

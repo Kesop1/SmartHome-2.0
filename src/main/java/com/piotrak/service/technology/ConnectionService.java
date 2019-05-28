@@ -6,6 +6,26 @@ public abstract class ConnectionService {
 
     public ConnectionService(Connection connection) {
         this.connection = connection;
+        connect();
+    }
+
+    protected Connection getConnection(){
+        return connection;
+    }
+
+    public abstract void actOnConnection(Command command);
+
+    public void checkForCommands(){
+        Command command;
+        do {
+            command = getConnection().getCommandQueue().poll();
+            if (command != null) {
+                sendCommandToElementService(command);
+            }
+        } while (command != null);
+    }
+
+    private void connect(){
         try {
             connection.connect();
         } catch (ConnectionException e) {
@@ -13,13 +33,5 @@ public abstract class ConnectionService {
         }
     }
 
-    public Connection getConnection(){
-        return connection;
-    }
-
-    public abstract void actOnCommand(Command command);
-
-    public Command checkForCommand(){
-        return getConnection().getCommandQueue().poll();
-    }
+    public abstract void sendCommandToElementService(Command command);
 }
