@@ -2,7 +2,7 @@ package com.piotrak.service.controller;
 
 import com.piotrak.service.element.Element;
 import com.piotrak.service.service.ElementService;
-import com.piotrak.service.technology.gui.GuiCommand;
+import com.piotrak.service.technology.gui.WebCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -21,7 +21,7 @@ public abstract class AbstractController {
         return model;
     }
 
-    GuiCommand getCommand(String cmd) {
-        return new GuiCommand(cmd);
+    WebCommand getCommand(String cmd) {
+        return new WebCommand(cmd);
     }
 }

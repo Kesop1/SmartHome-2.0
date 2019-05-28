@@ -2,9 +2,9 @@ package com.piotrak.service.technology.gui;
 
 import com.piotrak.service.technology.Command;
 
-public class GuiCommand extends Command {
+public class WebCommand extends Command {
 
-    public GuiCommand(String value) {
+    public WebCommand(String value) {
         super(value);
     }
 }
