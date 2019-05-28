@@ -4,7 +4,7 @@ import com.piotrak.service.element.Element;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.Communication;
 import com.piotrak.service.technology.ConnectionService;
-import com.piotrak.service.technology.gui.WebCommand;
+import com.piotrak.service.technology.web.WebCommand;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 

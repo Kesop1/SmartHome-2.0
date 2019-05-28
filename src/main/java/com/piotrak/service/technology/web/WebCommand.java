@@ -1,4 +1,4 @@
-package com.piotrak.service.technology.gui;
+package com.piotrak.service.technology.web;
 
 import com.piotrak.service.technology.Command;
 
