@@ -13,4 +13,6 @@ public abstract class Command {
     public String getValue() {
         return value;
     }
+
+    public abstract String toString();
 }

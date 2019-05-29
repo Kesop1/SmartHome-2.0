@@ -7,4 +7,11 @@ public class WebCommand extends Command {
     public WebCommand(String value) {
         super(value);
     }
+
+    @Override
+    public String toString() {
+        return "WebCommand{" +
+            "value='" + getValue() + '\'' +
+            '}';
+    }
 }

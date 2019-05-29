@@ -1,6 +1,11 @@
 package com.piotrak.service.technology;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public abstract class ConnectionService {
+
+    private Logger LOGGER = Logger.getLogger("ConnectionService");
 
     private Connection connection;
 
@@ -29,7 +34,7 @@ public abstract class ConnectionService {
         try {
             connection.connect();
         } catch (ConnectionException e) {
-            e.printStackTrace();//TODO: obsluga wyjatku
+            LOGGER.log(Level.SEVERE, "Unable to connect to " + connection, e);
         }
     }
 

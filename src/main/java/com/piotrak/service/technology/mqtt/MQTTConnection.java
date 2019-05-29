@@ -9,9 +9,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Component("mqttConnection")
 public class MQTTConnection extends Connection {
+
+    private Logger LOGGER = Logger.getLogger("MQTTConnection");
 
     @Value("${connection.mqtt.host}")
     private String host;
@@ -28,7 +32,7 @@ public class MQTTConnection extends Connection {
 
     @Override
     public void connect() throws ConnectionException {
-        System.out.println("Connect");//TODO
+        LOGGER.log(Level.INFO, "Connecting");
         String uri = protocol + "://" + host + ":" + port;
         try {
             mqttClient = new MqttClient(uri, MqttClient.generateClientId(), new MemoryPersistence());
@@ -50,17 +54,19 @@ public class MQTTConnection extends Connection {
 
     @Override
     public void disconnect() {
+        LOGGER.log(Level.INFO, "Disconnecting");
         if (isConnected()) {
             try {
                 mqttClient.disconnect();
             } catch (MqttException e) {
-//                LOGGER.error("Exception occurred while disconnecting MQTTModuleConnection", e);//TODO
+                LOGGER.log(Level.WARNING, "Exception occurred while disconnecting", e);
             }
         }
     }
     
     @Override
     public void send(Command command) throws ConnectionException {
+        LOGGER.log(Level.INFO, "Sending command: " + command);
         if(!(command instanceof MQTTCommand)){
             throw new ConnectionException("Unable to send command through MQTTConnection");
         }
@@ -69,7 +75,7 @@ public class MQTTConnection extends Connection {
         try {
             mqttTopic.publish(new MqttMessage(mqttCommand.getValue().getBytes()));
         } catch (MqttException e) {
-//            LOGGER.error("Error occurred while publishing MQTT command", e);//TODO
+            throw new ConnectionException("Error occurred while publishing MQTT command", e);
         }
     }
     
@@ -84,7 +90,7 @@ public class MQTTConnection extends Connection {
         try {
             mqttClient.subscribe(topic);
         } catch (MqttException e) {
-//            LOGGER.error("Error while subscribing to topic " + topic, e);//TODO
+            LOGGER.log(Level.WARNING, "Unable to subscribe to topic " + topic, e);
         }
     }
 
@@ -94,29 +100,30 @@ public class MQTTConnection extends Connection {
 
                 @Override
                 public void connectionLost(Throwable throwable) {
+                    LOGGER.log(Level.SEVERE, "Connection lost! Retrying", throwable);
                     if(!isConnected()){
                         try {
                             connect();
                         } catch (ConnectionException e) {
-                            e.printStackTrace();//TODO
+                            LOGGER.log(Level.SEVERE, "Unable to connect", e);
                         }
                     }
                     if(!isConnected()){
-//                        LOGGER.error("MQTTClient got disconnected", throwable);//TODO
+                        LOGGER.log(Level.WARNING, "Unable to reconnect, connection disabled");
                     }
                 }
 
                 @Override
                 public void messageArrived(String topic, MqttMessage mqttMessage) {
                     String message = new String(mqttMessage.getPayload());
-//                    LOGGER.info("MQTTMessage received in topic " + s + ": " + message);
                     MQTTCommand command = new MQTTCommand(topic, message);
+                    LOGGER.log(Level.INFO, "Command received: " + command);
                     getCommandQueue().add(command);
                 }
 
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-//                    LOGGER.info("MQTTMessage successfully sent");//TODO
+                    LOGGER.log(Level.FINE, "Message successfully sent: " + iMqttDeliveryToken);
                 }
             });
         }

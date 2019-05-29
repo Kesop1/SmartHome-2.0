@@ -1,7 +1,7 @@
 package com.piotrak.service.controller;
 
 import com.piotrak.service.element.Element;
-import com.piotrak.service.service.ElementService;
+import com.piotrak.service.elementservice.ElementService;
 import com.piotrak.service.technology.web.WebCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;

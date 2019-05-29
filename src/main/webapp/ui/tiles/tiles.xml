@@ -12,7 +12,7 @@
         <put-attribute name="footer" value="/ui/jsp/footer.jsp" />
     </definition>
 
-    <definition name="main" extends="template">
+    <definition name="mainView" extends="template">
         <put-attribute name="content" value="/ui/jsp/main.jsp" />
     </definition>
 

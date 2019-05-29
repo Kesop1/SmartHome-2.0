@@ -1,4 +1,4 @@
-package com.piotrak.service.service;
+package com.piotrak.service.elementservice;
 
 import com.piotrak.service.element.SwitchElement;
 import com.piotrak.service.technology.Command;
@@ -10,18 +10,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-@Service("tvElementService")
-public class TvElementService extends ElementService implements MQTTCommunication {
+@Service("amplitunerElementService")
+public class AmplitunerElementService extends ElementService implements MQTTCommunication {
 
-    @Value("${mqtt.topic.subscribe.tv}")
+    private Logger LOGGER = Logger.getLogger("AmplitunerElementService");
+
+    @Value("${mqtt.topic.subscribe.amplituner}")
     private String subscribeTopic;
 
-    @Value("${mqtt.topic.publish.tv}")
+    @Value("${mqtt.topic.publish.amplituner}")
     private String publishTopic;
 
-    public TvElementService(@Autowired SwitchElement tv, @Autowired MQTTConnectionService mqttConnectionService) {
-        super(tv, mqttConnectionService);
+    public AmplitunerElementService(@Autowired SwitchElement amplituner, @Autowired MQTTConnectionService mqttConnectionService) {
+        super(amplituner, mqttConnectionService);
     }
 
     @Override
@@ -39,9 +43,10 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
         getConnectionService().actOnConnection(getMQTTPublishCommand(command));//TODO: mapowanie "ON" na kod pilota
     }
 
-    @PostConstruct//TODO
+    @PostConstruct
     @Override
     public void setUpElementForMQTT() {
+        LOGGER.log(Level.FINE, "Setting up " + getElement().getName() + " for MQTT Connection");
         //TODO: sciagnij status elementu
         assert !StringUtils.isEmpty(getMQTTSubscribeTopic());
         ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getMQTTSubscribeTopic(), this);

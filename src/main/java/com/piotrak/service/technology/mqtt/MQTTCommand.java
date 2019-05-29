@@ -17,4 +17,11 @@ public class MQTTCommand extends Command {
         return topic;
     }
 
+    @Override
+    public String toString() {
+        return "MQTTCommand{" +
+                "value='" + getValue() + "\', " +
+                "topic='" + topic + '\'' +
+                '}';
+    }
 }
