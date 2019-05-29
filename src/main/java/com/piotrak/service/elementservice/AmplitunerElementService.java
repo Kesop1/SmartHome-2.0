@@ -39,8 +39,8 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
     }
 
     @Override
-    protected void actOnConnection(Command command) {
-        getConnectionService().actOnConnection(getMQTTPublishCommand(command));//TODO: mapowanie "ON" na kod pilota
+    protected Command translateCommand(Command command) {
+        return getMQTTPublishCommand(command);
     }
 
     @PostConstruct

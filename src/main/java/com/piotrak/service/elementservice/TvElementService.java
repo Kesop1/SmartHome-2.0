@@ -2,6 +2,7 @@ package com.piotrak.service.elementservice;
 
 import com.piotrak.service.element.SwitchElement;
 import com.piotrak.service.technology.Command;
+import com.piotrak.service.technology.mqtt.MQTTCommand;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
 import com.piotrak.service.technology.mqtt.MQTTConnectionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +40,8 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
     }
 
     @Override
-    protected void actOnConnection(Command command) {
-        getConnectionService().actOnConnection(getMQTTPublishCommand(command));//TODO: mapowanie "ON" na kod pilota
+    protected MQTTCommand translateCommand(Command command) {
+        return getMQTTPublishCommand(command);
     }
 
     @PostConstruct//TODO

@@ -38,13 +38,13 @@ public abstract class ElementService implements Communication {
         try {
             getElement().actOnCommand(command);
             if(command instanceof WebCommand) {
-                actOnConnection(command);
+                getConnectionService().actOnConnection(translateCommand(command));
             }
         } catch (OperationNotSupportedException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
         }
     }
 
-    protected abstract void actOnConnection(Command command);
+    protected abstract Command translateCommand(Command command);
 
 }
