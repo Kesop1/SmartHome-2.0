@@ -13,5 +13,8 @@
                 <label for="switch_element">${name}</label>
             </form>
         </c:if>
+        <c:if test="${entry.value['class'].name eq 'com.piotrak.service.element.HorizontalSeparatorElement'}">
+            <hr>
+        </c:if>
     </div>
 </c:forEach>

@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Configuration
@@ -16,7 +16,7 @@ public class ElementsConfiguration {
 
     @Bean
     public Map<String, Map<String, Element>> elementsMap(){
-        Map<String, Map<String, Element>> elementsMap = new HashMap<>();
+        Map<String, Map<String, Element>> elementsMap = new LinkedHashMap<>();
         elementsMap.put("thingsMap", thingsMap);
         return elementsMap;
     }
