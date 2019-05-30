@@ -10,7 +10,7 @@
                     <c:if test="${entry.value.on eq true}"><button type="submit" class="switch on"> </button></c:if>
                     <c:if test="${entry.value.on eq false}"><button type="submit" class="switch off"> </button></c:if>
                 </label>
-                <label for="switch_element">${name}</label>
+                <label for="switch_element">${entry.value.displayName}</label>
             </form>
         </c:if>
         <c:if test="${entry.value['class'].name eq 'com.piotrak.service.element.HorizontalSeparatorElement'}">

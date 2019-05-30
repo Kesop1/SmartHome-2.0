@@ -3,7 +3,7 @@ package com.piotrak.service.element;
 import com.piotrak.service.technology.Command;
 
 import javax.naming.OperationNotSupportedException;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,8 +13,12 @@ public class SwitchElement extends Element {
     
     private boolean on = false;
 
-    public SwitchElement(@NotNull String name) {
+    public SwitchElement(@NotBlank String name) {
         super(name);
+    }
+
+    public SwitchElement(@NotBlank String name, String displayName) {
+        super(name, displayName);
     }
 
     public boolean isOn() {
