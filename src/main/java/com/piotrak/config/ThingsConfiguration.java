@@ -17,7 +17,12 @@ public class ThingsConfiguration {
         Map<String, Element> thingsMap = new LinkedHashMap<>();
         thingsMap.put(tv().getName(), tv());
         thingsMap.put(amplituner().getName(), amplituner());
+        thingsMap.put(speakers().getName(), speakers());
+        thingsMap.put(ps3().getName(), ps3());
         thingsMap.put(horizontalSeparator().getName(), horizontalSeparator());
+        thingsMap.put(pc().getName(), pc());
+        thingsMap.put(pcScreen().getName(), pcScreen());
+        thingsMap.put(pcSpeakers().getName(), pcSpeakers());
         return thingsMap;
     }
 
@@ -32,8 +37,33 @@ public class ThingsConfiguration {
     }
 
     @Bean
+    public SwitchElement ps3(){
+        return new SwitchElement("PS3");
+    }
+
+    @Bean
+    public SwitchElement speakers(){
+        return new SwitchElement("Speakers", "Głośniki");
+    }
+
+    @Bean
+    public SwitchElement pc(){
+        return new SwitchElement("PC");
+    }
+
+    @Bean
+    public SwitchElement pcScreen(){
+        return new SwitchElement("PCScreen", "Monitor");
+    }
+
+    @Bean
+    public SwitchElement pcSpeakers(){
+        return new SwitchElement("PCSpeakers", "Głośniki PC");
+    }
+
+    @Bean
     public HorizontalSeparatorElement horizontalSeparator() {
-        return new HorizontalSeparatorElement("");
+        return new HorizontalSeparatorElement("Line");
     }
     
 }

@@ -1,8 +1,8 @@
 package com.piotrak.service.controller.element;
 
 import com.piotrak.service.controller.SwitchController;
-import com.piotrak.service.elementservice.AmplitunerElementService;
 import com.piotrak.service.elementservice.ElementService;
+import com.piotrak.service.elementservice.PCElementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,20 +14,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping("/amplituner")
-public class AmplitunerController extends SwitchController {
+@RequestMapping("/pc")
+public class PCController extends SwitchController {
 
-    private Logger LOGGER = Logger.getLogger("AmplitunerController");
+    private Logger LOGGER = Logger.getLogger("PCController");
 
-    private AmplitunerElementService amplitunerElementService;
+    private PCElementService pcElementService;
 
-    public AmplitunerController(@Autowired AmplitunerElementService amplitunerElementService) {
-        this.amplitunerElementService = amplitunerElementService;
+    public PCController(@Autowired PCElementService pcElementService) {
+        this.pcElementService = pcElementService;
     }
 
     @Override
     protected ElementService getService() {
-        return amplitunerElementService;
+        return pcElementService;
     }
 
     @Override
