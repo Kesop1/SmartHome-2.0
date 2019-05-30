@@ -55,15 +55,10 @@ public class MQTTConnectionServiceTests {
         assertTrue(mqttConnection.isConnected());
         String topic = env.getProperty("mqtt.topic.subscribe.tv");
         String value = "ON";
-
-        //removing retained message
         MqttTopic mqttTopic = mqttConnection.getMqttClient().getTopic(topic);
-        MqttMessage message = new MqttMessage();
-        message.setRetained(true);
-        mqttTopic.publish(message);
 
         //new retained message
-        message = new MqttMessage(value.getBytes());
+        MqttMessage message = new MqttMessage(value.getBytes());
         message.setRetained(true);
         mqttTopic.publish(message);
 
@@ -79,25 +74,39 @@ public class MQTTConnectionServiceTests {
         Command command = mqttConnection.getCommandQueue().element();
         assertNotNull(command);
         assertEquals(command.getValue(), value);
+
+        //removing retained message
+        mqttTopic = mqttConnection.getMqttClient().getTopic(topic);
+        message = new MqttMessage();
+        message.setRetained(true);
+        mqttTopic.publish(message);
     }
 
     @Test
-    public void checkIfElementIsGettingSubscribedTest(){
+    public void commandFromSubscribedTopic() throws InterruptedException, MqttException {
+        assertTrue(mqttConnection.isConnected());
+        String topic = env.getProperty("mqtt.topic.subscribe.tv");
+        String value = "OFF";
+        mqttConnection.subscribe(topic);
+        MqttTopic mqttTopic = mqttConnection.getMqttClient().getTopic(topic);
+        MqttMessage message = new MqttMessage(value.getBytes());
+        mqttTopic.publish(message);
 
+        Thread.sleep(2000);
+        Command command = mqttConnection.getCommandQueue().element();
+        assertNotNull(command);
+        assertEquals(command.getValue(), value);
     }
 
     @Test
-    public void commandFromUnsubscribedTopic(){
+    public void publishCommandTest() throws MqttException {
+        assertTrue(mqttConnection.isConnected());
+        String topic = env.getProperty("mqtt.topic.publish.tv");
+        String value = "ON";
 
-    }
-
-    @Test
-    public void commandFromSubscribedTopic(){
-
-    }
-
-    @Test
-    public void publishCommandTest(){
-
+        //removing retained message
+        MqttTopic mqttTopic = mqttConnection.getMqttClient().getTopic(topic);
+        MqttMessage message = new MqttMessage("OFF".getBytes());
+        mqttTopic.publish(message);
     }
 }
