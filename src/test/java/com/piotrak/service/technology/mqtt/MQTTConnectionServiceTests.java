@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = MQTTConnection.class)
-@TestPropertySource(locations = {"/MQTTConnectionServiceTests.properties"})
+@TestPropertySource
 public class MQTTConnectionServiceTests {
 
     @Autowired
@@ -80,6 +80,7 @@ public class MQTTConnectionServiceTests {
         message = new MqttMessage();
         message.setRetained(true);
         mqttTopic.publish(message);
+        mqttConnection.getCommandQueue().clear();
     }
 
     @Test
@@ -96,6 +97,7 @@ public class MQTTConnectionServiceTests {
         Command command = mqttConnection.getCommandQueue().element();
         assertNotNull(command);
         assertEquals(command.getValue(), value);
+        mqttConnection.getCommandQueue().clear();
     }
 
     @Test
