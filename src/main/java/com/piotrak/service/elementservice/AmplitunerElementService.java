@@ -47,7 +47,7 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
     @Override
     public void setUpElementForMQTT() {
         LOGGER.log(Level.FINE, "Setting up " + getElement().getName() + " for MQTT Connection");
-        //TODO: sciagnij status elementu
+        //TODO: sciagnij status elementu - gdy w temacie .../status znajdzie sie wiadomość z arduino z flagą retained, przy subskrybcji do tematu zostanie ona od razu sciągnięta
         assert !StringUtils.isEmpty(getMQTTSubscribeTopic());
         ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getMQTTSubscribeTopic(), this);
     }

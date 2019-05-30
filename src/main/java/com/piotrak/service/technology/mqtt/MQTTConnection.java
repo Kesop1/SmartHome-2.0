@@ -128,4 +128,8 @@ public class MQTTConnection extends Connection {
             });
         }
     }
+
+    public MqttClient getMqttClient() {
+        return mqttClient;
+    }
 }
