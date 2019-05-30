@@ -1,7 +1,7 @@
 package com.piotrak.service.controller;
 
 import com.piotrak.service.elementservice.ElementService;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -13,8 +13,8 @@ public class MainController extends AbstractController {
         return null;
     }
 
-    @GetMapping({"/", "/home", "/main"})
-    public ModelAndView main() {
+    @RequestMapping({"/", "/home", "/main"})
+    public ModelAndView mainGet() {
         ModelAndView model = super.getModelAndView();
         model.setViewName("mainView");
         return model;
