@@ -1,5 +1,6 @@
 package com.piotrak.service.element;
 
+import com.piotrak.service.action.Switchable;
 import com.piotrak.service.technology.Command;
 
 import javax.naming.OperationNotSupportedException;
@@ -7,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SwitchElement extends Element {
+public class SwitchElement extends Element implements Switchable {
 
     private Logger LOGGER = Logger.getLogger("SwitchElement");
     
@@ -32,10 +33,6 @@ public class SwitchElement extends Element {
 
     @Override
     public void actOnCommand(Command command) throws OperationNotSupportedException {
-        String cmd = command.getValue();
-        if(!"ON".equalsIgnoreCase(cmd) && !"OFF".equalsIgnoreCase(cmd)){
-            throw new OperationNotSupportedException("Invalid command: '" + cmd + "' sent for the SwitchElement: " + getName());
-        }
-        setOn("ON".equalsIgnoreCase(cmd));
+        switchElement(this, command.getValue());
     }
 }

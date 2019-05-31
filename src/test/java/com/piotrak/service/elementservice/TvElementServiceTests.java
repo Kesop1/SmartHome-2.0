@@ -27,7 +27,7 @@ public class TvElementServiceTests {
 
     @Test
     public void MQTTCommandReceivedTest() throws OperationNotSupportedException {
-        MQTTCommand mqttCommand = new MQTTCommand("aa", "aa");
+        MQTTCommand mqttCommand = new MQTTCommand("aa", "ON");
         SwitchElement tv = mock(SwitchElement.class);
         MQTTConnectionService mqttConnectionService = mock(MQTTConnectionService.class);
         TvElementService tvElementService = new TvElementService(tv, mqttConnectionService);
