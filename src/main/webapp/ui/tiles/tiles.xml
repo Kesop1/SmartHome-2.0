@@ -16,4 +16,7 @@
         <put-attribute name="content" value="/ui/jsp/main.jsp" />
     </definition>
 
+    <definition name="loginView" template="/ui/jsp/login.jsp">
+    </definition>
+
 </tiles-definitions>
