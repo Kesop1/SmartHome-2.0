@@ -5,7 +5,7 @@ import com.piotrak.service.technology.Connection;
 import com.piotrak.service.technology.ConnectionException;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -13,18 +13,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Component("mqttConnection")
+@ConfigurationProperties("mqtt")
 public class MQTTConnection extends Connection {
 
     private Logger LOGGER = Logger.getLogger("MQTTConnection");
 
-    @Value("${connection.mqtt.host}")
-    private String host;
+    private String host = "0.0.0.0";
     
-    @Value("${connection.mqtt.port}")
-    private String port;
+    private String port = "0";
     
-    @Value("${connection.mqtt.protocol}")
-    private String protocol;
+    private String protocol = "";
 
     private MqttClient mqttClient;
 
@@ -32,8 +30,8 @@ public class MQTTConnection extends Connection {
 
     @Override
     public void connect() throws ConnectionException {
-        LOGGER.log(Level.INFO, "Connecting");
         String uri = protocol + "://" + host + ":" + port;
+        LOGGER.log(Level.INFO, "Connecting to " + uri);
         try {
             mqttClient = new MqttClient(uri, MqttClient.generateClientId(), new MemoryPersistence());
             setCallback();
@@ -131,5 +129,29 @@ public class MQTTConnection extends Connection {
 
     public MqttClient getMqttClient() {
         return mqttClient;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 }

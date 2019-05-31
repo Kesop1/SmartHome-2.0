@@ -5,7 +5,7 @@ import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
 import com.piotrak.service.technology.mqtt.MQTTConnectionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -14,28 +14,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Service("deskElementService")
+@ConfigurationProperties("desk")
 public class DeskElementService extends ElementService implements MQTTCommunication {
 
     private Logger LOGGER = Logger.getLogger("DeskElementService");
 
-    @Value("${mqtt.topic.subscribe.desk}")
-    private String subscribeTopic;
+    private String subscribeTopic = "default/status";
 
-    @Value("${mqtt.topic.publish.desk}")
-    private String publishTopic;
+    private String publishTopic = "default";
 
     public DeskElementService(@Autowired SwitchElement desk, @Autowired MQTTConnectionService mqttConnectionService) {
         super(desk, mqttConnectionService);
-    }
-
-    @Override
-    public String getMQTTPublishTopic() {
-        return publishTopic;
-    }
-
-    @Override
-    public String getMQTTSubscribeTopic() {
-        return subscribeTopic;
     }
 
     @Override
@@ -47,7 +36,23 @@ public class DeskElementService extends ElementService implements MQTTCommunicat
     @Override
     public void setUpElementForMQTT() {
         LOGGER.log(Level.FINE, "Setting up " + getElement().getName() + " for MQTT Connection");
-        assert !StringUtils.isEmpty(getMQTTSubscribeTopic());
-        ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getMQTTSubscribeTopic(), this);
+        assert !StringUtils.isEmpty(getSubscribeTopic());
+        ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getSubscribeTopic(), this);
+    }
+
+    public String getSubscribeTopic() {
+        return subscribeTopic;
+    }
+
+    public void setSubscribeTopic(String subscribeTopic) {
+        this.subscribeTopic = subscribeTopic;
+    }
+
+    public String getPublishTopic() {
+        return publishTopic;
+    }
+
+    public void setPublishTopic(String publishTopic) {
+        this.publishTopic = publishTopic;
     }
 }

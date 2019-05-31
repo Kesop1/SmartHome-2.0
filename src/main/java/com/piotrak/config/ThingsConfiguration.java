@@ -3,6 +3,7 @@ package com.piotrak.config;
 import com.piotrak.service.element.Element;
 import com.piotrak.service.element.HorizontalSeparatorElement;
 import com.piotrak.service.element.SwitchElement;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Configuration
+@EnableConfigurationProperties()
 public class ThingsConfiguration {
 
     @Bean

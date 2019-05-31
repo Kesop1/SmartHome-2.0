@@ -9,7 +9,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-@PropertySource("file:/usr/local/tomcat/webapps/application.properties")
+
+@PropertySource(value = {"classpath:application.properties",
+		"file:/usr/local/tomcat/webapps/application.properties"}, ignoreResourceNotFound = true)
 public class Application extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {

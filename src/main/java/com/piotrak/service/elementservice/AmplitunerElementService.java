@@ -5,7 +5,7 @@ import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
 import com.piotrak.service.technology.mqtt.MQTTConnectionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -14,28 +14,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Service("amplitunerElementService")
+@ConfigurationProperties("amplituner")
 public class AmplitunerElementService extends ElementService implements MQTTCommunication {
 
     private Logger LOGGER = Logger.getLogger("AmplitunerElementService");
 
-    @Value("${mqtt.topic.subscribe.amplituner}")
-    private String subscribeTopic;
+    private String subscribeTopic = "default/status";
 
-    @Value("${mqtt.topic.publish.amplituner}")
-    private String publishTopic;
+    private String publishTopic = "default";
 
     public AmplitunerElementService(@Autowired SwitchElement amplituner, @Autowired MQTTConnectionService mqttConnectionService) {
         super(amplituner, mqttConnectionService);
-    }
-
-    @Override
-    public String getMQTTPublishTopic() {
-        return publishTopic;
-    }
-
-    @Override
-    public String getMQTTSubscribeTopic() {
-        return subscribeTopic;
     }
 
     @Override
@@ -47,8 +36,23 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
     @Override
     public void setUpElementForMQTT() {
         LOGGER.log(Level.FINE, "Setting up " + getElement().getName() + " for MQTT Connection");
-        //TODO: sciagnij status elementu - gdy w temacie .../status znajdzie sie wiadomość z arduino z flagą retained, przy subskrybcji do tematu zostanie ona od razu sciągnięta
-        assert !StringUtils.isEmpty(getMQTTSubscribeTopic());
-        ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getMQTTSubscribeTopic(), this);
+        assert !StringUtils.isEmpty(getSubscribeTopic());
+        ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getSubscribeTopic(), this);
+    }
+
+    public String getSubscribeTopic() {
+        return subscribeTopic;
+    }
+
+    public void setSubscribeTopic(String subscribeTopic) {
+        this.subscribeTopic = subscribeTopic;
+    }
+
+    public String getPublishTopic() {
+        return publishTopic;
+    }
+
+    public void setPublishTopic(String publishTopic) {
+        this.publishTopic = publishTopic;
     }
 }

@@ -7,14 +7,14 @@ import javax.annotation.PostConstruct;
 
 public interface MQTTCommunication extends Communication {
 
-    String getMQTTPublishTopic();
+    String getPublishTopic();
 
-    String getMQTTSubscribeTopic();
+    String getSubscribeTopic();
 
     @PostConstruct
     void setUpElementForMQTT();
 
     default MQTTCommand getMQTTPublishCommand(Command command){
-        return new MQTTCommand(getMQTTPublishTopic(), command.getValue());//TODO: mapowanie "ON" na kod pilota
+        return new MQTTCommand(getPublishTopic(), command.getValue());//TODO: mapowanie "ON" na kod pilota
     }
 }

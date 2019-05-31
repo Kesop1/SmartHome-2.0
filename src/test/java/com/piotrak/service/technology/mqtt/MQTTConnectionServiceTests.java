@@ -22,6 +22,16 @@ import static org.junit.Assert.*;
 @TestPropertySource
 public class MQTTConnectionServiceTests {
 
+    private static String SUBSCRIBE_TOPIC = "tv.subscribeTopic";
+
+    private static String PUBLISH_TOPIC = "tv.publishTopic";
+
+    private static String HOST = "mqtt.host";
+
+    private static String PORT = "mqtt.port";
+
+    private static String PROTOCOL = "mqtt.protocol";
+
     @Autowired
     private MQTTConnection mqttConnection;
 
@@ -30,6 +40,9 @@ public class MQTTConnectionServiceTests {
 
     @Before
     public void connect() throws ConnectionException {
+        mqttConnection.setHost(env.getProperty(HOST));
+        mqttConnection.setPort(env.getProperty(PORT));
+        mqttConnection.setProtocol(env.getProperty(PROTOCOL));
         mqttConnection.connect();
     }
 
@@ -53,7 +66,7 @@ public class MQTTConnectionServiceTests {
     @Test
     public void getInitialElementStateTest() throws ConnectionException, MqttException, InterruptedException {
         assertTrue(mqttConnection.isConnected());
-        String topic = env.getProperty("mqtt.topic.subscribe.tv");
+        String topic = env.getProperty(SUBSCRIBE_TOPIC);
         String value = "ON";
         MqttTopic mqttTopic = mqttConnection.getMqttClient().getTopic(topic);
 
@@ -67,7 +80,7 @@ public class MQTTConnectionServiceTests {
         assertFalse(mqttConnection.isConnected());
 
         //check if after reconnecting the message arrives
-        mqttConnection.connect();
+        connect();
         assertTrue(mqttConnection.isConnected());
         mqttConnection.subscribe(topic);
         Thread.sleep(2000);
@@ -86,7 +99,7 @@ public class MQTTConnectionServiceTests {
     @Test
     public void commandFromSubscribedTopic() throws InterruptedException, MqttException {
         assertTrue(mqttConnection.isConnected());
-        String topic = env.getProperty("mqtt.topic.subscribe.tv");
+        String topic = env.getProperty(SUBSCRIBE_TOPIC);
         String value = "OFF";
         mqttConnection.subscribe(topic);
         MqttTopic mqttTopic = mqttConnection.getMqttClient().getTopic(topic);
@@ -103,7 +116,7 @@ public class MQTTConnectionServiceTests {
     @Test
     public void publishCommandTest() throws MqttException {
         assertTrue(mqttConnection.isConnected());
-        String topic = env.getProperty("mqtt.topic.publish.tv");
+        String topic = env.getProperty(PUBLISH_TOPIC);
         String value = "ON";
 
         //removing retained message
