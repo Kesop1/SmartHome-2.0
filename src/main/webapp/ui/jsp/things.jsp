@@ -16,5 +16,6 @@
         <c:if test="${entry['class'].name eq 'com.piotrak.service.element.HorizontalSeparatorElement'}">
             <hr>
         </c:if>
+<%--        TODO: SchemaElement--%>
     </div>
 </c:forEach>

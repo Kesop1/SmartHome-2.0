@@ -7,7 +7,7 @@ import org.springframework.web.servlet.view.tiles3.TilesConfigurer;
 import org.springframework.web.servlet.view.tiles3.TilesView;
 
 @Configuration
-public class WebAppConfig {
+public class WebAppConfig {//TODO: Spring security
     
     @Bean
     public UrlBasedViewResolver viewResolver() {

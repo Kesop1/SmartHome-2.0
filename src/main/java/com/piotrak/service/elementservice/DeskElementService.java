@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 @Service("deskElementService")
 @ConfigurationProperties("desk")
-public class DeskElementService extends ElementService implements MQTTCommunication {
+public class DeskElementService extends ElementService implements MQTTCommunication {//TODO: odpowiednia wysokość biurka
 
     private Logger LOGGER = Logger.getLogger("DeskElementService");
 
