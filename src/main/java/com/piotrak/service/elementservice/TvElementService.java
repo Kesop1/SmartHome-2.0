@@ -80,22 +80,26 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
 
     private void handleOnCommand(Command command) {
         getConnectionService().actOnConnection(translateCommand(command));
-        try {
-            Thread.sleep(1000);
-            handleIrCommand(command);
-        } catch (InterruptedException e) {
-            LOGGER.log(Level.WARNING, e.getMessage());
-        }
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+                handleIrCommand(command);
+            } catch (InterruptedException e) {
+                LOGGER.log(Level.WARNING, e.getMessage());
+            }
+        }).start();
     }
 
     private void handleOffCommand(Command command) {
         handleIrCommand(command);
-        try {
-            Thread.sleep(1000);
-            getConnectionService().actOnConnection(translateCommand(command));
-        } catch (InterruptedException e) {
-            LOGGER.log(Level.WARNING, e.getMessage());
-        }
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+                getConnectionService().actOnConnection(translateCommand(command));
+            } catch (InterruptedException e) {
+                LOGGER.log(Level.WARNING, e.getMessage());
+            }
+        }).start();
     }
 
     private void handleIrCommand(Command command) {

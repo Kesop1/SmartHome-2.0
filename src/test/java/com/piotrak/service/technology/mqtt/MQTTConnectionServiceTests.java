@@ -119,9 +119,8 @@ public class MQTTConnectionServiceTests {
         String topic = env.getProperty(PUBLISH_TOPIC);
         String value = "ON";
 
-        //removing retained message
         MqttTopic mqttTopic = mqttConnection.getMqttClient().getTopic(topic);
-        MqttMessage message = new MqttMessage("OFF".getBytes());
+        MqttMessage message = new MqttMessage(value.getBytes());
         mqttTopic.publish(message);
     }
 }
