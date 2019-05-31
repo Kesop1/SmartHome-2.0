@@ -19,10 +19,12 @@ public class ThingsConfiguration {
         thingsMap.put(amplituner().getName(), amplituner());
         thingsMap.put(speakers().getName(), speakers());
         thingsMap.put(ps3().getName(), ps3());
+        thingsMap.put(vacuum().getName(), vacuum());
         thingsMap.put(horizontalSeparator().getName(), horizontalSeparator());
         thingsMap.put(pc().getName(), pc());
         thingsMap.put(pcScreen().getName(), pcScreen());
         thingsMap.put(pcSpeakers().getName(), pcSpeakers());
+        thingsMap.put(desk().getName(), desk());
         return thingsMap;
     }
 
@@ -44,6 +46,16 @@ public class ThingsConfiguration {
     @Bean
     public SwitchElement speakers(){
         return new SwitchElement("Speakers", "Głośniki");
+    }
+
+    @Bean
+    public SwitchElement vacuum(){
+        return new SwitchElement("Vacuum", "Odkurzacz");
+    }
+
+    @Bean
+    public SwitchElement desk(){
+        return new SwitchElement("Desk", "Biurko");
     }
 
     @Bean
