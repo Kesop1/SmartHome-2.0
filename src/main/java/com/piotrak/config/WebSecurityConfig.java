@@ -32,7 +32,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .loginPage("/login")
                 .loginProcessingUrl("/perform_login")
-                .defaultSuccessUrl("/main", true);
+                .defaultSuccessUrl("/main", true)
+                .and()
+                .rememberMe().key("uniqueAndSecret");
                 //.failureUrl("/login.html?error=true")
 //                .failureHandler(authenticationFailureHandler())
 //                .and()
