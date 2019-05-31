@@ -1,6 +1,5 @@
 package com.piotrak.service.controller;
 
-import com.piotrak.service.controller.MainController;
 import com.piotrak.service.element.Element;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -23,7 +23,7 @@ public class MainControllerTests {
     private MockMvc mockMvc;
 
     @MockBean
-    private Map<String, Map<String, Element>> elementsMap;
+    private Map<String, List<Element>> elementsMap;
 
     @Test
     public void emptyPathTest() throws Exception {

@@ -6,6 +6,7 @@ import com.piotrak.service.technology.web.WebCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractController {
@@ -13,7 +14,7 @@ public abstract class AbstractController {
     protected abstract ElementService getService();
 
     @Autowired
-    private Map<String, Map<String, Element>> elementsMap;
+    private Map<String, List<Element>> elementsMap;
 
     ModelAndView getModelAndView(){
         ModelAndView model = new ModelAndView();

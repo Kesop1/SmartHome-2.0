@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -24,7 +25,7 @@ public class SwitchControllerTests {
     private MockMvc mockMvc;
 
     @MockBean
-    private Map<String, Map<String, Element>> elementsMap;
+    private Map<String, List<Element>> elementsMap;
 
     @MockBean
     private TvElementService tvElementService;

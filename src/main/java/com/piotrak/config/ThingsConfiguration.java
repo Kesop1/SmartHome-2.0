@@ -7,27 +7,27 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 @Configuration
 @EnableConfigurationProperties()
 public class ThingsConfiguration {
 
     @Bean
-    public Map<String, Element> thingsMap(){
-        Map<String, Element> thingsMap = new LinkedHashMap<>();
-        thingsMap.put(tv().getName(), tv());
-        thingsMap.put(amplituner().getName(), amplituner());
-        thingsMap.put(speakers().getName(), speakers());
-        thingsMap.put(ps3().getName(), ps3());
-        thingsMap.put(vacuum().getName(), vacuum());
-        thingsMap.put(horizontalSeparator().getName(), horizontalSeparator());
-        thingsMap.put(pc().getName(), pc());
-        thingsMap.put(pcScreen().getName(), pcScreen());
-        thingsMap.put(pcSpeakers().getName(), pcSpeakers());
-        thingsMap.put(desk().getName(), desk());
-        return thingsMap;
+    public List<Element> thingsList(){
+        List<Element> thingsList = new LinkedList<>();
+        thingsList.add(tv());
+        thingsList.add(amplituner());
+        thingsList.add(speakers());
+        thingsList.add(ps3());
+        thingsList.add(vacuum());
+        thingsList.add(horizontalSeparator());
+        thingsList.add(pc());
+        thingsList.add(pcScreen());
+        thingsList.add(pcSpeakers());
+        thingsList.add(desk());
+        return thingsList;
     }
 
     @Bean
