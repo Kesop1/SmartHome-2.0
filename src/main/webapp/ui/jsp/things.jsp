@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@page pageEncoding="UTF-8"%>
 <jsp:useBean id="elementsMap" scope="request" type="java.util.Map<java.lang.String, java.util.List>"/>
 <c:forEach items="${elementsMap.thingsList}" var="entry">
     <c:set var = "name" value = "${entry.name}"/>

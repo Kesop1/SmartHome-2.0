@@ -1,5 +1,6 @@
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@page pageEncoding="UTF-8"%>
 <html>
 <head>
     <spring:url value="/ui/static/css/main.css" var="mainCss" />
