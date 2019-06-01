@@ -13,4 +13,12 @@ public class LoginController {
         model.setViewName("loginView");
         return model;
     }
+
+    @RequestMapping("/logout")
+    public ModelAndView logout() {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("loginView");
+        return model;
+    }
+
 }

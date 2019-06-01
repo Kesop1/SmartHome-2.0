@@ -1,40 +1,39 @@
 .things {
     float: left;
     width: 50%;
+    height: 600px;
     border: 1px solid darkred;
     position: relative;
-    height: auto;
-
 }
 
 .slot1 {
     float: left;
-    width: 19%;
-    height: 50%;
+    width: 24%;
+    height: 300px;
     border: 1px solid darkcyan;
     position: relative;
 }
 
 .slot2 {
     float: right;
-    width: 19%;
-    height: 50%;
+    width: 24%;
+    height: 300px;
     border: 1px solid darkorange;
     position: relative;
 }
 
 .slot3 {
     float: left;
-    width: 19%;
-    height: 50%;
+    width: 24%;
+    height: 300px;
     border: 1px solid darkkhaki;
     position: relative;
 }
 
 .slot4 {
     float: right;
-    width: 19%;
-    height: 50%;
+    width: 24%;
+    height: 300px;
     border: 1px solid darkviolet;
     position: relative;
 }
