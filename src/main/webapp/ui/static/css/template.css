@@ -8,8 +8,7 @@
 .menu {
     margin-left: 20px;
     float: left;
-    width: 180px;
-    height:600px;
+    width: 10%;
     border: 1px solid darkgreen;
 }
 .content {
@@ -25,7 +24,7 @@
     float: bottom;
     clear: both;
     border: 1px solid darkred;
-    position: absolute;
+    position: relative;
     bottom: 0;
     width: 100%;
 }

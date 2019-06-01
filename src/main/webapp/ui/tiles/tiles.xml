@@ -5,6 +5,9 @@
 
 <tiles-definitions>
 
+    <definition name="loginView" template="/ui/jsp/login.jsp">
+    </definition>
+
     <definition name="template" template="/ui/jsp/template.jsp">
         <put-attribute name="header" value="Main menu" />
         <put-attribute name="menu" value="/ui/jsp/menu.jsp" />
@@ -13,10 +16,15 @@
     </definition>
 
     <definition name="mainView" extends="template">
-        <put-attribute name="content" value="/ui/jsp/main.jsp" />
+        <put-attribute name="content" value="mainViewContent" />
     </definition>
 
-    <definition name="loginView" template="/ui/jsp/login.jsp">
+    <definition name="mainViewContent" template="/ui/jsp/main.jsp">
+        <put-attribute name="things" value="/ui/jsp/things.jsp" />
+        <put-attribute name="slot1" value="/ui/jsp/schemas.jsp" />
+        <put-attribute name="slot2" value="/ui/jsp/radio.jsp" />
+        <put-attribute name="slot3" value="/ui/jsp/weather.jsp" />
+        <put-attribute name="slot4" value="/ui/jsp/calendar.jsp" />
     </definition>
 
 </tiles-definitions>
