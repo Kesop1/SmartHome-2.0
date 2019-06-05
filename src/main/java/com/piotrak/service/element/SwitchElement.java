@@ -33,6 +33,15 @@ public class SwitchElement extends Element implements Switchable {
 
     @Override
     public void actOnCommand(Command command) throws OperationNotSupportedException {
-        switchElement(this, command.getValue());
+        switchElement(command.getValue());
+    }
+
+    @Override
+    public void switchElement(String command) throws OperationNotSupportedException {
+        if ("ON".equalsIgnoreCase(command) || "OFF".equalsIgnoreCase(command)) {
+            setOn("ON".equalsIgnoreCase(command));
+        } else {
+            throw new OperationNotSupportedException("Invalid command: '" + command + "' sent for : " + getName());
+        }
     }
 }

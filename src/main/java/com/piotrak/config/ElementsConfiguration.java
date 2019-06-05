@@ -15,10 +15,14 @@ public class ElementsConfiguration {
     @Autowired
     private List<Element> thingsList;
 
+    @Autowired
+    private List<Element> templatesList;
+
     @Bean
     public Map<String, List<Element>> elementsMap(){
         Map<String, List<Element>> elementsMap = new LinkedHashMap<>();
         elementsMap.put("thingsList", thingsList);
+        elementsMap.put("templatesList", templatesList);
         return elementsMap;
     }
 

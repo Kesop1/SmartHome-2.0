@@ -8,8 +8,8 @@
         <c:if test="${entry['class'].name eq 'com.piotrak.service.element.SwitchElement'}">
             <form action="${pageContext.request.contextPath}/${fn:toLowerCase(name)}?cmd=${entry.on eq true ? "OFF" : "ON"}" method="post">
                 <label id="switch_element">
-                    <c:if test="${entry.on eq true}"><button type="submit" class="switch on"> </button></c:if>
-                    <c:if test="${entry.on eq false}"><button type="submit" class="switch off"> </button></c:if>
+                    <c:if test="${entry.on eq true}"><button type="submit" class="switch switch-on"> </button></c:if>
+                    <c:if test="${entry.on eq false}"><button type="submit" class="switch switch-off"> </button></c:if>
                 </label>
                 <label for="switch_element">${entry.displayName}</label>
             </form>
@@ -17,6 +17,5 @@
         <c:if test="${entry['class'].name eq 'com.piotrak.service.element.HorizontalSeparatorElement'}">
             <hr>
         </c:if>
-<%--        TODO: SchemaElement--%>
     </div>
 </c:forEach>

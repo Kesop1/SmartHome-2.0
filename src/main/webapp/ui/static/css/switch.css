@@ -74,10 +74,10 @@ input:checked + .slider:before {
     cursor: pointer;
 }
 
-.off {
+.switch-off {
     background-color: darkred;
 }
 
-.on {
+.switch-on {
     background-color: darkgreen;
 }
