@@ -27,6 +27,7 @@ public class ThingsConfiguration {
         thingsList.add(pcScreen());
         thingsList.add(pcSpeakers());
         thingsList.add(desk());
+        thingsList.add(laptop());
         return thingsList;
     }
 
@@ -48,6 +49,11 @@ public class ThingsConfiguration {
     @Bean
     public SwitchElement speakers(){
         return new SwitchElement("Speakers", "Głośniki");
+    }
+
+    @Bean
+    public SwitchElement laptop(){
+        return new SwitchElement("Laptop");
     }
 
     @Bean
