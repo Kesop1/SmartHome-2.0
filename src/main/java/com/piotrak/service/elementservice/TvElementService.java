@@ -2,7 +2,6 @@ package com.piotrak.service.elementservice;
 
 import com.piotrak.service.element.SwitchElement;
 import com.piotrak.service.technology.Command;
-import com.piotrak.service.technology.ir.IRCommand;
 import com.piotrak.service.technology.ir.IRCommunication;
 import com.piotrak.service.technology.mqtt.MQTTCommand;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
@@ -29,6 +28,8 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
     private String subscribeTopic = "default/status";
 
     private String publishTopic = "default";
+
+    private String irPublishTopic = "ir/default";
 
     private Map<String, String> irCode = new HashMap<>();
 
@@ -105,8 +106,7 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
     private void handleIrCommand(Command command) {
         String irCode = getIRCodeForCommand(command.getValue().toLowerCase());
         if(irCode != null) {
-            Command irCommand = new IRCommand(irCode);
-            getConnectionService().actOnConnection(translateCommand(irCommand));
+            getConnectionService().actOnConnection(new MQTTCommand(getIrPublishTopic(), irCode));
         }
     }
 
@@ -137,5 +137,13 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
 
     public void setIrCode(Map<String, String> irCode) {
         this.irCode = irCode;
+    }
+
+    public String getIrPublishTopic() {
+        return irPublishTopic;
+    }
+
+    public void setIrPublishTopic(String irPublishTopic) {
+        this.irPublishTopic = irPublishTopic;
     }
 }
