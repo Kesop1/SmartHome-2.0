@@ -2,8 +2,8 @@ package com.piotrak.service.elementservice;
 
 import com.piotrak.service.element.SwitchElement;
 import com.piotrak.service.technology.Command;
-import com.piotrak.service.technology.ir.IRCommand;
 import com.piotrak.service.technology.ir.IRCommunication;
+import com.piotrak.service.technology.mqtt.MQTTCommand;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
 import com.piotrak.service.technology.mqtt.MQTTConnectionService;
 import com.piotrak.service.technology.web.WebCommand;
@@ -28,6 +28,8 @@ public class VacuumElementService extends ElementService implements MQTTCommunic
     private String subscribeTopic = "default/status";
 
     private String publishTopic = "default";
+
+    private String irPublishTopic = "ir/default";
 
     private Map<String, String> irCode = new HashMap<>();
 
@@ -75,8 +77,7 @@ public class VacuumElementService extends ElementService implements MQTTCommunic
 
     private void handleIrCommand(Command command) {
         String irCode = getIRCodeForCommand(command.getValue().toLowerCase());
-        Command irCommand = new IRCommand(irCode);
-        getConnectionService().actOnConnection(translateCommand(irCommand));
+        getConnectionService().actOnConnection(new MQTTCommand(getIrPublishTopic(), irCode));
     }
 
     @Override
@@ -108,5 +109,13 @@ public class VacuumElementService extends ElementService implements MQTTCommunic
 
     public void setIrCode(Map<String, String> irCode) {
         this.irCode = irCode;
+    }
+
+    public String getIrPublishTopic() {
+        return irPublishTopic;
+    }
+
+    public void setIrPublishTopic(String irPublishTopic) {
+        this.irPublishTopic = irPublishTopic;
     }
 }
