@@ -36,7 +36,7 @@ public class TemplatesConfiguration {
     }
 
     @Bean
-    public TemplateElement templateAllOff(){//TODO: autowire wszystkich elementów, w serwisie wywołuj actOnCommand na każdym w mapie
+    public TemplateElement templateAllOff(){
         Map<ElementService, Command> actions = new HashMap<>();
         actions.put(tvElementService, commandOff);
         actions.put(amplitunerElementService, commandOff);
