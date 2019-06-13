@@ -29,13 +29,14 @@ public class MQTTConnection extends Connection {
     private Set<String> subscribeTopics = new HashSet<>();
 
     @Override
-    public void connect() throws ConnectionException {
+    public void connect() throws ConnectionException {//TODO: aplikacja nie wstaje gdy nie można się połączyć z MQTT
         String uri = protocol + "://" + host + ":" + port;
         LOGGER.log(Level.INFO, "Connecting to " + uri);
         try {
             mqttClient = new MqttClient(uri, MqttClient.generateClientId(), new MemoryPersistence());
             setCallback();
             mqttClient.connect();
+            LOGGER.log(Level.INFO, "Connected successfully");
             subscribeTopics.forEach(this::subscribe);
         } catch (MqttException e) {
             throw new ConnectionException(e.getMessage());

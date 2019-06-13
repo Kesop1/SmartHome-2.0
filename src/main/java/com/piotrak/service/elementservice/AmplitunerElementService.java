@@ -50,6 +50,10 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
         ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getSubscribeTopic(), this);
     }
 
+    /**
+     * Act on command, it can be an ON/OFF or a different IR command the device will respond to
+     * @param command received command
+     */
     @Override
     public void commandReceived(Command command) {
         assert command != null;
@@ -58,16 +62,19 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
         try {
             if ("ON".equalsIgnoreCase(cmd) || "OFF".equalsIgnoreCase(cmd)) {
                 handleSwitchCommand(command);
-            } else if (getIRCodeForCommand(cmd) != null) {
-                handleIrCommand(command);
             } else {
-                throw new OperationNotSupportedException("Command not recognized: " + command);
+                handleIrCommand(command);
             }
         } catch (OperationNotSupportedException e){
             LOGGER.log(Level.WARNING, e.getMessage());
         }
     }
 
+    /**
+     * ON or OFF command received
+     * @param command ON or OFF command
+     * @throws OperationNotSupportedException
+     */
     private void handleSwitchCommand(Command command) throws OperationNotSupportedException {
         getElement().actOnCommand(command);
         if(command instanceof WebCommand) {
@@ -79,19 +86,27 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
         }
     }
 
+    /**
+     * turn on the device, first flip on the switch, and then send an IR code
+     * @param command ON command
+     */
     private void handleOnCommand(Command command) {
         getConnectionService().actOnConnection(translateCommand(command));
         new Thread(() -> {
             try {
                 Thread.sleep(1000);
                 handleIrCommand(command);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | OperationNotSupportedException e) {
                 LOGGER.log(Level.WARNING, e.getMessage());
             }
         }).start();
     }
 
-    private void handleOffCommand(Command command) {
+    /**
+     * turn off the device, first send an IR code, and then flip off the switch
+     * @param command OFF command
+     */
+    private void handleOffCommand(Command command) throws OperationNotSupportedException {
         handleIrCommand(command);
         new Thread(() -> {
             try {
@@ -103,12 +118,28 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
         }).start();
     }
 
-    private void handleIrCommand(Command command) {
-        String irCode = getIRCodeForCommand(command.getValue().toLowerCase());
-        if(irCode != null) {
-            getConnectionService().actOnConnection(new MQTTCommand(getIrPublishTopic(), irCode));
+    /**
+     * send out an IR command, command gets translated into an IR code,
+     * if it's to be repeated n times, add a "n_" suffix to it
+     * @param command IR command
+     * @throws OperationNotSupportedException if no IR command was found in the IR codes map for the element
+     */
+    private void handleIrCommand(Command command) throws OperationNotSupportedException{
+        String cmd = command.getValue();
+        int repeat = 1;
+        if(cmd.contains("_")){
+            String[] strings = cmd.split("_");
+            repeat = Integer.parseInt(strings[0]);
+            cmd = strings[1];
+        }
+        String irCode = getIRCodeForCommand(cmd.toLowerCase());
+        if (irCode != null) {
+            getConnectionService().actOnConnection(new MQTTCommand(getIrPublishTopic(), (repeat > 1 ? repeat + "_" : "") + irCode));
+        } else{
+            throw new OperationNotSupportedException("Unable to find an IR code for the command: " + command);
         }
     }
+
 
     @Override
     public Map<String, String> getIRCodesMap() {
