@@ -1,17 +1,14 @@
 .radio-button {
-    border-radius: 34px;
+    border-radius: 18px;
     border: none;
     color: white;
-    padding: 15px 32px;
+    padding: 12px 16px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 16px;
+    font-size: 10px;
     margin: 4px 2px;
     cursor: pointer;
     background-color: darkblue;
-}
-
-.radio-table {
-    padding: 10px;
+    float: left;
 }
