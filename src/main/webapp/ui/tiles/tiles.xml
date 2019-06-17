@@ -5,8 +5,7 @@
 
 <tiles-definitions>
 
-    <definition name="loginView" template="/ui/jsp/login.jsp">
-    </definition>
+    <definition name="loginView" template="/ui/jsp/login.jsp"/>
 
     <definition name="template" template="/ui/jsp/template.jsp">
         <put-attribute name="header" value="Main menu" />
