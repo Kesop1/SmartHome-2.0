@@ -47,4 +47,8 @@ public class Listwa1WeatherSensorElementService extends ElementService implement
     protected Command translateCommand(Command command) {
         return null;//Nothing to do
     }
+    
+    public void setSubscribeTopic(String subscribeTopic) {
+        this.subscribeTopic = subscribeTopic;
+    }
 }
