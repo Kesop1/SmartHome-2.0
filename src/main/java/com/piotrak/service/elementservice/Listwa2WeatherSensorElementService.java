@@ -21,8 +21,8 @@ public class Listwa2WeatherSensorElementService extends ElementService implement
     
     private String subscribeTopic = "default";
     
-    public Listwa2WeatherSensorElementService(@Autowired SensorElement listwaWeatherSensor, @Autowired MQTTConnectionService mqttConnectionService) {
-        super(listwaWeatherSensor, mqttConnectionService);
+    public Listwa2WeatherSensorElementService(@Autowired SensorElement listwa2WeatherSensor, @Autowired MQTTConnectionService mqttConnectionService) {
+        super(listwa2WeatherSensor, mqttConnectionService);
     }
     
     @Override
