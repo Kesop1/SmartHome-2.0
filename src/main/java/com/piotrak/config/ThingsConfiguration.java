@@ -19,7 +19,6 @@ public class ThingsConfiguration {
         List<Element> thingsList = new LinkedList<>();
         thingsList.add(tv());
         thingsList.add(amplituner());
-        thingsList.add(speakers());
         thingsList.add(ps3());
         thingsList.add(vacuum());
         thingsList.add(horizontalSeparator());
@@ -45,12 +44,7 @@ public class ThingsConfiguration {
     public SwitchElement ps3(){
         return new SwitchElement("PS3");
     }
-
-    @Bean
-    public SwitchElement speakers(){
-        return new SwitchElement("Speakers", "Głośniki");
-    }
-
+    
     @Bean
     public SwitchElement laptop(){
         return new SwitchElement("Laptop");

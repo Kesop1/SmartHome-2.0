@@ -41,7 +41,6 @@ public class TemplatesConfiguration {
         actions.put(tvElementService, commandOff);
         actions.put(amplitunerElementService, commandOff);
         actions.put(ps3ElementService, commandOff);
-        actions.put(speakersElementService, commandOff);
         actions.put(laptopElementService, commandOff);
         actions.put(vacuumElementService, commandOff);
         actions.put(deskElementService, commandOff);
@@ -65,7 +64,6 @@ public class TemplatesConfiguration {
     public TemplateElement templateRadio() {
         Map<ElementService, Command> actions = new HashMap<>();
         actions.put(amplitunerElementService, commandOn);
-        actions.put(speakersElementService, commandOn);
         return new TemplateElement("radio", "Meloman", actions);
     }
 
@@ -78,11 +76,8 @@ public class TemplatesConfiguration {
     public TemplateElement templateMovie(){
         Map<ElementService, Command> actions = new HashMap<>();
         actions.put(pcElementService, commandOn);
-        actions.put(pcScreenElementService, commandOff);
-        actions.put(pcSpeakersElementService, commandOff);
-        actions.put(amplitunerElementService, commandOn);
+        actions.put(amplitunerElementService, commandOn);//TODO: ustaw odpowiedni program na amlitunerze i glosniki na pc
         actions.put(tvElementService, commandOn);
-        actions.put(speakersElementService, commandOn);//TODO: ustaw odpowiedni program na amlitunerze i glosniki na pc
         return new TemplateElement("movie", "Kinoman", actions);
     }
 
@@ -90,8 +85,10 @@ public class TemplatesConfiguration {
     public TemplateElement templateWork(){
         Map<ElementService, Command> actions = new HashMap<>();
         actions.put(laptopElementService, commandOn);
-        actions.put(deskElementService, commandOn);//TODO: ustaw odpowiednie wyjscie na switchu
-        return new TemplateElement("work", "Pracuś", actions);
+        actions.put(deskElementService, commandOn);
+        actions.put(pcScreenElementService, commandOn);
+        actions.put(pcSpeakersElementService, commandOn);//TODO: ustaw odpoeiednie wyjscia na switchu
+        return new TemplateElement("work", "BioRobot", actions);
     }
 
     @Autowired
@@ -102,10 +99,7 @@ public class TemplatesConfiguration {
 
     @Autowired
     public PS3ElementService ps3ElementService;
-
-    @Autowired
-    public SpeakersElementService speakersElementService;
-
+    
     @Autowired
     public LaptopElementService laptopElementService;
 
