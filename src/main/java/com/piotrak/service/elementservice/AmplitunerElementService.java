@@ -132,9 +132,9 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
             repeat = Integer.parseInt(strings[0]);
             cmd = strings[1];
         }
-        String irCode = getIRCodeForCommand(cmd.toLowerCase());
-        if (irCode != null) {
-            getConnectionService().actOnConnection(new MQTTCommand(getIrPublishTopic(), (repeat > 1 ? repeat + "_" : "") + irCode));
+        String irCodeForCommand = getIRCodeForCommand(cmd.toLowerCase());
+        if (irCodeForCommand != null) {
+            getConnectionService().actOnConnection(new MQTTCommand(getIrPublishTopic(), (repeat > 1 ? repeat + "_" : "") + irCodeForCommand));
         } else{
             throw new OperationNotSupportedException("Unable to find an IR code for the command: " + command);
         }

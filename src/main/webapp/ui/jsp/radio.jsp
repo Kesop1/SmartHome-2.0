@@ -4,22 +4,22 @@
 <h2>Radio</h2>
 <p>Głośność</p>
 <div>
-    <form action="${path}1_volup" method="post">
+    <form action="${path}2_volup" method="post">
         <button type="submit" class="radio-button">+1</button>
     </form>
-    <form action="${path}5_volup" method="post">
+    <form action="${path}6_volup" method="post">
         <button type="submit" class="radio-button">+5</button>
     </form>
-    <form action="${path}10_volup" method="post">
+    <form action="${path}11_volup" method="post">
         <button type="submit" class="radio-button">+10</button>
     </form>
-    <form action="${path}1_voldn" method="post">
+    <form action="${path}2_voldn" method="post">
         <button type="submit" class="radio-button">-1</button>
     </form>
-    <form action="${path}5_voldn" method="post">
+    <form action="${path}6_voldn" method="post">
         <button type="submit" class="radio-button">-5</button>
     </form>
-    <form action="${path}10_voldn" method="post">
+    <form action="${path}11_voldn" method="post">
         <button type="submit" class="radio-button">-10</button>
     </form>
 </div>
