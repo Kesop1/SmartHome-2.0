@@ -87,19 +87,11 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
     }
 
     /**
-     * turn on the device, first flip on the switch, and then send an IR code
+     * turn on the device, flip on the switch, sending the IR code is not needed
      * @param command ON command
      */
     private void handleOnCommand(Command command) {
         getConnectionService().actOnConnection(translateCommand(command));
-        new Thread(() -> {
-            try {
-                Thread.sleep(1000);
-                handleIrCommand(command);
-            } catch (InterruptedException | OperationNotSupportedException e) {
-                LOGGER.log(Level.WARNING, e.getMessage());
-            }
-        }).start();
     }
 
     /**
