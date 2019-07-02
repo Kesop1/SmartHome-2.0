@@ -4,6 +4,7 @@ import com.piotrak.service.element.Element;
 import com.piotrak.service.element.TemplateElement;
 import com.piotrak.service.elementservice.*;
 import com.piotrak.service.technology.Command;
+import com.piotrak.service.technology.ir.IRCommand;
 import com.piotrak.service.technology.web.WebCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -14,10 +15,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Configuration
 @EnableConfigurationProperties()
 public class TemplatesConfiguration {
+    
+    private Logger LOGGER = Logger.getLogger("TemplatesConfiguration");
 
     private WebCommand commandOff = new WebCommand("OFF");
 
@@ -64,6 +69,14 @@ public class TemplatesConfiguration {
     public TemplateElement templateRadio() {
         Map<ElementService, Command> actions = new HashMap<>();
         actions.put(amplitunerElementService, commandOn);
+        new Thread(() -> {
+            try {
+                Thread.sleep(2000);
+                actions.put(amplitunerElementService, new IRCommand("4"));
+            } catch (InterruptedException e) {
+                LOGGER.log(Level.WARNING, e.getMessage());
+            }
+        }).start();
         return new TemplateElement("radio", "Meloman", actions);
     }
 
@@ -77,6 +90,14 @@ public class TemplatesConfiguration {
         Map<ElementService, Command> actions = new HashMap<>();
         actions.put(pcElementService, commandOn);
         actions.put(amplitunerElementService, commandOn);//TODO: ustaw odpowiedni program na amlitunerze i glosniki na pc
+        new Thread(() -> {
+            try {
+                Thread.sleep(2000);
+                actions.put(amplitunerElementService, new IRCommand("2"));
+            } catch (InterruptedException e) {
+                LOGGER.log(Level.WARNING, e.getMessage());
+            }
+        }).start();
         actions.put(tvElementService, commandOn);
         return new TemplateElement("movie", "Kinoman", actions);
     }
@@ -87,7 +108,7 @@ public class TemplatesConfiguration {
         actions.put(laptopElementService, commandOn);
         actions.put(deskElementService, commandOn);
         actions.put(pcScreenElementService, commandOn);
-        actions.put(pcSpeakersElementService, commandOn);//TODO: ustaw odpoeiednie wyjscia na switchu
+        actions.put(pcSpeakersElementService, commandOn);//TODO: ustaw odpowiednie wyjscia na switchu
         return new TemplateElement("work", "BioRobot", actions);
     }
 
