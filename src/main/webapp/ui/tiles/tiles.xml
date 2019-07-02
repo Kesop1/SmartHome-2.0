@@ -23,7 +23,7 @@
         <put-attribute name="slot1" value="/ui/jsp/templates.jsp" />
         <put-attribute name="slot2" value="/ui/jsp/radio.jsp" />
         <put-attribute name="slot3" value="/ui/jsp/weather.jsp" />
-        <put-attribute name="slot4" value="/ui/jsp/calendar.jsp" />
+        <put-attribute name="slot4" value="/ui/jsp/buttons.jsp" />
     </definition>
 
 </tiles-definitions>
