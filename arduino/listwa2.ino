@@ -16,26 +16,23 @@
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
 #include <dht.h>
-dht DHT;
 
-const char* ssid     = "UPC6354859";
-const char* password = "AHBTYCHS";
-const char* mqttServer = "192.168.0.21";
-const int mqttPort = 1883;
-const char* mqttUser = "listwa2";
-const char* mqttPassword = "password";
-const char* deviceName = "listwa2";
-
-#define DHT11_PIN 16//D0
+const char* WIFI_SSID     = "TP-LINK_5DBD15";
+const char* WIFI_PASSWORD = "Qweasdzxc1";
+const char* MQTT_SERVER = "192.168.1.101";
+const int MQTT_PORT = 1883;
+const String DEVICE_NAME = "listwa2";
 
 const uint16_t kIrLed = 4;  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
 IRsend irsend(kIrLed);  // Set the GPIO to be used to sending the message.
 
-const String TOPIC_DEVICE = "listwa2";
+const String MESSAGE_WELCOME = DEVICE_NAME + " connected";
+const String MESSAGE_GOODBYE = DEVICE_NAME + " disconnected";
+const String TOPIC_DEVICES = "devices/" + DEVICE_NAME;
 const String SUBTOPIC_IN = "in";
 const String SUBTOPIC_OUT = "out";
 const String SUBTOPIC_IR = "ir";
-const String PUBLISH_TOPIC = TOPIC_DEVICE + "/" + SUBTOPIC_OUT + "/";
+const String PUBLISH_TOPIC = DEVICE_NAME + "/" + SUBTOPIC_OUT + "/";
 const String IR_DEVICE_AMP = "amp";
 const String IR_DEVICE_TV = "tv";
 const String IR_DEVICE_VACUUM = "vacuum";
@@ -44,8 +41,8 @@ const String SENSOR_TEMP = "temp";
 const String SENSOR_WEATHER = "weather";
 
 const String SUBSCRIBE_TOPICS[] = {
-              TOPIC_DEVICE + "/" + SUBTOPIC_IN + "/#",
-              TOPIC_DEVICE + "/" + SUBTOPIC_IR + "/#"
+              DEVICE_NAME + "/" + SUBTOPIC_IN + "/#",
+              DEVICE_NAME + "/" + SUBTOPIC_IR + "/#"
             };
 
 uint16_t TV_ON[67] = {4500,4450, 550,1700, 550,1650, 550,1700, 600,550, 
@@ -56,26 +53,49 @@ uint16_t TV_ON[67] = {4500,4450, 550,1700, 550,1650, 550,1700, 600,550,
                       550,1700, 550,600, 550,1650, 550,1700, 550,1700, 
                       550,1650, 600,1650, 550,1700, 550};
 
+dht DHT;
+#define DHT11_PIN 16//D0
 long previousMillis = -700000;
 const long dhtInterval = 600000;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 
+int wifiRetryCount = 0;
+int mqttRetryCount = 0;
+
 void setup() {
   Serial.begin(115200);
   delay(10);
+  WiFi.mode(WIFI_STA);
+  WiFi.setAutoConnect(false);
   setupPins();
   connectWiFi();
   connectMQTT();  
-  subscribeMQTT();
-  client.publish("main", deviceName);
   irsend.begin();
 }
 
 void loop() {
-  client.loop();
-  updateDht();
+  if (WiFi.status() == WL_CONNECTED) {
+    wifiRetryCount = 0;
+    if (client.connected()) {
+      mqttRetryCount = 0;
+      client.loop();
+      updateDht();
+    } else {
+      connectMQTT();
+      mqttRetryCount++;
+      if(mqttRetryCount == 5){
+        activateOfflineMode();
+      }
+    }
+  } else{
+    connectWiFi();
+    wifiRetryCount++;
+    if(wifiRetryCount == 5){
+      activateOfflineMode();
+    }
+  }
 }
 
 void setupPins(){
@@ -87,37 +107,43 @@ void setupPins(){
 }
 
 void connectWiFi(){
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-  WiFi.hostname(deviceName);
-  WiFi.begin(ssid, password);
- 
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
+  Serial.print("Connecting to WIFI: ");
+  Serial.println(WIFI_SSID);
+  WiFi.hostname(DEVICE_NAME.c_str());
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+  if (WiFi.status() != WL_CONNECTED) {
+    delay(5000);
+  } else {
+    Serial.println("");
+    Serial.println(" connected");
+   
+    // Print the IP address
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
   }
-  Serial.println("");
-  Serial.println(" connected");
- 
-  // Print the IP address
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
 }
 
 void connectMQTT() {
-  client.setServer(mqttServer, mqttPort);
+  client.setServer(MQTT_SERVER, MQTT_PORT);
   client.setCallback(callback);
-  
-  while (!client.connected()) {
-    Serial.println("Connecting to MQTT...");
-    if (client.connect(deviceName, mqttUser, mqttPassword )) {
-      Serial.println("connected");  
-    } else {
-      Serial.print("failed with state ");
-      Serial.print(client.state());
-      delay(2000);
-    }
+  if(connectMQTTClient()){
+    subscribeMQTT();
+    client.publish(TOPIC_DEVICES.c_str(), MESSAGE_WELCOME.c_str());
   }
+}
+
+boolean connectMQTTClient(){
+  Serial.println("Connecting to MQTT...");
+  if (client.connect(DEVICE_NAME.c_str(), TOPIC_DEVICES.c_str(), 0, true, MESSAGE_GOODBYE.c_str())){
+    Serial.println(MESSAGE_WELCOME);
+    return true;
+  } else {
+    Serial.print("failed with state ");
+    Serial.println(client.state());
+    delay(5000);
+  }
+  return false;
 }
 
 void subscribeMQTT() {
@@ -129,12 +155,20 @@ void subscribeMQTT() {
   Serial.println("Done");
 }
 
+void activateOfflineMode(){
+  Serial.println("Device is offline");
+  digitalWrite(5, LOW);//D1
+  digitalWrite(12, LOW);//D6
+  digitalWrite(13, LOW);//D7
+  digitalWrite(14, LOW);//D5
+}
+
 void callback(char* top, byte* payload, unsigned int length) {
   String topic = top;
   String msg = String((char*)payload);
   msg = msg.substring(0, length);
   Serial.println("Received message from the broker:\t=" + msg + "\tin topic: " + topic);
-  topic.remove(0, TOPIC_DEVICE.length() + 1);
+  topic.remove(0, DEVICE_NAME.length() + 1);
   if (topic.startsWith(SUBTOPIC_IN)) {
     topic.remove(0, SUBTOPIC_IN.length() + 1);
     int port = topic.substring(0, topic.indexOf("/")).toInt();
@@ -209,7 +243,7 @@ void updateDht(){
       temp = "N/A";
       break;
   }
-  String publishTopic = PUBLISH_TOPIC + SENSOR_WEATHER;
-  client.publish(publishTopic.c_str(), (SENSOR_HUM + "=" + hum).c_str(), true);
-  client.publish(publishTopic.c_str(), (SENSOR_TEMP + "=" + temp).c_str(), true);
+  String publishTopic = PUBLISH_TOPIC + SENSOR_WEATHER + "/";
+  client.publish((publishTopic + SENSOR_HUM).c_str(), hum.c_str(), true);
+  client.publish((publishTopic + SENSOR_TEMP).c_str(), temp.c_str(), true);
 }
