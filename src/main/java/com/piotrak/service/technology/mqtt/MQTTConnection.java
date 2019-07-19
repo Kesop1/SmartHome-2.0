@@ -8,7 +8,8 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,7 +23,7 @@ public class MQTTConnection extends Connection {
     
     private String port = "0";
     
-    private String protocol = "";
+    private String protocol = "tcp";
 
     private MqttClient mqttClient;
 
