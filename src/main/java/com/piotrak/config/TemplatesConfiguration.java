@@ -48,7 +48,6 @@ public class TemplatesConfiguration {
         actions.put(speakersElementService, commandOff);
         actions.put(ps3ElementService, commandOff);
         actions.put(laptopElementService, commandOff);
-        actions.put(vacuumElementService, commandOff);
         actions.put(deskElementService, commandOff);
         actions.put(pcElementService, commandOff);
         actions.put(pcScreenElementService, commandOff);
@@ -131,9 +130,6 @@ public class TemplatesConfiguration {
     
     @Autowired
     public LaptopElementService laptopElementService;
-
-    @Autowired
-    public VacuumElementService vacuumElementService;
 
     @Autowired
     public DeskElementService deskElementService;

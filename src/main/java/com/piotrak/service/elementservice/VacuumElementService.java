@@ -56,22 +56,13 @@ public class VacuumElementService extends ElementService implements MQTTCommunic
         LOGGER.log(Level.INFO, "Command received:\t" + command);
         String cmd = command.getValue();
         try {
-            if ("ON".equalsIgnoreCase(cmd) || "OFF".equalsIgnoreCase(cmd)) {
-                handleSwitchCommand(command);
-            } else if (getIRCodeForCommand(cmd.toLowerCase()) != null) {
+            if (getIRCodeForCommand(cmd.toLowerCase()) != null) {
                 handleIrCommand(command);
             } else {
                 throw new OperationNotSupportedException("Command not recognized: " + command);
             }
         } catch (OperationNotSupportedException e){
             LOGGER.log(Level.WARNING, e.getMessage());
-        }
-    }
-
-    private void handleSwitchCommand(Command command) throws OperationNotSupportedException {
-        getElement().actOnCommand(command);
-        if(command instanceof WebCommand) {
-            getConnectionService().actOnConnection(translateCommand(command));
         }
     }
 

@@ -21,7 +21,6 @@ public class ThingsConfiguration {
         thingsList.add(amplituner());
         thingsList.add(speakers());
         thingsList.add(ps3());
-        thingsList.add(vacuum());
         thingsList.add(horizontalSeparator());
         thingsList.add(pc());
         thingsList.add(pcScreen());
