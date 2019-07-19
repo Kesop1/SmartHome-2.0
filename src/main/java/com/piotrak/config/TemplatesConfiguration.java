@@ -71,14 +71,15 @@ public class TemplatesConfiguration {
         Map<ElementService, Command> actions = new HashMap<>();
         actions.put(amplitunerElementService, commandOn);
         actions.put(speakersElementService, commandOn);
-        new Thread(() -> {
-            try {
-                Thread.sleep(2000);
-                actions.put(amplitunerElementService, new IRCommand("4"));
-            } catch (InterruptedException e) {
-                LOGGER.log(Level.WARNING, e.getMessage());
-            }
-        }).start();
+        //TODO: DelayedCommand/ScheduledCommand
+//        new Thread(() -> {
+//            try {
+//                Thread.sleep(2000);
+//                actions.put(amplitunerElementService, new IRCommand("4"));
+//            } catch (InterruptedException e) {
+//                LOGGER.log(Level.WARNING, e.getMessage());
+//            }
+//        }).start();
         return new TemplateElement("radio", "Meloman", actions);
     }
 
@@ -93,14 +94,15 @@ public class TemplatesConfiguration {
         actions.put(pcElementService, commandOn);
         actions.put(amplitunerElementService, commandOn);//TODO: ustaw odpowiedni program na amlitunerze i glosniki na pc
         actions.put(speakersElementService, commandOn);
-        new Thread(() -> {
-            try {
-                Thread.sleep(2000);
-                actions.put(amplitunerElementService, new IRCommand("2"));
-            } catch (InterruptedException e) {
-                LOGGER.log(Level.WARNING, e.getMessage());
-            }
-        }).start();
+        //TODO: DelayedCommand/ScheduledCommand
+//        new Thread(() -> {
+//            try {
+//                Thread.sleep(2000);
+//                actions.put(amplitunerElementService, new IRCommand("2"));
+//            } catch (InterruptedException e) {
+//                LOGGER.log(Level.WARNING, e.getMessage());
+//            }
+//        }).start();
         actions.put(tvElementService, commandOn);
         return new TemplateElement("movie", "Kinoman", actions);
     }
