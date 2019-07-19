@@ -45,6 +45,7 @@ public class TemplatesConfiguration {
         Map<ElementService, Command> actions = new HashMap<>();
         actions.put(tvElementService, commandOff);
         actions.put(amplitunerElementService, commandOff);
+        actions.put(speakersElementService, commandOff);
         actions.put(ps3ElementService, commandOff);
         actions.put(laptopElementService, commandOff);
         actions.put(vacuumElementService, commandOff);
@@ -69,6 +70,7 @@ public class TemplatesConfiguration {
     public TemplateElement templateRadio() {
         Map<ElementService, Command> actions = new HashMap<>();
         actions.put(amplitunerElementService, commandOn);
+        actions.put(speakersElementService, commandOn);
         new Thread(() -> {
             try {
                 Thread.sleep(2000);
@@ -90,6 +92,7 @@ public class TemplatesConfiguration {
         Map<ElementService, Command> actions = new HashMap<>();
         actions.put(pcElementService, commandOn);
         actions.put(amplitunerElementService, commandOn);//TODO: ustaw odpowiedni program na amlitunerze i glosniki na pc
+        actions.put(speakersElementService, commandOn);
         new Thread(() -> {
             try {
                 Thread.sleep(2000);
@@ -117,6 +120,9 @@ public class TemplatesConfiguration {
 
     @Autowired
     public AmplitunerElementService amplitunerElementService;
+
+    @Autowired
+    public SpeakersElementService speakersElementService;
 
     @Autowired
     public PS3ElementService ps3ElementService;
