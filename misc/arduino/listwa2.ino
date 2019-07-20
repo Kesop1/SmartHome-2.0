@@ -18,7 +18,7 @@
 #include <dht.h>
 
 const char* WIFI_SSID     = "TP-LINK_5DBD15";
-const char* WIFI_PASSWORD = "Qweasdzxc1";
+const char* WIFI_PASSWORD = ""; //WIFI password here
 const char* MQTT_SERVER = "192.168.1.101";
 const int MQTT_PORT = 1883;
 const String DEVICE_NAME = "listwa2";
@@ -45,12 +45,12 @@ const String SUBSCRIBE_TOPICS[] = {
               DEVICE_NAME + "/" + SUBTOPIC_IR + "/#"
             };
 
-uint16_t TV_ON[67] = {4500,4450, 550,1700, 550,1650, 550,1700, 600,550, 
-                      550,600, 550,550, 600,550, 550,600, 550,1700, 
-                      550,1700, 550,1650, 550,600, 550,600, 550,600, 
-                      550,600, 550,550, 600,550, 600,1650, 550,600, 
-                      550,600, 550,600, 550,550, 600,550, 550,600, 
-                      550,1700, 550,600, 550,1650, 550,1700, 550,1700, 
+uint16_t TV_ON[67] = {4500,4450, 550,1700, 550,1650, 550,1700, 600,550,
+                      550,600, 550,550, 600,550, 550,600, 550,1700,
+                      550,1700, 550,1650, 550,600, 550,600, 550,600,
+                      550,600, 550,550, 600,550, 600,1650, 550,600,
+                      550,600, 550,600, 550,550, 600,550, 550,600,
+                      550,1700, 550,600, 550,1650, 550,1700, 550,1700,
                       550,1650, 600,1650, 550,1700, 550};
 
 dht DHT;
@@ -64,6 +64,13 @@ PubSubClient client(espClient);
 int wifiRetryCount = 0;
 int mqttRetryCount = 0;
 
+/*
+ * Set up the device:
+ * prepare pins
+ * connect to WiFi network
+ * connect to MQTT broker
+ * activate the IR transmitter
+ */
 void setup() {
   Serial.begin(115200);
   delay(10);
@@ -71,33 +78,30 @@ void setup() {
   WiFi.setAutoConnect(false);
   setupPins();
   connectWiFi();
-  connectMQTT();  
+  connectMQTT();
   irsend.begin();
 }
 
+/*
+ * check connection status, connect if necessary
+ * if unable to connect to WiFi or MQTT activate offline mode (all output pins ON)
+ * if connected proceed with MQTT service and update DHT read-outs
+ */
 void loop() {
-  if (WiFi.status() == WL_CONNECTED) {
-    wifiRetryCount = 0;
-    if (client.connected()) {
-      mqttRetryCount = 0;
-      client.loop();
-      updateDht();
-    } else {
-      connectMQTT();
-      mqttRetryCount++;
-      if(mqttRetryCount == 5){
-        activateOfflineMode();
-      }
-    }
-  } else{
-    connectWiFi();
-    wifiRetryCount++;
-    if(wifiRetryCount == 5){
-      activateOfflineMode();
-    }
+  if(checkWiFi()){
+    checkMQTT();
+  }
+  if(wifiRetryCount == 5 || mqttRetryCount == 5){
+    activateOfflineMode();
+  } else {
+    client.loop();
+    updateDht();
   }
 }
 
+/*
+ * Set up device pins
+ */
 void setupPins(){
 //  pinMode(4, OUTPUT);//D2
   pinMode(5, OUTPUT);//D1
@@ -106,6 +110,36 @@ void setupPins(){
   pinMode(14, OUTPUT);//D5
 }
 
+/*
+ * check WiFi connection status, connect if necessary
+ */
+boolean checkWiFi(){
+  if (WiFi.status() == WL_CONNECTED) {
+    wifiRetryCount = 0;
+    return true;
+  } else {
+    mqttRetryCount = 0;
+    connectWiFi();
+    wifiRetryCount++;
+    return false;
+  }
+}
+
+/*
+ * check MQTT connection status, connect if necessary
+ */
+void checkMQTT(){
+  if (client.connected()) {
+    mqttRetryCount = 0;
+  } else {
+    connectMQTT();
+    mqttRetryCount++;
+  }
+}
+
+/*
+ * Connect to WiFi
+ */
 void connectWiFi(){
   Serial.print("Connecting to WIFI: ");
   Serial.println(WIFI_SSID);
@@ -117,22 +151,30 @@ void connectWiFi(){
   } else {
     Serial.println("");
     Serial.println(" connected");
-   
+
     // Print the IP address
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
   }
 }
 
+/*
+ * Connect to MQTT broker
+ * if connected subscribe to the topics, get the pins setup and publish a welcome message
+ */
 void connectMQTT() {
   client.setServer(MQTT_SERVER, MQTT_PORT);
   client.setCallback(callback);
   if(connectMQTTClient()){
     subscribeMQTT();
+    setupPinsFromMQTT();
     client.publish(TOPIC_DEVICES.c_str(), MESSAGE_WELCOME.c_str());
   }
 }
 
+/*
+ * Connect to the MQTT broker
+ */
 boolean connectMQTTClient(){
   Serial.println("Connecting to MQTT...");
   if (client.connect(DEVICE_NAME.c_str(), TOPIC_DEVICES.c_str(), 0, true, MESSAGE_GOODBYE.c_str())){
@@ -146,6 +188,9 @@ boolean connectMQTTClient(){
   return false;
 }
 
+/*
+ * Subscribe to the MQTT topics
+ */
 void subscribeMQTT() {
   Serial.println("Subscribing to the topics:");
   for(int i=0; i<sizeof(SUBSCRIBE_TOPICS) / sizeof(SUBSCRIBE_TOPICS[0]); i++){
@@ -155,6 +200,18 @@ void subscribeMQTT() {
   Serial.println("Done");
 }
 
+/*
+ * Get the pins setup from MQTT
+ */
+void setupPinsFromMQTT() {
+  client.subscribe((DEVICE_NAME + "/" + SUBTOPIC_OUT + "/#").c_str());
+  delay(100);
+  client.unsubscribe((DEVICE_NAME + "/" + SUBTOPIC_OUT + "/#").c_str());
+}
+
+/*
+ * Turn all the output pins ON
+ */
 void activateOfflineMode(){
   Serial.println("Device is offline");
   digitalWrite(5, LOW);//D1
@@ -163,6 +220,12 @@ void activateOfflineMode(){
   digitalWrite(14, LOW);//D5
 }
 
+/*
+ * Act on message arrived from MQTT
+ * if received from MQTT switch pins and publish the pin status
+ * if reading the pins statuses just switch pins
+ * if IR code received transmit it
+ */
 void callback(char* top, byte* payload, unsigned int length) {
   String topic = top;
   String msg = String((char*)payload);
@@ -173,6 +236,12 @@ void callback(char* top, byte* payload, unsigned int length) {
     topic.remove(0, SUBTOPIC_IN.length() + 1);
     int port = topic.substring(0, topic.indexOf("/")).toInt();
     actOnCommand(port, msg);
+    String publishTopic = PUBLISH_TOPIC + port;
+    client.publish(publishTopic.c_str(), msg.c_str(), true);
+   } else if (topic.startsWith(SUBTOPIC_OUT)) {
+    topic.remove(0, SUBTOPIC_OUT.length() + 1);
+    int port = topic.substring(0, topic.indexOf("/")).toInt();
+    actOnCommand(port, msg);
   } else if(topic.startsWith(SUBTOPIC_IR)){
     topic.remove(0, SUBTOPIC_IR.length() + 1);
     String device = topic.substring(0, topic.indexOf("/"));
@@ -180,18 +249,22 @@ void callback(char* top, byte* payload, unsigned int length) {
   }
 }
 
+/*
+ * Turn ON or OFF the device
+ */
 void actOnCommand(int port, String msg){
   if(msg.equalsIgnoreCase("ON")){
     digitalWrite(port, LOW);
   } else if(msg.equalsIgnoreCase("OFF")){
     digitalWrite(port, HIGH);
-  } else{
-    analogWrite(port, msg.toInt());
+//  } else{
+//    analogWrite(port, msg.toInt());
   }
-  String publishTopic = PUBLISH_TOPIC + port;
-  client.publish(publishTopic.c_str(), msg.c_str(), true);
 }
 
+/*
+ * Send the IR signal, repeatedly if necessary
+ */
 void actOnIrCommand(String device, String msg){
   int repeat = 1;
   if(msg.indexOf("_") > 0){
@@ -200,11 +273,9 @@ void actOnIrCommand(String device, String msg){
   }
   long signal = strtol((char*)msg.c_str(), NULL, 16);
   for(int i = 0; i<repeat; i++){
-    if(IR_DEVICE_AMP.equals(device)){
-      irsend.sendNEC(signal, 32);
-    } else if(IR_DEVICE_TV.equals(device)){
+    if(IR_DEVICE_TV.equals(device)){
       irsend.sendRaw(TV_ON, 67, 38);
-    } else if(IR_DEVICE_VACUUM.equals(device)){
+    } else {
       irsend.sendNEC(signal, 32);
     }
     delay(100);
@@ -213,6 +284,9 @@ void actOnIrCommand(String device, String msg){
   }
 }
 
+/*
+ * Read DHT11 values every 10 minutes and publish to the MQTT broker
+ */
 void updateDht(){
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis < dhtInterval) {

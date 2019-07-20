@@ -1,0 +1,51 @@
+LISTWA2:
+
+	Connected to: 	WiFi: TP-LINK_5DBD15
+					MQTT: 192.168.1.101:1883
+	IP:				192.168.1.112
+	Device name:	listwa2
+	MAC:			BC-DD-C2-24-B1-03
+	
+	PINOUT:			A0 - NOT USED
+					D0 - DHT11 DATA
+					D1 - RELAY(5)
+					D2 - IR transmitter
+					D3 - NOT USED
+					D4 - NOT USED
+					D5 - RELAY (14)
+					D6 - RELAY (12)
+					D7 - RELAY (13)
+					D8 - NOT USED
+	
+	MQTT topics:
+		publish:	${Device name}/out/# (retained) - relay pin status
+						messages:	ON
+									OFF
+						
+					devices/${Device name} (retained) - (dis)connected message
+						messages:	${Device name}: connected
+									${Device name}: disconnected
+						
+					${Device name}/weather/hum (retained) - DHT11 humidity, updated every 10 minutes
+						messages:	#value
+						
+					${Device name}/weather/temp (retained) - DHT11 temperature, updated every 10 minutes
+						messages:	#value
+		
+		subscribe:	${Device name}/in/5 - relay D1
+					${Device name}/in/12 - relay D6
+					${Device name}/in/13 - relay D7
+					${Device name}/in/14 - relay D5
+						messages:	ON
+									OFF
+						
+					${Device name}/ir
+						messages:	IR codes
+					
+	Features:		connect to WiFi
+					connect to MQTT
+					When unable to connect to WiFi or MQTT switch all the pins ON
+					when able to connect download set up of the output pins
+					update DHT11 read-outs every 10 minutes
+					switch the devices ON or OFF from MQTT
+					send IR codes from MQTT
