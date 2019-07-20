@@ -15,7 +15,7 @@
 #include <dht.h>
 
 const char* WIFI_SSID     = "TP-LINK_5DBD15";
-const char* WIFI_PASSWORD = "Qweasdzxc1";
+const char* WIFI_PASSWORD = ""; //WIFI password here
 const char* MQTT_SERVER = "192.168.1.101";
 const int MQTT_PORT = 1883;
 const String DEVICE_NAME = "listwa1";
@@ -45,6 +45,12 @@ PubSubClient client(espClient);
 int wifiRetryCount = 0;
 int mqttRetryCount = 0;
 
+/*
+ * Set up the device:
+ * prepare pins
+ * connect to WiFi network
+ * connect to MQTT broker
+ */
 void setup() {
   Serial.begin(115200);
   delay(10);
@@ -55,6 +61,11 @@ void setup() {
   connectMQTT();
 }
 
+/*
+ * check connection status, connect if necessary
+ * if unable to connect to WiFi or MQTT activate offline mode (all output pins ON)
+ * if connected proceed with MQTT service and update DHT read-outs
+ */
 void loop() {
   if (WiFi.status() == WL_CONNECTED) {
     wifiRetryCount = 0;
@@ -78,6 +89,9 @@ void loop() {
   }
 }
 
+/*
+ * Set up device pins
+ */
 void setupPins(){
   pinMode(4, OUTPUT);//D2
 //  pinMode(5, OUTPUT);//D1
@@ -86,6 +100,9 @@ void setupPins(){
   pinMode(14, OUTPUT);//D5
 }
 
+/*
+ * Connect to WiFi
+ */
 void connectWiFi(){
   Serial.print("Connecting to WIFI: ");
   Serial.println(WIFI_SSID);
@@ -97,22 +114,30 @@ void connectWiFi(){
   } else {
     Serial.println("");
     Serial.println(" connected");
-   
+
     // Print the IP address
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
   }
 }
 
+/*
+ * Connect to MQTT broker
+ * if connected subscribe to the topics, get the pins setup and publish a welcome message
+ */
 void connectMQTT() {
   client.setServer(MQTT_SERVER, MQTT_PORT);
   client.setCallback(callback);
   if(connectMQTTClient()){
     subscribeMQTT();
+    setupPinsFromMQTT();
     client.publish(TOPIC_DEVICES.c_str(), MESSAGE_WELCOME.c_str());
   }
 }
 
+/*
+ * Connect to the MQTT broker
+ */
 boolean connectMQTTClient(){
   Serial.println("Connecting to MQTT...");
   if (client.connect(DEVICE_NAME.c_str(), TOPIC_DEVICES.c_str(), 0, true, MESSAGE_GOODBYE.c_str())){
@@ -126,6 +151,9 @@ boolean connectMQTTClient(){
   return false;
 }
 
+/*
+ * Subscribe to the MQTT topics
+ */
 void subscribeMQTT() {
   Serial.println("Subscribing to the topics:");
   for(int i=0; i<sizeof(SUBSCRIBE_TOPICS) / sizeof(SUBSCRIBE_TOPICS[0]); i++){
@@ -135,6 +163,18 @@ void subscribeMQTT() {
   Serial.println("Done");
 }
 
+/*
+ * Get the pins setup from MQTT
+ */
+void setupPinsFromMQTT() {
+  client.subscribe((DEVICE_NAME + "/" + SUBTOPIC_OUT + "/#").c_str());
+  delay(100);
+  client.unsubscribe((DEVICE_NAME + "/" + SUBTOPIC_OUT + "/#").c_str());
+}
+
+/*
+ * Turn all the output pins ON
+ */
 void activateOfflineMode(){
   Serial.println("Device is offline");
   digitalWrite(4, HIGH);//D2
@@ -143,6 +183,11 @@ void activateOfflineMode(){
   digitalWrite(14, HIGH);//D5
 }
 
+/*
+ * Act on message arrived from MQTT
+ * if received from MQTT switch pins and publish the pin status
+ * if reading the pins statuses just switch pins
+ */
 void callback(char* top, byte* payload, unsigned int length) {
   String topic = top;
   String msg = String((char*)payload);
@@ -153,21 +198,31 @@ void callback(char* top, byte* payload, unsigned int length) {
     topic.remove(0, SUBTOPIC_IN.length() + 1);
     int port = topic.substring(0, topic.indexOf("/")).toInt();
     actOnCommand(port, msg);
-  } 
+    String publishTopic = PUBLISH_TOPIC + port;
+    client.publish(publishTopic.c_str(), msg.c_str(), true);
+  } else if (topic.startsWith(SUBTOPIC_OUT)) {
+    topic.remove(0, SUBTOPIC_OUT.length() + 1);
+    int port = topic.substring(0, topic.indexOf("/")).toInt();
+    actOnCommand(port, msg);
+  }
 }
 
+/*
+ * Turn ON or OFF the device
+ */
 void actOnCommand(int port, String msg){
   if(msg.equalsIgnoreCase("ON")){
     digitalWrite(port, HIGH);
   } else if(msg.equalsIgnoreCase("OFF")){
     digitalWrite(port, LOW);
-  } else{
-    analogWrite(port, msg.toInt());
+//  } else{
+//    analogWrite(port, msg.toInt());
   }
-  String publishTopic = PUBLISH_TOPIC + port;
-  client.publish(publishTopic.c_str(), msg.c_str(), true);
 }
 
+/*
+ * Read DHT11 values every 10 minutes and publish to the MQTT broker
+ */
 void updateDht(){
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis < dhtInterval) {
