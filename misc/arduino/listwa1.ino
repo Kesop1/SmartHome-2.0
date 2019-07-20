@@ -67,25 +67,14 @@ void setup() {
  * if connected proceed with MQTT service and update DHT read-outs
  */
 void loop() {
-  if (WiFi.status() == WL_CONNECTED) {
-    wifiRetryCount = 0;
-    if (client.connected()) {
-      mqttRetryCount = 0;
-      client.loop();
-      updateDht();
-    } else {
-      connectMQTT();
-      mqttRetryCount++;
-      if(mqttRetryCount == 5){
-        activateOfflineMode();
-      }
-    }
-  } else{
-    connectWiFi();
-    wifiRetryCount++;
-    if(wifiRetryCount == 5){
-      activateOfflineMode();
-    }
+  if(checkWiFi()){
+    checkMQTT();
+  }
+  if(wifiRetryCount == 5 || mqttRetryCount == 5){
+    activateOfflineMode();
+  } else {
+    client.loop();
+    updateDht();
   }
 }
 
@@ -98,6 +87,33 @@ void setupPins(){
   pinMode(12, OUTPUT);//D6
   pinMode(13, OUTPUT);//D7
   pinMode(14, OUTPUT);//D5
+}
+
+/*
+ * check WiFi connection status, connect if necessary
+ */
+boolean checkWiFi(){
+  if (WiFi.status() == WL_CONNECTED) {
+    wifiRetryCount = 0;
+    return true;
+  } else {
+    mqttRetryCount = 0;
+    connectWiFi();
+    wifiRetryCount++;
+    return false;
+  }
+}
+
+/*
+ * check MQTT connection status, connect if necessary
+ */
+void checkMQTT(){
+  if (client.connected()) {
+    mqttRetryCount = 0;
+  } else {
+    connectMQTT();
+    mqttRetryCount++;
+  }
 }
 
 /*

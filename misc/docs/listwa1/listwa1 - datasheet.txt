@@ -18,26 +18,26 @@ LISTWA1:
 					D8 - NOT USED
 
 	MQTT topics:
-		publish:	listwa1/out/# (retained) - relay pin status
-			messages:	ON
-						OFF
+		publish:	${Device name}/out/# (retained) - relay pin status
+                        messages:	ON
+                                    OFF
 
-					devices/listwa1 (retained) - (dis)connected message
-			messages:	$Device name: connected
-						$Device name: disconnected
+					devices/${Device name} (retained) - (dis)connected message
+                        messages:	$Device name: connected
+                                    $Device name: disconnected
 
-					listwa1/weather/hum (retained) - DHT11 humidity, updated every 10 minutes
-			messages:	#value
+					${Device name}/weather/hum (retained) - DHT11 humidity, updated every 10 minutes
+                        messages:	#value
 
-					listwa1/weather/temp (retained) - DHT11 temperature, updated every 10 minutes
-			messages:	#value
+					${Device name}/weather/temp (retained) - DHT11 temperature, updated every 10 minutes
+                        messages:	#value
 
-		subscribe:	listwa1/in/4 - relay D2
-					listwa1/in/12 - relay D6
-					listwa1/in/13 - relay D7
-					listwa1/in/14 - relay D5
-			messages:	ON
-						OFF
+		subscribe:	${Device name}/in/4 - relay D2
+					${Device name}/in/12 - relay D6
+					${Device name}/in/13 - relay D7
+					${Device name}/in/14 - relay D5
+                        messages:	ON
+                                    OFF
 
 	Features:		connect to WiFi
 					connect to MQTT
