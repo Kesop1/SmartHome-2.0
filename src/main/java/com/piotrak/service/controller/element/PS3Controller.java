@@ -13,6 +13,9 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Controller for the ps3 element
+ */
 @RestController
 @RequestMapping("/ps3")
 public class PS3Controller extends SwitchController {
@@ -30,6 +33,11 @@ public class PS3Controller extends SwitchController {
         return ps3ElementService;
     }
 
+    /**
+     * Act on the switch command received from the GUI
+     * @param cmd switch command
+     * @return main page
+     */
     @Override
     @PostMapping
     public ModelAndView handleSwitchRequest(@RequestParam String cmd) {

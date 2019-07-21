@@ -2,6 +2,9 @@ package com.piotrak.service.technology.ir;
 
 import java.util.Map;
 
+/**
+ * Interface marking elements that communicate using IR signals
+ */
 public interface IRCommunication {
 
     /**

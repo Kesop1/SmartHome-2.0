@@ -13,6 +13,9 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Controller for the amplituner element
+ */
 @RestController
 @RequestMapping("/amplituner")
 public class AmplitunerController extends SwitchController {
@@ -30,6 +33,11 @@ public class AmplitunerController extends SwitchController {
         return amplitunerElementService;
     }
 
+    /**
+     * Act on the switch command received from the GUI
+     * @param cmd switch command
+     * @return main page
+     */
     @Override
     @PostMapping
     public ModelAndView handleSwitchRequest(@RequestParam String cmd) {

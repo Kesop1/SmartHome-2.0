@@ -14,17 +14,27 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *
+ */
 @Service("mqttConnectionService")
 public class MQTTConnectionService extends ConnectionService {
 
     private Logger LOGGER = Logger.getLogger("MQTTConnectionService");
 
+    /**
+     * All the topics to be subscribed to
+     */
     private Map<String, ElementService> elementServiceTopicsMap = new HashMap<>();
 
     public MQTTConnectionService(@Autowired MQTTConnection mqttConnection) {
         super(mqttConnection);
     }
 
+    /**
+     * Send command to the MQTT broker
+     * @param command Command to be sent
+     */
     @Override
     public void actOnConnection(Command command) {
         try {
@@ -34,12 +44,20 @@ public class MQTTConnectionService extends ConnectionService {
         }
     }
 
+    /**
+     * Subscribe to the topic
+     * @param topic Topic to be subscribed to
+     * @param elementService Element listening to the topic
+     */
     public void subscribeToTopic(String topic, ElementService elementService){
         LOGGER.log(Level.INFO, "Subscribing " + elementService.getElement().getName() + " to topic: " + topic);
         elementServiceTopicsMap.put(topic, elementService);
         ((MQTTConnection) getConnection()).subscribe(topic);
     }
 
+    /**
+     * Check for the MQTT commands in the queue
+     */
     @Scheduled(fixedDelay = 1000)
     @Async
     @Override
@@ -48,6 +66,10 @@ public class MQTTConnectionService extends ConnectionService {
         super.checkForCommands();
     }
 
+    /**
+     * Send the command to the appropriate elementService
+     * @param command Command to be sent
+     */
     @Override
     public void sendCommandToElementService(Command command) {
         ElementService service = elementServiceTopicsMap.get(((MQTTCommand) command).getTopic());

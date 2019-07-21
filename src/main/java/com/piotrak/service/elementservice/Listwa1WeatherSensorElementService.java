@@ -13,6 +13,9 @@ import javax.annotation.PostConstruct;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Listwa1 weather sensor service for communication between systems
+ */
 @Service("listwa1WeatherSensorElementService")
 @ConfigurationProperties("listwa1.weather")
 public class Listwa1WeatherSensorElementService extends ElementService implements MQTTCommunication {
@@ -34,7 +37,10 @@ public class Listwa1WeatherSensorElementService extends ElementService implement
     public String getSubscribeTopic() {
         return subscribeTopic;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @PostConstruct
     @Override
     public void setUpElementForMQTT() {
@@ -42,7 +48,12 @@ public class Listwa1WeatherSensorElementService extends ElementService implement
         assert !StringUtils.isEmpty(getSubscribeTopic());
         ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getSubscribeTopic(), this);
     }
-    
+
+    /**
+     * Sensror element only receives commands
+     * @param command Command to be ignored
+     * @return null
+     */
     @Override
     protected Command translateCommand(Command command) {
         return null;//Nothing to do

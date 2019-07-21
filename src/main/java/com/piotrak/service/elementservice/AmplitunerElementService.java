@@ -19,6 +19,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Amplituner service for communication between systems
+ */
 @Service("amplitunerElementService")
 @ConfigurationProperties("amplituner")
 public class AmplitunerElementService extends ElementService implements MQTTCommunication, IRCommunication {
@@ -37,11 +40,19 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
         super(amplituner, mqttConnectionService);
     }
 
+    /**
+     * Translate the command so it can be published in the element's publishTopic
+     * @param command Command to be translated
+     * @return MQTT command
+     */
     @Override
-    protected Command translateCommand(Command command) {
+    protected Command translateCommand(Command command) {//TODO: może da się to gdzieś przerzucić?
         return getMQTTPublishCommand(command);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @PostConstruct
     @Override
     public void setUpElementForMQTT() {
@@ -73,7 +84,7 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
     /**
      * ON or OFF command received
      * @param command ON or OFF command
-     * @throws OperationNotSupportedException
+     * @throws OperationNotSupportedException when an incorrect message is received
      */
     private void handleSwitchCommand(Command command) throws OperationNotSupportedException {
         getElement().actOnCommand(command);

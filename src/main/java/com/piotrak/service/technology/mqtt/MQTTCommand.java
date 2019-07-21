@@ -4,8 +4,14 @@ import com.piotrak.service.technology.Command;
 
 import javax.validation.constraints.NotBlank;
 
+/**
+ * MQTT {@inheritDoc}
+ */
 public class MQTTCommand extends Command {
-    
+
+    /**
+     * Topic of the MQTT message
+     */
     private final String topic;
 
     public MQTTCommand(@NotBlank String topic, @NotBlank String command) {

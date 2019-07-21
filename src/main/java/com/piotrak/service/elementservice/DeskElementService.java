@@ -13,6 +13,9 @@ import javax.annotation.PostConstruct;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Desk service for communication between systems
+ */
 @Service("deskElementService")
 @ConfigurationProperties("desk")
 public class DeskElementService extends ElementService implements MQTTCommunication {//TODO: odpowiednia wysokość biurka
@@ -27,11 +30,19 @@ public class DeskElementService extends ElementService implements MQTTCommunicat
         super(desk, mqttConnectionService);
     }
 
+    /**
+     * Translate the command so it can be published in the element's publishTopic
+     * @param command Command to be translated
+     * @return MQTT command
+     */
     @Override
     protected Command translateCommand(Command command) {
         return getMQTTPublishCommand(command);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @PostConstruct
     @Override
     public void setUpElementForMQTT() {

@@ -9,6 +9,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A bean with all the elements, used by the webapp
+ */
 @Configuration
 public class ElementsConfiguration {
 

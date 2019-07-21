@@ -13,6 +13,9 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Controller for the desk element
+ */
 @RestController
 @RequestMapping("/desk")
 public class DeskController extends SwitchController {
@@ -30,6 +33,11 @@ public class DeskController extends SwitchController {
         return deskElementService;
     }
 
+    /**
+     * Act on the switch command received from the GUI
+     * @param cmd switch command
+     * @return main page
+     */
     @Override
     @PostMapping
     public ModelAndView handleSwitchRequest(@RequestParam String cmd) {

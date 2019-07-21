@@ -3,10 +3,16 @@ package com.piotrak.service.technology;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Class for maintaining the connection
+ */
 public abstract class ConnectionService {
 
     private Logger LOGGER = Logger.getLogger("ConnectionService");
 
+    /**
+     * Connection
+     */
     private Connection connection;
 
     public ConnectionService(Connection connection) {
@@ -18,8 +24,15 @@ public abstract class ConnectionService {
         return connection;
     }
 
+    /**
+     * Send command to the connection
+     * @param command Command to be sent
+     */
     public abstract void actOnConnection(Command command);
 
+    /**
+     * Scan connection command queue
+     */
     public void checkForCommands(){
         Command command;
         do {
@@ -30,6 +43,9 @@ public abstract class ConnectionService {
         } while (command != null);
     }
 
+    /**
+     * Connect to the connection
+     */
     private void connect(){
         try {
             connection.connect();
@@ -38,5 +54,9 @@ public abstract class ConnectionService {
         }
     }
 
+    /**
+     * Send the command to the respective element service
+     * @param command Command to be sent
+     */
     public abstract void sendCommandToElementService(Command command);
 }

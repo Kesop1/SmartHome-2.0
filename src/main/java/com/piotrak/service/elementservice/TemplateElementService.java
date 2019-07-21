@@ -13,12 +13,18 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Templates service for handling group actions and sending them to the appropriate element services
+ */
 @Service("templateElementService")
 @ConfigurationProperties("template")
 public class TemplateElementService {
 
     private Logger LOGGER = Logger.getLogger("TemplateElementService");
 
+    /**
+     * Template currently active
+     */
     private TemplateElement activeTemplate = null;
 
     @Autowired
@@ -30,6 +36,11 @@ public class TemplateElementService {
     @Autowired
     private List<TemplateElement> templatesList;
 
+    /**
+     * Activate the template, mark the rest as inactive
+     * if the "restOff" template is activated, turn all the elements off except for the ones defined in the active template
+     * @param name Template's name
+     */
     public void switchTemplate(String name){
         if(!checkCommand(name)){
             LOGGER.log(Level.WARNING, "Invalid template name: " + name);
@@ -53,6 +64,9 @@ public class TemplateElementService {
         }
     }
 
+    /**
+     * Turn all the elements off except for the ones defined in the active template
+     */
     private void restOffTemplate(){
         Map<ElementService, Command> restOffcommands = new HashMap<>(templateAllOff.getElementCommandMap());
         if(activeTemplate != null){
@@ -69,6 +83,11 @@ public class TemplateElementService {
         }
     }
 
+    /**
+     * Check if the command received has a corresponding template name
+     * @param name Name of the template
+     * @return true if template was found
+     */
     private boolean checkCommand(String name){
         for (TemplateElement template : templatesList) {
             if(template.getName().equalsIgnoreCase(name)){

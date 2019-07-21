@@ -13,6 +13,9 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Controller for the pc speakers element
+ */
 @RestController
 @RequestMapping("/pcspeakers")
 public class PCSpeakersController extends SwitchController {
@@ -30,6 +33,11 @@ public class PCSpeakersController extends SwitchController {
         return pcSpeakersElementService;
     }
 
+    /**
+     * Act on the switch command received from the GUI
+     * @param cmd switch command
+     * @return main page
+     */
     @Override
     @PostMapping
     public ModelAndView handleSwitchRequest(@RequestParam String cmd) {

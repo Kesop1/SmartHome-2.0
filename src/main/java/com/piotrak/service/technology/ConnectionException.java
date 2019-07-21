@@ -1,5 +1,8 @@
 package com.piotrak.service.technology;
 
+/**
+ * Exception thrown when there's something wrong with the connection
+ */
 public class ConnectionException extends Exception {
     
     public ConnectionException() {

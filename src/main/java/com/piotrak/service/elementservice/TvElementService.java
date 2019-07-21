@@ -19,6 +19,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * TV service for communication between systems
+ */
 @Service("tvElementService")
 @ConfigurationProperties("tv")
 public class TvElementService extends ElementService implements MQTTCommunication, IRCommunication {
@@ -42,6 +45,9 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
         return getMQTTPublishCommand(command);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @PostConstruct//TODO
     @Override
     public void setUpElementForMQTT() {

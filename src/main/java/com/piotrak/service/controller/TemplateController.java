@@ -11,6 +11,9 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Controller for the templates
+ */
 @RestController
 @RequestMapping("/template")
 public class TemplateController extends AbstractController {
@@ -23,6 +26,11 @@ public class TemplateController extends AbstractController {
         this.templateElementService = templateElementService;
     }
 
+    /**
+     * Controller for the template element request
+     * @param name template to be activated
+     * @return main page
+     */
     @PostMapping
     public ModelAndView setTemplate(@RequestParam String name) {
         LOGGER.log(Level.INFO, "Command received from web application: " + name);

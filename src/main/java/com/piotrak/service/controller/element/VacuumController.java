@@ -13,9 +13,12 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Controller for the vacuum element
+ */
 @RestController
 @RequestMapping("/vacuum")
-public class VacuumController extends SwitchController {
+public class VacuumController extends SwitchController {//TODO: można usunąć
 
     private Logger LOGGER = Logger.getLogger("VacuumController");
 
@@ -30,6 +33,11 @@ public class VacuumController extends SwitchController {
         return vacuumElementService;
     }
 
+    /**
+     * Act on the switch command received from the GUI
+     * @param cmd switch command
+     * @return main page
+     */
     @Override
     @PostMapping
     public ModelAndView handleSwitchRequest(@RequestParam String cmd) {

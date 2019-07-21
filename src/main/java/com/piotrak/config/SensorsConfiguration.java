@@ -9,6 +9,9 @@ import org.springframework.context.annotation.Configuration;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Sensor beans displayed in the weather tile
+ */
 @Configuration
 @EnableConfigurationProperties()
 public class SensorsConfiguration {

@@ -5,6 +5,9 @@ import com.piotrak.service.technology.Communication;
 
 import javax.annotation.PostConstruct;
 
+/**
+ * Interface marking elements that communicate using MQTT technology
+ */
 public interface MQTTCommunication extends Communication {
 
     /**

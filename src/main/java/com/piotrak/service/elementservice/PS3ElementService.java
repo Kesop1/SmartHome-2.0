@@ -13,6 +13,9 @@ import javax.annotation.PostConstruct;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * PS3 service for communication between systems
+ */
 @Service("ps3ElementService")
 @ConfigurationProperties("ps3")
 public class PS3ElementService extends ElementService implements MQTTCommunication {
@@ -27,11 +30,19 @@ public class PS3ElementService extends ElementService implements MQTTCommunicati
         super(ps3, mqttConnectionService);
     }
 
+    /**
+     * Translate the command so it can be published in the element's publishTopic
+     * @param command Command to be translated
+     * @return MQTT command
+     */
     @Override
     protected Command translateCommand(Command command) {
         return getMQTTPublishCommand(command);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @PostConstruct
     @Override
     public void setUpElementForMQTT() {

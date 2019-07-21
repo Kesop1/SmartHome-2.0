@@ -19,6 +19,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Vacuum service for communication between systems
+ */
 @Service("vacuumElementService")
 @ConfigurationProperties("vacuum")
 public class VacuumElementService extends ElementService implements MQTTCommunication, IRCommunication {
@@ -33,15 +36,23 @@ public class VacuumElementService extends ElementService implements MQTTCommunic
 
     private Map<String, String> irCode = new HashMap<>();
 
-    public VacuumElementService(@Autowired SwitchElement vacuum, @Autowired MQTTConnectionService mqttConnectionService) {
+    public VacuumElementService(@Autowired SwitchElement vacuum, @Autowired MQTTConnectionService mqttConnectionService) {//TODO: SwitchElement vacuum można usunąć, tylko IR commands są używane
         super(vacuum, mqttConnectionService);
     }
 
+    /**
+     * Translate the command so it can be published in the element's publishTopic
+     * @param command Command to be translated
+     * @return MQTT command
+     */
     @Override
-    protected Command translateCommand(Command command) {
+    protected Command translateCommand(Command command) {//TODO: oodkurzacz nie publikuje wiadomości
         return getMQTTPublishCommand(command);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @PostConstruct
     @Override
     public void setUpElementForMQTT() {

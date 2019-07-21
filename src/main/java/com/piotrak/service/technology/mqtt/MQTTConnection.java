@@ -13,22 +13,44 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Connection using the MQTT technology
+ */
 @Component("mqttConnection")
 @ConfigurationProperties("mqtt")
 public class MQTTConnection extends Connection {
 
     private Logger LOGGER = Logger.getLogger("MQTTConnection");
 
+    /**
+     * MQTT broker host address
+     */
     private String host = "0.0.0.0";
-    
+
+    /**
+     * MQTT broker host port
+     */
     private String port = "0";
-    
+
+    /**
+     * MQTT broker host protocol
+     */
     private String protocol = "tcp";
 
+    /**
+     * MqttClient that acts as a middle man between the application and MQTT broker
+     */
     private MqttClient mqttClient;
 
+    /**
+     * Topics to listen to
+     */
     private Set<String> subscribeTopics = new HashSet<>();
 
+    /**
+     * Connect to the MQTT broker
+     * @throws ConnectionException when unable to connect
+     */
     @Override
     public void connect() throws ConnectionException {//TODO: aplikacja nie wstaje gdy nie można się połączyć z MQTT
         String uri = protocol + "://" + host + ":" + port;
@@ -44,6 +66,10 @@ public class MQTTConnection extends Connection {
         }
     }
 
+    /**
+     * Is the application connected to the broker
+     * @return true if the application is connected to the broker
+     */
     @Override
     public boolean isConnected() {
         if (mqttClient != null) {
@@ -52,6 +78,9 @@ public class MQTTConnection extends Connection {
         return false;
     }
 
+    /**
+     * Disconnect from the MQTT broker
+     */
     @Override
     public void disconnect() {
         LOGGER.log(Level.INFO, "Disconnecting");
@@ -63,7 +92,12 @@ public class MQTTConnection extends Connection {
             }
         }
     }
-    
+
+    /**
+     * Send a message to the MQTT broker
+     * @param command Command to be sent
+     * @throws ConnectionException when an error occurs during sending or an incorrect message is received
+     */
     @Override
     public void send(Command command) throws ConnectionException {
         LOGGER.log(Level.INFO, "Sending command: " + command);
@@ -78,13 +112,22 @@ public class MQTTConnection extends Connection {
             throw new ConnectionException("Error occurred while publishing MQTT command", e);
         }
     }
-    
+
+    /**
+     * Not used
+     * @return null
+     * @throws ConnectionException not thrown
+     */
     @Override
     public Command receive() throws ConnectionException {
         //dealt with inside setCallback() -> messageArrived() method
         return null;
     }
 
+    /**
+     * Listen for messages in the topic
+     * @param topic Topic to be subscribed to
+     */
     void subscribe(String topic){
         subscribeTopics.add(topic);
         try {
@@ -94,10 +137,17 @@ public class MQTTConnection extends Connection {
         }
     }
 
+    /**
+     * Methods for MQTT connection
+     */
     private void setCallback() {
         if (mqttClient != null) {
             mqttClient.setCallback(new MqttCallback() {
 
+                /**
+                 * When connection to the broker is lost retry then log the message
+                 * @param throwable Error causing the disconnection
+                 */
                 @Override
                 public void connectionLost(Throwable throwable) {
                     LOGGER.log(Level.SEVERE, "Connection lost! Retrying", throwable);
@@ -113,6 +163,11 @@ public class MQTTConnection extends Connection {
                     }
                 }
 
+                /**
+                 * Message arrived from the subscribed topic, add it to the messages queue
+                 * @param topic Topic of the message
+                 * @param mqttMessage Message content
+                 */
                 @Override
                 public void messageArrived(String topic, MqttMessage mqttMessage) {
                     String message = new String(mqttMessage.getPayload());
@@ -121,6 +176,10 @@ public class MQTTConnection extends Connection {
                     getCommandQueue().add(command);
                 }
 
+                /**
+                 * Message sent was delivered successfully
+                 * @param iMqttDeliveryToken token of the delivered message
+                 */
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
                     LOGGER.log(Level.FINE, "Message successfully sent: " + iMqttDeliveryToken);

@@ -4,6 +4,9 @@ import com.piotrak.service.technology.Command;
 
 import javax.validation.constraints.NotBlank;
 
+/**
+ * IR command
+ */
 public class IRCommand extends Command {
 
     public IRCommand(@NotBlank String value) {

@@ -8,17 +8,32 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Abstract controller for the webapp request
+ */
 public abstract class AbstractController {
 
+    /**
+     * All elements map
+     */
     @Autowired
     private Map<String, List<Element>> elementsMap;
 
+    /**
+     * Get model and view for the webapp
+     * @return model and view with elements
+     */
     ModelAndView getModelAndView(){
         ModelAndView model = new ModelAndView();
         model.addObject("elementsMap", elementsMap);
         return model;
     }
 
+    /**
+     * Get command from the GUI
+     * @param cmd user's command
+     * @return Webcommand
+     */
     WebCommand getCommand(String cmd) {
         return new WebCommand(cmd);
     }

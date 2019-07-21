@@ -11,12 +11,21 @@ import javax.validation.constraints.NotNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Service for communication between systems for the element
+ */
 public abstract class ElementService implements Communication {
 
     private Logger LOGGER = Logger.getLogger("ElementService");
 
+    /**
+     * Element of the service
+     */
     private Element element;
 
+    /**
+     * Element's connection with the application
+     */
     private ConnectionService connectionService;
 
     public ElementService(@NotNull Element element, @NotNull ConnectionService connectionService) {
@@ -32,6 +41,10 @@ public abstract class ElementService implements Communication {
         return connectionService;
     }
 
+    /**
+     * Act on command
+     * @param command Command received
+     */
     public void commandReceived(Command command) {
         assert command != null;
         LOGGER.log(Level.INFO, "Command received:\t" + command);
@@ -45,6 +58,11 @@ public abstract class ElementService implements Communication {
         }
     }
 
+    /**
+     * Translate the command for the element communication
+     * @param command Command to be translated
+     * @return Translated command
+     */
     protected abstract Command translateCommand(Command command);
 
 }

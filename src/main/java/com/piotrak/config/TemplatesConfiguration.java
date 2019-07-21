@@ -18,6 +18,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Templates that group actions, displayed in the templates tile
+ */
 @Configuration
 @EnableConfigurationProperties()
 public class TemplatesConfiguration {
@@ -40,7 +43,7 @@ public class TemplatesConfiguration {
         return list;
     }
 
-    @Bean
+    @Bean//TODO: to chyba nie musi być Bean
     public TemplateElement templateAllOff(){
         Map<ElementService, Command> actions = new HashMap<>();
         actions.put(tvElementService, commandOff);

@@ -10,6 +10,9 @@ import org.springframework.context.annotation.Configuration;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Things that represent physical devices which can be switched etc., displayed in the things tile
+ */
 @Configuration
 @EnableConfigurationProperties()
 public class ThingsConfiguration {
