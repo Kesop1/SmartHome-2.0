@@ -3,10 +3,10 @@
 <h2>Przyciski</h2>
 <p>Odkurzacz</p>
 <div>
-    <form action="${path}vacuum?cmd=clean" method="post">
+    <form action="${path}vacuum/ir?cmd=clean" method="post">
         <button type="submit" class="button">Do roboty</button>
     </form>
-    <form action="${path}vacuum?cmd=home" method="post">
+    <form action="${path}vacuum/ir?cmd=home" method="post">
         <button type="submit" class="button">Do domu</button>
     </form>
 </div>

@@ -2,11 +2,11 @@ package com.piotrak.service.elementservice;
 
 import com.piotrak.service.element.SwitchElement;
 import com.piotrak.service.technology.Command;
+import com.piotrak.service.technology.ir.IRCommand;
 import com.piotrak.service.technology.ir.IRCommunication;
 import com.piotrak.service.technology.mqtt.MQTTCommand;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
 import com.piotrak.service.technology.mqtt.MQTTConnectionService;
-import com.piotrak.service.technology.web.WebCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.naming.OperationNotSupportedException;
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -61,14 +62,16 @@ public class VacuumElementService extends ElementService implements MQTTCommunic
         ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getSubscribeTopic(), this);
     }
 
+    /**
+     * Act on command, it can only be an IR command the device will respond to
+     * @param command received command
+     */
     @Override
-    public void commandReceived(Command command) {
-        assert command != null;
+    public void commandReceived(@NotNull Command command) {
         LOGGER.log(Level.INFO, "Command received:\t" + command);
-        String cmd = command.getValue();
         try {
-            if (getIRCodeForCommand(cmd.toLowerCase()) != null) {
-                handleIrCommand(command);
+            if (command instanceof IRCommand){
+                handleIrCommand((IRCommand) command);
             } else {
                 throw new OperationNotSupportedException("Command not recognized: " + command);
             }
@@ -77,7 +80,11 @@ public class VacuumElementService extends ElementService implements MQTTCommunic
         }
     }
 
-    private void handleIrCommand(Command command) {
+    /**
+     * Send the IRCommand to the MQTT broker
+     * @param command IR command
+     */
+    private void handleIrCommand(IRCommand command) {
         String irCode = getIRCodeForCommand(command.getValue().toLowerCase());
         getConnectionService().actOnConnection(new MQTTCommand(getIrPublishTopic(), irCode));
     }

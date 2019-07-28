@@ -26,15 +26,16 @@ public abstract class AbstractController {
     ModelAndView getModelAndView(){
         ModelAndView model = new ModelAndView();
         model.addObject("elementsMap", elementsMap);
+        model.setViewName("redirect:/main");
         return model;
     }
 
     /**
      * Get command from the GUI
      * @param cmd user's command
-     * @return Webcommand
+     * @return WebCommand
      */
-    WebCommand getCommand(String cmd) {
+    protected WebCommand getWebCommand(String cmd) {
         return new WebCommand(cmd);
     }
 }

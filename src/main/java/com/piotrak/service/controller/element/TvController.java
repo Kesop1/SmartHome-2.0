@@ -1,6 +1,6 @@
 package com.piotrak.service.controller.element;
 
-import com.piotrak.service.controller.SwitchController;
+import com.piotrak.service.controller.ElementController;
 import com.piotrak.service.elementservice.ElementService;
 import com.piotrak.service.elementservice.TvElementService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  */
 @RestController
 @RequestMapping("/tv")
-public class TvController extends SwitchController {
+public class TvController extends ElementController {
 
     private Logger LOGGER = Logger.getLogger("TvController");
 
@@ -35,11 +35,10 @@ public class TvController extends SwitchController {
      * @param cmd switch command
      * @return main page
      */
-    @Override
     @PostMapping
-    public ModelAndView handleSwitchRequest(@RequestParam String cmd) {
+    public ModelAndView handleSwitchCommand(@RequestParam String cmd) {
         LOGGER.log(Level.INFO, "Command received from web application: " + cmd);
-        return super.handleSwitchRequest(cmd);
+        return super.handleCommand(getWebCommand(cmd));
     }
 
 }

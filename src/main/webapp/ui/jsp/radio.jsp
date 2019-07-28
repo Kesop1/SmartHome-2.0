@@ -1,6 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page pageEncoding="UTF-8"%>
-<c:set var = "path" value = "${pageContext.request.contextPath}/amplituner?cmd="/>
+<c:set var = "path" value = "${pageContext.request.contextPath}/amplituner/ir?cmd="/>
 <h2>Radio</h2>
 <p>Głośność</p>
 <div>

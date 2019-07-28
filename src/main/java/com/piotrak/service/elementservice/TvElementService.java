@@ -1,11 +1,14 @@
 package com.piotrak.service.elementservice;
 
+import com.piotrak.service.DelayedCommandService;
 import com.piotrak.service.element.SwitchElement;
 import com.piotrak.service.technology.Command;
+import com.piotrak.service.technology.ir.IRCommand;
 import com.piotrak.service.technology.ir.IRCommunication;
 import com.piotrak.service.technology.mqtt.MQTTCommand;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
 import com.piotrak.service.technology.mqtt.MQTTConnectionService;
+import com.piotrak.service.technology.time.DelayedCommand;
 import com.piotrak.service.technology.web.WebCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -14,6 +17,8 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.naming.OperationNotSupportedException;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -36,8 +41,12 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
 
     private Map<String, String> irCode = new HashMap<>();
 
-    public TvElementService(@Autowired SwitchElement tv, @Autowired MQTTConnectionService mqttConnectionService) {
+    private DelayedCommandService delayedCommandService;
+
+    public TvElementService(@Autowired SwitchElement tv, @Autowired MQTTConnectionService mqttConnectionService,
+                            @Autowired DelayedCommandService delayedCommandService) {
         super(tv, mqttConnectionService);
+        this.delayedCommandService = delayedCommandService;
     }
 
     @Override
@@ -56,24 +65,32 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
         ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getSubscribeTopic(), this);
     }
 
+    /**
+     * Act on command, it can be an ON/OFF or a different IR command the device will respond to
+     * @param command received command
+     */
     @Override
-    public void commandReceived(Command command) {
-        assert command != null;
+    public void commandReceived(@NotNull Command command) {
         LOGGER.log(Level.INFO, "Command received:\t" + command);
-        String cmd = command.getValue();
         try {
-            if ("ON".equalsIgnoreCase(cmd) || "OFF".equalsIgnoreCase(cmd)) {
-                handleSwitchCommand(command);
-            } else if (getIRCodeForCommand(cmd) != null) {
-                handleIrCommand(command);
+            if (command instanceof IRCommand){
+                handleIrCommand((IRCommand) command);
             } else {
-                throw new OperationNotSupportedException("Command not recognized: " + command);
+                String cmd = command.getValue();
+                if ("ON".equalsIgnoreCase(cmd) || "OFF".equalsIgnoreCase(cmd)) {
+                    handleSwitchCommand(command);
+                }
             }
         } catch (OperationNotSupportedException e){
             LOGGER.log(Level.WARNING, e.getMessage());
         }
     }
 
+    /**
+     * ON or OFF command received, if WebCommand then send it also to the MQTT broker
+     * @param command ON or OFF command
+     * @throws OperationNotSupportedException when an incorrect message is received
+     */
     private void handleSwitchCommand(Command command) throws OperationNotSupportedException {
         getElement().actOnCommand(command);
         if(command instanceof WebCommand) {
@@ -85,27 +102,44 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
         }
     }
 
+    /**
+     * turn on the device, flip on the switch, also send the IR code
+     * @param command ON command
+     */
     private void handleOnCommand(Command command) {
         getConnectionService().actOnConnection(translateCommand(command));
+        getDelayedCommandService().commandReceived(new DelayedCommand(1000, new IRCommand("on"), this));
     }
 
+    /**
+     * turn off the device, first send an IR code, and then flip off the switch
+     * @param command OFF command
+     */
     private void handleOffCommand(Command command) {
-        handleIrCommand(command);
-        new Thread(() -> {
-            try {
-                Thread.sleep(1000);
-                getConnectionService().actOnConnection(translateCommand(command));
-            } catch (InterruptedException e) {
-                LOGGER.log(Level.WARNING, e.getMessage());
-            }
-        }).start();
+        sendIRCommand(getIRCodeForCommand("off"));
+        getDelayedCommandService().commandReceived(new DelayedCommand(1000, translateCommand(command), this));
     }
 
-    private void handleIrCommand(Command command) {
-        String irCode = getIRCodeForCommand(command.getValue().toLowerCase());
-        if(irCode != null) {
-            getConnectionService().actOnConnection(new MQTTCommand(getIrPublishTopic(), irCode));
+    /**
+     * send out an IR command, command gets translated into an IR code
+     * @param command IR command
+     * @throws OperationNotSupportedException if no IR command was found in the IR codes map for the element
+     */
+    private void handleIrCommand(IRCommand command) throws OperationNotSupportedException{
+        String irCodeForCommand = getIRCodeForCommand(command.getValue().toLowerCase());
+        if (irCodeForCommand != null) {
+            sendIRCommand(irCodeForCommand);
+        } else{
+            throw new OperationNotSupportedException("Unable to find an IR code for the command: " + command);
         }
+    }
+
+    /**
+     * Send the IR code to the MQTT broker, it can be sent with the suffix to get repeated on the receiving end
+     * @param irCode code to be sent
+     */
+    private void sendIRCommand(@NotBlank String irCode){
+        getConnectionService().actOnConnection(new MQTTCommand(getIrPublishTopic(), irCode));
     }
 
     @Override
@@ -143,5 +177,13 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
 
     public void setIrPublishTopic(String irPublishTopic) {
         this.irPublishTopic = irPublishTopic;
+    }
+
+    public DelayedCommandService getDelayedCommandService() {
+        return delayedCommandService;
+    }
+
+    public void setDelayedCommandService(DelayedCommandService delayedCommandService) {
+        this.delayedCommandService = delayedCommandService;
     }
 }

@@ -1,10 +1,13 @@
 package com.piotrak.config;
 
+import com.piotrak.service.CommandService;
+import com.piotrak.service.DelayedCommandService;
 import com.piotrak.service.element.Element;
 import com.piotrak.service.element.TemplateElement;
 import com.piotrak.service.elementservice.*;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.ir.IRCommand;
+import com.piotrak.service.technology.time.DelayedCommand;
 import com.piotrak.service.technology.web.WebCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -15,7 +18,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -45,7 +47,7 @@ public class TemplatesConfiguration {
 
     @Bean//TODO: to chyba nie musi być Bean
     public TemplateElement templateAllOff(){
-        Map<ElementService, Command> actions = new HashMap<>();
+        Map<CommandService, Command> actions = new HashMap<>();
         actions.put(tvElementService, commandOff);
         actions.put(amplitunerElementService, commandOff);
         actions.put(speakersElementService, commandOff);
@@ -60,7 +62,7 @@ public class TemplatesConfiguration {
 
     @Bean
     public TemplateElement templatePc(){
-        Map<ElementService, Command> actions = new HashMap<>();
+        Map<CommandService, Command> actions = new HashMap<>();
         actions.put(pcElementService, commandOn);
         actions.put(deskElementService, commandOn);
         actions.put(pcScreenElementService, commandOn);
@@ -70,18 +72,10 @@ public class TemplatesConfiguration {
 
     @Bean
     public TemplateElement templateRadio() {
-        Map<ElementService, Command> actions = new HashMap<>();
+        Map<CommandService, Command> actions = new HashMap<>();
         actions.put(amplitunerElementService, commandOn);
         actions.put(speakersElementService, commandOn);
-        //TODO: DelayedCommand/ScheduledCommand
-//        new Thread(() -> {
-//            try {
-//                Thread.sleep(2000);
-//                actions.put(amplitunerElementService, new IRCommand("4"));
-//            } catch (InterruptedException e) {
-//                LOGGER.log(Level.WARNING, e.getMessage());
-//            }
-//        }).start();
+        actions.put(delayedCommandService, new DelayedCommand(2000, new IRCommand("4"), amplitunerElementService));
         return new TemplateElement("radio", "Meloman", actions);
     }
 
@@ -92,26 +86,18 @@ public class TemplatesConfiguration {
 
     @Bean
     public TemplateElement templateMovie(){
-        Map<ElementService, Command> actions = new HashMap<>();
+        Map<CommandService, Command> actions = new HashMap<>();
         actions.put(pcElementService, commandOn);
-        actions.put(amplitunerElementService, commandOn);//TODO: ustaw odpowiedni program na amlitunerze i glosniki na pc
+        actions.put(amplitunerElementService, commandOn);//TODO: ustaw glosniki na pc
+        actions.put(delayedCommandService, new DelayedCommand(2000, new IRCommand("2"), amplitunerElementService));
         actions.put(speakersElementService, commandOn);
-        //TODO: DelayedCommand/ScheduledCommand
-//        new Thread(() -> {
-//            try {
-//                Thread.sleep(2000);
-//                actions.put(amplitunerElementService, new IRCommand("2"));
-//            } catch (InterruptedException e) {
-//                LOGGER.log(Level.WARNING, e.getMessage());
-//            }
-//        }).start();
         actions.put(tvElementService, commandOn);
         return new TemplateElement("movie", "Kinoman", actions);
     }
 
     @Bean
     public TemplateElement templateWork(){
-        Map<ElementService, Command> actions = new HashMap<>();
+        Map<CommandService, Command> actions = new HashMap<>();
         actions.put(laptopElementService, commandOn);
         actions.put(deskElementService, commandOn);
         actions.put(pcScreenElementService, commandOn);
@@ -145,5 +131,8 @@ public class TemplatesConfiguration {
 
     @Autowired
     public PCSpeakersElementService pcSpeakersElementService;
+
+    @Autowired
+    public DelayedCommandService delayedCommandService;
 
 }

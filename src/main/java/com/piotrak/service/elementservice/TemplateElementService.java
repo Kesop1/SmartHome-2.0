@@ -1,5 +1,6 @@
 package com.piotrak.service.elementservice;
 
+import com.piotrak.service.CommandService;
 import com.piotrak.service.element.TemplateElement;
 import com.piotrak.service.technology.Command;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +69,7 @@ public class TemplateElementService {
      * Turn all the elements off except for the ones defined in the active template
      */
     private void restOffTemplate(){
-        Map<ElementService, Command> restOffcommands = new HashMap<>(templateAllOff.getElementCommandMap());
+        Map<CommandService, Command> restOffcommands = new HashMap<>(templateAllOff.getElementCommandMap());
         if(activeTemplate != null){
             for(Map.Entry activeCommands : activeTemplate.getElementCommandMap().entrySet()){
                 restOffcommands.remove(activeCommands.getKey());

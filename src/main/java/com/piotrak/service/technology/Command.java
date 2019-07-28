@@ -1,7 +1,5 @@
 package com.piotrak.service.technology;
 
-import javax.validation.constraints.NotBlank;
-
 /**
  * Command for the elements
  */
@@ -12,7 +10,11 @@ public abstract class Command {
      */
     private final String value;
 
-    public Command(@NotBlank String value) {
+    public Command() {
+        this.value = "";
+    }
+
+    public Command(String value) {
         this.value = value;
     }
 

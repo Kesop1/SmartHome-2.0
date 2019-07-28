@@ -35,8 +35,6 @@ public class TemplateController extends AbstractController {
     public ModelAndView setTemplate(@RequestParam String name) {
         LOGGER.log(Level.INFO, "Command received from web application: " + name);
         templateElementService.switchTemplate(name);
-        ModelAndView model = super.getModelAndView();
-        model.setViewName("mainView");
-        return model;
+        return super.getModelAndView();
     }
 }

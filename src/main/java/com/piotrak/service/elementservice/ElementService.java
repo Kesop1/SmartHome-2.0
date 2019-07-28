@@ -1,5 +1,6 @@
 package com.piotrak.service.elementservice;
 
+import com.piotrak.service.CommandService;
 import com.piotrak.service.element.Element;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.Communication;
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * Service for communication between systems for the element
  */
-public abstract class ElementService implements Communication {
+public abstract class ElementService extends CommandService implements Communication {
 
     private Logger LOGGER = Logger.getLogger("ElementService");
 
@@ -45,7 +46,8 @@ public abstract class ElementService implements Communication {
      * Act on command
      * @param command Command received
      */
-    public void commandReceived(Command command) {
+    @Override
+    public void commandReceived(Command command) {//TODO notnull
         assert command != null;
         LOGGER.log(Level.INFO, "Command received:\t" + command);
         try {

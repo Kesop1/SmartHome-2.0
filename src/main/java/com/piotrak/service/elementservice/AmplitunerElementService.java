@@ -1,11 +1,14 @@
 package com.piotrak.service.elementservice;
 
+import com.piotrak.service.DelayedCommandService;
 import com.piotrak.service.element.SwitchElement;
 import com.piotrak.service.technology.Command;
+import com.piotrak.service.technology.ir.IRCommand;
 import com.piotrak.service.technology.ir.IRCommunication;
 import com.piotrak.service.technology.mqtt.MQTTCommand;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
 import com.piotrak.service.technology.mqtt.MQTTConnectionService;
+import com.piotrak.service.technology.time.DelayedCommand;
 import com.piotrak.service.technology.web.WebCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -14,6 +17,8 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.naming.OperationNotSupportedException;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -36,8 +41,12 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
 
     private Map<String, String> irCode = new HashMap<>();
 
-    public AmplitunerElementService(@Autowired SwitchElement amplituner, @Autowired MQTTConnectionService mqttConnectionService) {
+    private DelayedCommandService delayedCommandService;
+
+    public AmplitunerElementService(@Autowired SwitchElement amplituner, @Autowired MQTTConnectionService mqttConnectionService,
+                                    @Autowired DelayedCommandService delayedCommandService) {
         super(amplituner, mqttConnectionService);
+        this.delayedCommandService = delayedCommandService;
     }
 
     /**
@@ -66,15 +75,16 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
      * @param command received command
      */
     @Override
-    public void commandReceived(Command command) {
-        assert command != null;
+    public void commandReceived(@NotNull Command command) {
         LOGGER.log(Level.INFO, "Command received:\t" + command);
-        String cmd = command.getValue();
         try {
-            if ("ON".equalsIgnoreCase(cmd) || "OFF".equalsIgnoreCase(cmd)) {
-                handleSwitchCommand(command);
+            if (command instanceof IRCommand){
+                handleIrCommand((IRCommand) command);
             } else {
-                handleIrCommand(command);
+                String cmd = command.getValue();
+                if ("ON".equalsIgnoreCase(cmd) || "OFF".equalsIgnoreCase(cmd)) {
+                    handleSwitchCommand(command);
+                }
             }
         } catch (OperationNotSupportedException e){
             LOGGER.log(Level.WARNING, e.getMessage());
@@ -82,7 +92,7 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
     }
 
     /**
-     * ON or OFF command received
+     * ON or OFF command received, if WebCommand then send it also to the MQTT broker
      * @param command ON or OFF command
      * @throws OperationNotSupportedException when an incorrect message is received
      */
@@ -98,11 +108,12 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
     }
 
     /**
-     * turn on the device, flip on the switch, sending the IR code is not needed
+     * turn on the device, flip on the switch, also send the IR code
      * @param command ON command
      */
     private void handleOnCommand(Command command) {
         getConnectionService().actOnConnection(translateCommand(command));
+        getDelayedCommandService().commandReceived(new DelayedCommand(500, new IRCommand("on"), this));
     }
 
     /**
@@ -110,15 +121,8 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
      * @param command OFF command
      */
     private void handleOffCommand(Command command) throws OperationNotSupportedException {
-        handleIrCommand(command);
-        new Thread(() -> {
-            try {
-                Thread.sleep(1000);
-                getConnectionService().actOnConnection(translateCommand(command));
-            } catch (InterruptedException e) {
-                LOGGER.log(Level.WARNING, e.getMessage());
-            }
-        }).start();
+        sendIRCommand(getIRCodeForCommand("off"), 1);
+        getDelayedCommandService().commandReceived(new DelayedCommand(500, translateCommand(command), this));
     }
 
     /**
@@ -127,7 +131,7 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
      * @param command IR command
      * @throws OperationNotSupportedException if no IR command was found in the IR codes map for the element
      */
-    private void handleIrCommand(Command command) throws OperationNotSupportedException{
+    private void handleIrCommand(IRCommand command) throws OperationNotSupportedException{
         String cmd = command.getValue();
         int repeat = 1;
         if(cmd.contains("_")){
@@ -137,12 +141,20 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
         }
         String irCodeForCommand = getIRCodeForCommand(cmd.toLowerCase());
         if (irCodeForCommand != null) {
-            getConnectionService().actOnConnection(new MQTTCommand(getIrPublishTopic(), (repeat > 1 ? repeat + "_" : "") + irCodeForCommand));
+            sendIRCommand(irCodeForCommand, repeat);
         } else{
             throw new OperationNotSupportedException("Unable to find an IR code for the command: " + command);
         }
     }
 
+    /**
+     * Send the IR code to the MQTT broker, it can be sent with the suffix to get repeated on the receiving end
+     * @param irCode code to be sent
+     * @param repeat repeat the code
+     */
+    private void sendIRCommand(@NotBlank String irCode, int repeat){
+        getConnectionService().actOnConnection(new MQTTCommand(getIrPublishTopic(), (repeat > 1 ? repeat + "_" : "") + irCode));
+    }
 
     @Override
     public Map<String, String> getIRCodesMap() {
@@ -179,5 +191,13 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
 
     public void setIrPublishTopic(String irPublishTopic) {
         this.irPublishTopic = irPublishTopic;
+    }
+
+    public DelayedCommandService getDelayedCommandService() {
+        return delayedCommandService;
+    }
+
+    public void setDelayedCommandService(DelayedCommandService delayedCommandService) {
+        this.delayedCommandService = delayedCommandService;
     }
 }
