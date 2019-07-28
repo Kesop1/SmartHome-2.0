@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class TvElementServiceTests {
-
+/*
     @Test
     public void webCommandReceivedTest() throws OperationNotSupportedException {
         WebCommand webCommand = new WebCommand("ON");
@@ -44,5 +44,5 @@ public class TvElementServiceTests {
         TvElementService tvElementService = new TvElementService(tv, mqttConnectionService);
         Command command = tvElementService.translateCommand(webCommand);
         assertTrue(command instanceof MQTTCommand);
-    }
+    }*/
 }
