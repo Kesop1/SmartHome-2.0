@@ -55,7 +55,7 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
      * @return MQTT command
      */
     @Override
-    protected Command translateCommand(Command command) {//TODO: może da się to gdzieś przerzucić?
+    protected MQTTCommand translateCommand(Command command) {//TODO: może da się to gdzieś przerzucić?
         return getMQTTPublishCommand(command);
     }
 
@@ -80,6 +80,8 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
         try {
             if (command instanceof IRCommand){
                 handleIrCommand((IRCommand) command);
+            } else if (command instanceof MQTTCommand){
+                handleMQTTCommand((MQTTCommand) command);
             } else {
                 String cmd = command.getValue();
                 if ("ON".equalsIgnoreCase(cmd) || "OFF".equalsIgnoreCase(cmd)) {
@@ -112,7 +114,7 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
      * @param command ON command
      */
     private void handleOnCommand(Command command) {
-        getConnectionService().actOnConnection(translateCommand(command));
+        handleMQTTCommand(translateCommand(command));
         getDelayedCommandService().commandReceived(new DelayedCommand(500, new IRCommand("on"), this));
     }
 
@@ -120,9 +122,22 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
      * turn off the device, first send an IR code, and then flip off the switch
      * @param command OFF command
      */
-    private void handleOffCommand(Command command) throws OperationNotSupportedException {
-        sendIRCommand(getIRCodeForCommand("off"), 1);
+    private void handleOffCommand(Command command) {
+        try {
+            handleIrCommand(new IRCommand("off"));
+        } catch (OperationNotSupportedException e) {
+            LOGGER.log(Level.INFO, e.getMessage());
+        }
         getDelayedCommandService().commandReceived(new DelayedCommand(500, translateCommand(command), this));
+    }
+
+    /**
+     * Send MQTT command to the broker
+     * @param command MQTT command
+     */
+    private void handleMQTTCommand(MQTTCommand command){
+        LOGGER.log(Level.INFO, "Sending command to the broker:\t" + command);
+        getConnectionService().actOnConnection(command);
     }
 
     /**
@@ -153,7 +168,7 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
      * @param repeat repeat the code
      */
     private void sendIRCommand(@NotBlank String irCode, int repeat){
-        getConnectionService().actOnConnection(new MQTTCommand(getIrPublishTopic(), (repeat > 1 ? repeat + "_" : "") + irCode));
+        handleMQTTCommand(new MQTTCommand(getIrPublishTopic(), (repeat > 1 ? repeat + "_" : "") + irCode));
     }
 
     @Override
