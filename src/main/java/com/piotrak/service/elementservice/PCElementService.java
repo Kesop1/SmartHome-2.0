@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
+import javax.naming.OperationNotSupportedException;
+import javax.validation.constraints.NotNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,6 +30,24 @@ public class PCElementService extends ElementService implements MQTTCommunicatio
 
     public PCElementService(@Autowired SwitchElement pc, @Autowired MQTTConnectionService mqttConnectionService) {
         super(pc, mqttConnectionService);
+    }
+
+    /**
+     * Act on command
+     * @param command Command received
+     */
+    @Override
+    public void commandReceived(@NotNull Command command) {
+        LOGGER.log(Level.INFO, "Command received:\t" + command);
+        try {
+            String cmd = command.getValue();
+            if ("ON".equalsIgnoreCase(cmd) || "OFF".equalsIgnoreCase(cmd)) {
+                getElement().actOnCommand(command);
+            }
+            getConnectionService().actOnConnection(translateCommand(command));
+        } catch (OperationNotSupportedException e) {
+            LOGGER.log(Level.WARNING, e.getMessage());
+        }
     }
 
     /**

@@ -9,15 +9,15 @@ import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.ir.IRCommand;
 import com.piotrak.service.technology.time.DelayedCommand;
 import com.piotrak.service.technology.web.WebCommand;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -47,7 +47,7 @@ public class TemplatesConfiguration {
 
     @Bean//TODO: to chyba nie musi być Bean
     public TemplateElement templateAllOff(){
-        Map<CommandService, Command> actions = new HashMap<>();
+        MultiValuedMap<CommandService, Command> actions = new ArrayListValuedHashMap<>();
         actions.put(tvElementService, commandOff);
         actions.put(amplitunerElementService, commandOff);
         actions.put(speakersElementService, commandOff);
@@ -62,7 +62,7 @@ public class TemplatesConfiguration {
 
     @Bean
     public TemplateElement templatePc(){
-        Map<CommandService, Command> actions = new HashMap<>();
+        MultiValuedMap<CommandService, Command> actions = new ArrayListValuedHashMap<>();
         actions.put(pcElementService, commandOn);
         actions.put(delayedCommandService, new DelayedCommand(3000, new WebCommand("audio-pc"), pcElementService));
         actions.put(deskElementService, commandOn);
@@ -73,7 +73,7 @@ public class TemplatesConfiguration {
 
     @Bean
     public TemplateElement templateRadio() {
-        Map<CommandService, Command> actions = new HashMap<>();
+        MultiValuedMap<CommandService, Command> actions = new ArrayListValuedHashMap<>();
         actions.put(amplitunerElementService, commandOn);
         actions.put(speakersElementService, commandOn);
         actions.put(delayedCommandService, new DelayedCommand(2000, new IRCommand("4"), amplitunerElementService));
@@ -82,16 +82,16 @@ public class TemplatesConfiguration {
 
     @Bean
     public TemplateElement templateRestOff(){
-        return new TemplateElement("restOff", "Reszta off", new HashMap<>());
+        return new TemplateElement("restOff", "Reszta off", new ArrayListValuedHashMap<>());
     }//TODO: jakies akcje tu sa potrzebne
 
     @Bean
     public TemplateElement templateMovie(){
-        Map<CommandService, Command> actions = new HashMap<>();
+        MultiValuedMap<CommandService, Command> actions = new ArrayListValuedHashMap<>();
         actions.put(pcElementService, commandOn);
         actions.put(amplitunerElementService, commandOn);
         actions.put(delayedCommandService, new DelayedCommand(2000, new IRCommand("2"), amplitunerElementService));
-        actions.put(delayedCommandService, new DelayedCommand(3000, new WebCommand("audio-amp"), pcElementService));
+        actions.put(delayedCommandService, new DelayedCommand(10000, new WebCommand("audio-tv"), pcElementService));
         actions.put(speakersElementService, commandOn);
         actions.put(tvElementService, commandOn);
         return new TemplateElement("movie", "Kinoman", actions);
@@ -99,7 +99,7 @@ public class TemplatesConfiguration {
 
     @Bean
     public TemplateElement templateWork(){
-        Map<CommandService, Command> actions = new HashMap<>();
+        MultiValuedMap<CommandService, Command> actions = new ArrayListValuedHashMap<>();
         actions.put(laptopElementService, commandOn);
         actions.put(deskElementService, commandOn);
         actions.put(pcScreenElementService, commandOn);

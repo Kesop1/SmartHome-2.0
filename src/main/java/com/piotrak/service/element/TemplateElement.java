@@ -3,6 +3,7 @@ package com.piotrak.service.element;
 import com.piotrak.service.CommandService;
 import com.piotrak.service.action.Switchable;
 import com.piotrak.service.technology.Command;
+import org.apache.commons.collections4.MultiValuedMap;
 
 import javax.naming.OperationNotSupportedException;
 import javax.validation.constraints.NotBlank;
@@ -18,9 +19,9 @@ public class TemplateElement extends Element implements Switchable {
     /**
      * Commands to be performed when template is activated
      */
-    private Map<CommandService, Command> elementCommandMap;
+    private MultiValuedMap<CommandService, Command> elementCommandMap;
 
-    public TemplateElement(@NotBlank String name, String displayName, Map<CommandService, Command> elementCommandMap) {
+    public TemplateElement(@NotBlank String name, String displayName, MultiValuedMap<CommandService, Command> elementCommandMap) {
         super(name, displayName);
         this.elementCommandMap = elementCommandMap;
     }
@@ -50,7 +51,7 @@ public class TemplateElement extends Element implements Switchable {
         this.active = active;
     }
 
-    public Map<CommandService, Command> getElementCommandMap() {
+    public MultiValuedMap<CommandService, Command> getElementCommandMap() {
         return elementCommandMap;
     }
 
@@ -67,7 +68,7 @@ public class TemplateElement extends Element implements Switchable {
             throw new OperationNotSupportedException("Invalid command: '" + command + "' sent for : " + getName());
         }
         if(isActive()){
-            for (Map.Entry entry : getElementCommandMap().entrySet()){
+            for (Map.Entry entry : getElementCommandMap().entries()){
                 CommandService service = (CommandService) entry.getKey();
                 service.commandReceived((Command) entry.getValue());
             }

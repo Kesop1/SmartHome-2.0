@@ -3,12 +3,13 @@ package com.piotrak.service.elementservice;
 import com.piotrak.service.CommandService;
 import com.piotrak.service.element.TemplateElement;
 import com.piotrak.service.technology.Command;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import javax.naming.OperationNotSupportedException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -69,9 +70,9 @@ public class TemplateElementService {
      * Turn all the elements off except for the ones defined in the active template
      */
     private void restOffTemplate(){
-        Map<CommandService, Command> restOffcommands = new HashMap<>(templateAllOff.getElementCommandMap());
+        MultiValuedMap<CommandService, Command> restOffcommands = new ArrayListValuedHashMap<>(templateAllOff.getElementCommandMap());
         if(activeTemplate != null){
-            for(Map.Entry activeCommands : activeTemplate.getElementCommandMap().entrySet()){
+            for(Map.Entry activeCommands : activeTemplate.getElementCommandMap().entries()){
                 restOffcommands.remove(activeCommands.getKey());
             }
             templateRestOff.getElementCommandMap().clear();
