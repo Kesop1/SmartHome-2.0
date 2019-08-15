@@ -64,6 +64,7 @@ public class TemplatesConfiguration {
     public TemplateElement templatePc(){
         Map<CommandService, Command> actions = new HashMap<>();
         actions.put(pcElementService, commandOn);
+        actions.put(delayedCommandService, new DelayedCommand(3000, new WebCommand("audio-pc"), pcElementService));
         actions.put(deskElementService, commandOn);
         actions.put(pcScreenElementService, commandOn);
         actions.put(pcSpeakersElementService, commandOn);//TODO: ustaw odpoeiednie wyjscia na switchu
@@ -88,8 +89,9 @@ public class TemplatesConfiguration {
     public TemplateElement templateMovie(){
         Map<CommandService, Command> actions = new HashMap<>();
         actions.put(pcElementService, commandOn);
-        actions.put(amplitunerElementService, commandOn);//TODO: ustaw glosniki na pc
+        actions.put(amplitunerElementService, commandOn);
         actions.put(delayedCommandService, new DelayedCommand(2000, new IRCommand("2"), amplitunerElementService));
+        actions.put(delayedCommandService, new DelayedCommand(3000, new WebCommand("audio-amp"), pcElementService));
         actions.put(speakersElementService, commandOn);
         actions.put(tvElementService, commandOn);
         return new TemplateElement("movie", "Kinoman", actions);
