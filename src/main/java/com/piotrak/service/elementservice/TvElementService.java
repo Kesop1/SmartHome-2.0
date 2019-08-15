@@ -109,7 +109,7 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
      * @param command ON command
      */
     private void handleOnCommand(Command command) {
-        handleMQTTCommand(translateCommand(command));
+        getConnectionService().actOnConnection(translateCommand(command));
         getDelayedCommandService().commandReceived(new DelayedCommand(1000, new IRCommand("on"), this));
     }
 
@@ -123,16 +123,23 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
         } catch (OperationNotSupportedException e) {
             LOGGER.log(Level.INFO, e.getMessage());
         }
-        getDelayedCommandService().commandReceived(new DelayedCommand(1000, translateCommand(command), this));
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+                getConnectionService().actOnConnection(translateCommand(command));
+            } catch (InterruptedException e) {
+                LOGGER.log(Level.WARNING, e.getMessage());
+            }
+        }).start();
     }
 
     /**
-     * Send MQTT command to the broker
+     * Handle MQTT message from the broker
      * @param command MQTT command
      */
-    private void handleMQTTCommand(MQTTCommand command){
+    private void handleMQTTCommand(MQTTCommand command) throws OperationNotSupportedException {
         LOGGER.log(Level.INFO, "Sending command to the broker:\t" + command);
-        getConnectionService().actOnConnection(command);
+        getElement().actOnCommand(command);
     }
 
     /**
@@ -150,11 +157,11 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
     }
 
     /**
-     * Send the IR code to the MQTT broker, it can be sent with the suffix to get repeated on the receiving end
+     * Send the IR code to the MQTT broker
      * @param irCode code to be sent
      */
     private void sendIRCommand(@NotBlank String irCode){
-        handleMQTTCommand(new MQTTCommand(getIrPublishTopic(), irCode));
+        getConnectionService().actOnConnection(new MQTTCommand(getIrPublishTopic(), irCode));
     }
 
     @Override

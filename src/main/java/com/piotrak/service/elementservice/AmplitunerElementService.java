@@ -114,8 +114,8 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
      * @param command ON command
      */
     private void handleOnCommand(Command command) {
-        handleMQTTCommand(translateCommand(command));
-        getDelayedCommandService().commandReceived(new DelayedCommand(500, new IRCommand("on"), this));
+        getConnectionService().actOnConnection(translateCommand(command));
+        getDelayedCommandService().commandReceived(new DelayedCommand(2000, new IRCommand("on"), this));
     }
 
     /**
@@ -128,16 +128,23 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
         } catch (OperationNotSupportedException e) {
             LOGGER.log(Level.INFO, e.getMessage());
         }
-        getDelayedCommandService().commandReceived(new DelayedCommand(500, translateCommand(command), this));
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+                getConnectionService().actOnConnection(translateCommand(command));
+            } catch (InterruptedException e) {
+                LOGGER.log(Level.WARNING, e.getMessage());
+            }
+        }).start();
     }
 
     /**
-     * Send MQTT command to the broker
+     * Handle MQTT messaeg from the broker
      * @param command MQTT command
      */
-    private void handleMQTTCommand(MQTTCommand command){
+    private void handleMQTTCommand(MQTTCommand command) throws OperationNotSupportedException {
         LOGGER.log(Level.INFO, "Sending command to the broker:\t" + command);
-        getConnectionService().actOnConnection(command);
+        getElement().actOnCommand(command);
     }
 
     /**
@@ -167,8 +174,8 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
      * @param irCode code to be sent
      * @param repeat repeat the code
      */
-    private void sendIRCommand(@NotBlank String irCode, int repeat){
-        handleMQTTCommand(new MQTTCommand(getIrPublishTopic(), (repeat > 1 ? repeat + "_" : "") + irCode));
+    private void sendIRCommand(@NotBlank String irCode, int repeat) {
+        getConnectionService().actOnConnection(new MQTTCommand(getIrPublishTopic(), (repeat > 1 ? repeat + "_" : "") + irCode));
     }
 
     @Override
