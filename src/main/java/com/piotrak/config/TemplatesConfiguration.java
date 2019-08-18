@@ -1,12 +1,15 @@
 package com.piotrak.config;
 
 import com.piotrak.service.CommandService;
+import com.piotrak.service.ConditionalCommandService;
 import com.piotrak.service.DelayedCommandService;
 import com.piotrak.service.element.Element;
+import com.piotrak.service.element.SwitchElement;
 import com.piotrak.service.element.TemplateElement;
 import com.piotrak.service.elementservice.*;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.ir.IRCommand;
+import com.piotrak.service.technology.time.ConditionalCommand;
 import com.piotrak.service.technology.time.DelayedCommand;
 import com.piotrak.service.technology.web.WebCommand;
 import org.apache.commons.collections4.MultiValuedMap;
@@ -64,7 +67,7 @@ public class TemplatesConfiguration {
     public TemplateElement templatePc(){
         MultiValuedMap<CommandService, Command> actions = new ArrayListValuedHashMap<>();
         actions.put(pcElementService, commandOn);
-        actions.put(delayedCommandService, new DelayedCommand(3000, new WebCommand("audio-pc"), pcElementService));
+        actions.put(conditionalCommandService, new ConditionalCommand((e)-> ((SwitchElement)e).isOn(), new WebCommand("audio-pc"), pcElementService, 60000));
         actions.put(deskElementService, commandOn);
         actions.put(pcScreenElementService, commandOn);
         actions.put(pcSpeakersElementService, commandOn);//TODO: ustaw odpoeiednie wyjscia na switchu
@@ -89,9 +92,9 @@ public class TemplatesConfiguration {
     public TemplateElement templateMovie(){
         MultiValuedMap<CommandService, Command> actions = new ArrayListValuedHashMap<>();
         actions.put(pcElementService, commandOn);
+        actions.put(conditionalCommandService, new ConditionalCommand((e)-> ((SwitchElement)e).isOn(), new WebCommand("audio-tv"), pcElementService, 60000));
         actions.put(amplitunerElementService, commandOn);
         actions.put(delayedCommandService, new DelayedCommand(2000, new IRCommand("2"), amplitunerElementService));
-        actions.put(delayedCommandService, new DelayedCommand(10000, new WebCommand("audio-tv"), pcElementService));
         actions.put(speakersElementService, commandOn);
         actions.put(tvElementService, commandOn);
         return new TemplateElement("movie", "Kinoman", actions);
@@ -136,5 +139,8 @@ public class TemplatesConfiguration {
 
     @Autowired
     public DelayedCommandService delayedCommandService;
+
+    @Autowired
+    private ConditionalCommandService conditionalCommandService;
 
 }

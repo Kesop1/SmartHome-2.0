@@ -27,7 +27,7 @@ public class DelayedCommandService extends CommandService {
         new Thread(() -> {
             try {
                 Thread.sleep(delayedCommand.getDelay());
-                delayedCommand.getElementService().commandReceived(delayedCommand.getCommand());
+                delayedCommand.getCommandService().commandReceived(delayedCommand.getCommand());
             } catch (InterruptedException e) {
                 LOGGER.log(Level.WARNING, e.getMessage());
             }

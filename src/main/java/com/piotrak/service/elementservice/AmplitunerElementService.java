@@ -115,7 +115,7 @@ public class AmplitunerElementService extends ElementService implements MQTTComm
      */
     private void handleOnCommand(Command command) {
         getConnectionService().actOnConnection(translateCommand(command));
-        getDelayedCommandService().commandReceived(new DelayedCommand(2000, new IRCommand("on"), this));
+        getDelayedCommandService().commandReceived(new DelayedCommand(500, new IRCommand("on"), this));
     }
 
     /**
