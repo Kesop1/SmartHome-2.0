@@ -2,8 +2,10 @@ package com.piotrak.service.elementservice;
 
 import com.piotrak.service.element.SwitchElement;
 import com.piotrak.service.technology.Command;
+import com.piotrak.service.technology.mqtt.MQTTCommand;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
 import com.piotrak.service.technology.mqtt.MQTTConnectionService;
+import com.piotrak.service.technology.web.WebCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
@@ -41,10 +43,13 @@ public class PCElementService extends ElementService implements MQTTCommunicatio
         LOGGER.log(Level.INFO, "Command received:\t" + command);
         try {
             String cmd = command.getValue();
-            if ("ON".equalsIgnoreCase(cmd) || "OFF".equalsIgnoreCase(cmd)) {
-                getElement().actOnCommand(command);
+            if(command instanceof MQTTCommand) {
+                if ("ON".equalsIgnoreCase(cmd) || "OFF".equalsIgnoreCase(cmd)) {
+                    getElement().actOnCommand(command);
+                }
+            } else if(command instanceof WebCommand) {
+                getConnectionService().actOnConnection(translateCommand(command));
             }
-            getConnectionService().actOnConnection(translateCommand(command));
         } catch (OperationNotSupportedException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
         }
