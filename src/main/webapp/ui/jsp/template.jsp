@@ -9,8 +9,7 @@
         </head>
 <body>
         <link href="${stylesheetsCss}" rel="stylesheet" />
-        <div>
-                <div class="container" style="margin:50px">
+            <div class="container">
                 <div class="header">
                         <tiles:insertAttribute name="header" />
                 </div>
@@ -23,6 +22,6 @@
                 <div class="footer">
                         <tiles:insertAttribute name="footer" />
                 </div>
-        </div>
+            </div>
 </body>
 </html>

@@ -3,3 +3,9 @@
 @import "templates.css";
 @import "radio.css";
 @import "buttons.css";
+
+html, body, .container
+{
+    height: 100%;
+    min-height: 100%;
+}

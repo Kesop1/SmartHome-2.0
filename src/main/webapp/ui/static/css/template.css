@@ -1,36 +1,32 @@
 .header {
-    text-align: center;
-    height: 50px;
-    margin-left: 1%;
-    margin-right: 1%;
-    margin-top: 1%;
     border: 1px solid yellowgreen;
-    vertical-align: top;
+    height: 5%;
+    width: 100%;
+    text-align: center;
 }
+
 .menu {
-    margin-left: 1%;
+    position: absolute;
     float: left;
-    width: 10%;
-    height:600px;
+    top: 7%;
     border: 1px solid darkgreen;
+    height: 80%;
+    width: 9%;
 }
+
 .content {
-    margin-left: 11%;
-    margin-right: 1%;
-    width: available;
+    position: absolute;
+    top: 7%;
+    left: 10%;
     border: 1px solid black;
-    position: relative;
-    height:600px;
+    height: 80%;
+    width: 89.5%;
 }
+
 .footer {
-    margin-left: 1%;
-    margin-right: 1%;
-    margin-bottom: 1%;
-    height: 50px;
-    float: bottom;
-    clear: both;
+    position: absolute;
+    top: 88%;
     border: 1px solid darkred;
-    position: relative;
-    bottom: 0;
-    width: 98%;
+    height: 10%;
+    width: 99%;
 }
