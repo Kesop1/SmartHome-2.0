@@ -10,4 +10,17 @@
         <button type="submit" class="button">Do domu</button>
     </form>
 </div>
+<br><br>
+<p>Dźwięk</p>
+<div>
+    <form action="${path}pc?cmd=audio-pc" method="post">
+        <button type="submit" class="button">PC</button>
+    </form>
+    <form action="${path}pc?cmd=audio-tv" method="post">
+        <button type="submit" class="button">TV</button>
+     </form>
+     <form action="${path}pc?cmd=audio-amp" method="post">
+        <button type="submit" class="button">AMP</button>
+     </form>
+</div>
 <br>
