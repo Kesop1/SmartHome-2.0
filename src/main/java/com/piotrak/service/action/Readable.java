@@ -1,22 +1,32 @@
 package com.piotrak.service.action;
 
-import java.util.Map;
-
 /**
  * Interface for devices that send out values that can be read and displayed
  */
 public interface Readable {
 
     /**
-     * Get the values map
-     * @return values map
+     * Get the value
+     * @return value
      */
-    Map<String, String> getValues();
+    String getValue();
 
     /**
      * Set the values map
-     * @param values map of values
+     * @param value read value
      */
-    void setValues(Map<String, String> values);
+    void setValue(String value);
+
+    /**
+     * Get unit of the read value
+     * @return unit of the read
+     */
+    String getUnit();
+
+    /**
+     * Set unit of the read value
+     * @param unit unit
+     */
+    void setUnit(String unit);
     
 }

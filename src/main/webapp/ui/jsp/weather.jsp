@@ -2,10 +2,11 @@
 <%@page pageEncoding="UTF-8"%>
 <h2>Pogoda</h2>
 <jsp:useBean id="elementsMap" scope="request" type="java.util.Map<java.lang.String, java.util.List>"/>
-<c:forEach items="${elementsMap.sensorsList}" var="entry">
-    <p>${entry.displayName}</p>
-    <c:forEach var="read" items="${entry.values}">
-        ${read.key} = ${read.value}
-        <br>
+<table style="width:100%">
+    <c:forEach items="${elementsMap.sensorsList}" var="entry">
+        <tr>
+            <td>${entry.displayName}</td>
+            <td>${entry.value}&nbsp;${entry.unit}</td>
+        </tr>
     </c:forEach>
-</c:forEach>
+</table>

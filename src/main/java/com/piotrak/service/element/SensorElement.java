@@ -5,8 +5,6 @@ import com.piotrak.service.technology.Command;
 
 import javax.naming.OperationNotSupportedException;
 import javax.validation.constraints.NotBlank;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Element representing a sensor
@@ -14,9 +12,14 @@ import java.util.Map;
 public class SensorElement extends Element implements Readable {
 
     /**
-     * Map of values read
+     * Read value
      */
-    private Map<String, String> values = new HashMap<>();
+    private String value = "";
+
+    /**
+     * Value unit
+     */
+    private String unit = "";
     
     public SensorElement(@NotBlank String name) {
         super(name);
@@ -33,11 +36,7 @@ public class SensorElement extends Element implements Readable {
      */
     @Override
     public void actOnCommand(Command command) throws OperationNotSupportedException {
-        String[] commands = command.getValue().split("=");
-        if(commands.length<2){
-            throw new OperationNotSupportedException("Invalid sensor command received: " + command);
-        }
-        this.values.put(commands[0], commands[1]);
+        this.value = command.getValue();
     }
 
     /**
@@ -45,16 +44,34 @@ public class SensorElement extends Element implements Readable {
      * @return
      */
     @Override
-    public Map<String, String> getValues() {
-        return values;
+    public String getValue() {
+        return value;
     }
 
     /**
      * {@inheritDoc}
-     * @param values map of values
+     * @param value value
      */
     @Override
-    public void setValues(Map<String, String> values) {
-        this.values = values;
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return
+     */
+    @Override
+    public String getUnit() {
+        return unit;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param unit unit
+     */
+    @Override
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 }

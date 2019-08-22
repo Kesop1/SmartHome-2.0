@@ -14,18 +14,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Listwa1 weather sensor service for communication between systems
+ * Listwa1 humidity sensor service for communication between systems
  */
-@Service("listwa1WeatherSensorElementService")
-@ConfigurationProperties("listwa1.weather")
-public class Listwa1WeatherSensorElementService extends ElementService implements MQTTCommunication {
-    
-    private Logger LOGGER = Logger.getLogger("Listwa1WeatherSensorElementService");
-    
+@Service("listwa1HumSensorElementService")
+@ConfigurationProperties("listwa1.hum")
+public class Listwa1HumSensorElementService extends ElementService implements MQTTCommunication {
+
+    private Logger LOGGER = Logger.getLogger(this.getClass().getName());
+
     private String subscribeTopic = "default";
-    
-    public Listwa1WeatherSensorElementService(@Autowired SensorElement listwa1WeatherSensor, @Autowired MQTTConnectionService mqttConnectionService) {
-        super(listwa1WeatherSensor, mqttConnectionService);
+
+    private final String unit = "%";
+
+    public Listwa1HumSensorElementService(@Autowired SensorElement listwa1HumSensor, @Autowired MQTTConnectionService mqttConnectionService) {
+        super(listwa1HumSensor, mqttConnectionService);
+        listwa1HumSensor.setUnit(unit);
     }
     
     @Override
@@ -50,7 +53,7 @@ public class Listwa1WeatherSensorElementService extends ElementService implement
     }
 
     /**
-     * Sensror element only receives commands
+     * Sensor element only receives commands
      * @param command Command to be ignored
      * @return null
      */
@@ -58,8 +61,12 @@ public class Listwa1WeatherSensorElementService extends ElementService implement
     protected Command translateCommand(Command command) {
         return null;//Nothing to do
     }
-    
+
     public void setSubscribeTopic(String subscribeTopic) {
         this.subscribeTopic = subscribeTopic;
+    }
+
+    public String getUnit() {
+        return unit;
     }
 }

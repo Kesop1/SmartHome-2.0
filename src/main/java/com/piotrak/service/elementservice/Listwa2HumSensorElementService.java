@@ -14,18 +14,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Listwa2 weather sensor service for communication between systems
+ * Listwa2 humidity sensor service for communication between systems
  */
-@Service("listwa2WeatherSensorElementService")
-@ConfigurationProperties("listwa2.weather")
-public class Listwa2WeatherSensorElementService extends ElementService implements MQTTCommunication {
-    
-    private Logger LOGGER = Logger.getLogger("Listwa2WeatherSensorElementService");
-    
+@Service("listwa2HumSensorElementService")
+@ConfigurationProperties("listwa2.hum")
+public class Listwa2HumSensorElementService extends ElementService implements MQTTCommunication {
+
+    private Logger LOGGER = Logger.getLogger(this.getClass().getName());
+
     private String subscribeTopic = "default";
-    
-    public Listwa2WeatherSensorElementService(@Autowired SensorElement listwa2WeatherSensor, @Autowired MQTTConnectionService mqttConnectionService) {
-        super(listwa2WeatherSensor, mqttConnectionService);
+
+    private final String unit = "%";
+
+    public Listwa2HumSensorElementService(@Autowired SensorElement listwa2HumSensor, @Autowired MQTTConnectionService mqttConnectionService) {
+        super(listwa2HumSensor, mqttConnectionService);
+        listwa2HumSensor.setUnit(unit);
     }
     
     @Override
@@ -58,8 +61,12 @@ public class Listwa2WeatherSensorElementService extends ElementService implement
     protected Command translateCommand(Command command) {
         return null;//Nothing to do
     }
-    
+
     public void setSubscribeTopic(String subscribeTopic) {
         this.subscribeTopic = subscribeTopic;
+    }
+
+    public String getUnit() {
+        return unit;
     }
 }
