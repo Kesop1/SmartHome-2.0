@@ -1,12 +1,9 @@
 package com.piotrak.config;
 
 import com.piotrak.service.CommandService;
-import com.piotrak.service.ConditionalCommandService;
-import com.piotrak.service.DelayedCommandService;
 import com.piotrak.service.element.Element;
 import com.piotrak.service.element.SwitchElement;
 import com.piotrak.service.element.TemplateElement;
-import com.piotrak.service.elementservice.*;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.ir.IRCommand;
 import com.piotrak.service.technology.time.ConditionalCommand;
@@ -32,6 +29,9 @@ public class TemplatesConfiguration {
     
     private Logger LOGGER = Logger.getLogger("TemplatesConfiguration");
 
+    @Autowired
+    private ServicesConfiguration servicesConfiguration;
+
     private WebCommand commandOff = new WebCommand("OFF");
 
     private WebCommand commandOn = new WebCommand("ON");
@@ -51,35 +51,35 @@ public class TemplatesConfiguration {
     @Bean//TODO: to chyba nie musi być Bean
     public TemplateElement templateAllOff(){
         MultiValuedMap<CommandService, Command> actions = new ArrayListValuedHashMap<>();
-        actions.put(tvElementService, commandOff);
-        actions.put(amplitunerElementService, commandOff);
-        actions.put(speakersElementService, commandOff);
-        actions.put(ps3ElementService, commandOff);
-        actions.put(laptopElementService, commandOff);
-        actions.put(deskElementService, commandOff);
-        actions.put(pcElementService, commandOff);
-        actions.put(pcScreenElementService, commandOff);
-        actions.put(pcSpeakersElementService, commandOff);
+        actions.put(servicesConfiguration.getServiceMap().get("TV"), commandOff);
+        actions.put(servicesConfiguration.getServiceMap().get("Amplituner"), commandOff);
+        actions.put(servicesConfiguration.getServiceMap().get("Speakers"), commandOff);
+        actions.put(servicesConfiguration.getServiceMap().get("PS3"), commandOff);
+        actions.put(servicesConfiguration.getServiceMap().get("Laptop"), commandOff);
+        actions.put(servicesConfiguration.getServiceMap().get("Desk"), commandOff);
+        actions.put(servicesConfiguration.getServiceMap().get("PC"), commandOff);
+        actions.put(servicesConfiguration.getServiceMap().get("PCScreen"), commandOff);
+        actions.put(servicesConfiguration.getServiceMap().get("PCSpeakers"), commandOff);
         return new TemplateElement("allOff", "Pawsinoga", actions);
     }
 
     @Bean
     public TemplateElement templatePc(){
         MultiValuedMap<CommandService, Command> actions = new ArrayListValuedHashMap<>();
-        actions.put(pcElementService, commandOn);
-        actions.put(conditionalCommandService, new ConditionalCommand((e)-> ((SwitchElement)e).isOn(), new WebCommand("audio-pc"), pcElementService, 60000));
-        actions.put(deskElementService, commandOn);
-        actions.put(pcScreenElementService, commandOn);
-        actions.put(pcSpeakersElementService, commandOn);//TODO: ustaw odpoeiednie wyjscia na switchu
+        actions.put(servicesConfiguration.getServiceMap().get("PC"), commandOn);
+        actions.put(servicesConfiguration.getServiceMap().get("conditional"), new ConditionalCommand((e)-> ((SwitchElement)e).isOn(), new WebCommand("audio-pc"), servicesConfiguration.getServiceMap().get("PC"), 60000));
+        actions.put(servicesConfiguration.getServiceMap().get("Desk"), commandOn);
+        actions.put(servicesConfiguration.getServiceMap().get("PC"), commandOn);
+        actions.put(servicesConfiguration.getServiceMap().get("PCSpeakers"), commandOn);//TODO: ustaw odpoeiednie wyjscia na switchu
         return new TemplateElement("pc", "Pececiarz", actions);
     }
 
     @Bean
     public TemplateElement templateRadio() {
         MultiValuedMap<CommandService, Command> actions = new ArrayListValuedHashMap<>();
-        actions.put(amplitunerElementService, commandOn);
-        actions.put(speakersElementService, commandOn);
-        actions.put(delayedCommandService, new DelayedCommand(2000, new IRCommand("4"), amplitunerElementService));
+        actions.put(servicesConfiguration.getServiceMap().get("Amplituner"), commandOn);
+        actions.put(servicesConfiguration.getServiceMap().get("Speakers"), commandOn);
+        actions.put(servicesConfiguration.getServiceMap().get("delayed"), new DelayedCommand(2000, new IRCommand("4"), servicesConfiguration.getServiceMap().get("Amplituner")));
         return new TemplateElement("radio", "Meloman", actions);
     }
 
@@ -91,56 +91,25 @@ public class TemplatesConfiguration {
     @Bean
     public TemplateElement templateMovie(){
         MultiValuedMap<CommandService, Command> actions = new ArrayListValuedHashMap<>();
-        actions.put(pcElementService, commandOn);
-        actions.put(conditionalCommandService, new ConditionalCommand((e)-> ((SwitchElement)e).isOn(), new WebCommand("audio-tv"), pcElementService, 60000));
-        actions.put(amplitunerElementService, commandOn);
-        actions.put(delayedCommandService, new DelayedCommand(2000, new IRCommand("2"), amplitunerElementService));
-        actions.put(speakersElementService, commandOn);
-        actions.put(tvElementService, commandOn);
+        actions.put(servicesConfiguration.getServiceMap().get("PC"), commandOn);
+        actions.put(servicesConfiguration.getServiceMap().get("conditional"), new ConditionalCommand((e)-> ((SwitchElement)e).isOn(), new WebCommand("audio-tv"), servicesConfiguration.getServiceMap().get("PC"), 60000));
+        actions.put(servicesConfiguration.getServiceMap().get("Amplituner"), commandOn);
+        actions.put(servicesConfiguration.getServiceMap().get("delayed"), new DelayedCommand(2000, new IRCommand("2"), servicesConfiguration.getServiceMap().get("Amplituner")));
+        actions.put(servicesConfiguration.getServiceMap().get("Speakers"), commandOn);
+        actions.put(servicesConfiguration.getServiceMap().get("TV"), commandOn);
         return new TemplateElement("movie", "Kinoman", actions);
     }
 
     @Bean
     public TemplateElement templateWork(){
         MultiValuedMap<CommandService, Command> actions = new ArrayListValuedHashMap<>();
-        actions.put(laptopElementService, commandOn);
-        actions.put(deskElementService, commandOn);
-        actions.put(pcScreenElementService, commandOn);
-        actions.put(pcSpeakersElementService, commandOn);//TODO: ustaw odpowiednie wyjscia na switchu
+        actions.put(servicesConfiguration.getServiceMap().get("Laptop"), commandOn);
+        actions.put(servicesConfiguration.getServiceMap().get("Desk"), commandOn);
+        actions.put(servicesConfiguration.getServiceMap().get("PC"), commandOn);
+        actions.put(servicesConfiguration.getServiceMap().get("PCSpeakers"), commandOn);//TODO: ustaw odpowiednie wyjscia na switchu
         return new TemplateElement("work", "BioRobot", actions);
     }
 
-    @Autowired
-    public TvElementService tvElementService;
 
-    @Autowired
-    public AmplitunerElementService amplitunerElementService;
-
-    @Autowired
-    public SpeakersElementService speakersElementService;
-
-    @Autowired
-    public PS3ElementService ps3ElementService;
-    
-    @Autowired
-    public LaptopElementService laptopElementService;
-
-    @Autowired
-    public DeskElementService deskElementService;
-
-    @Autowired
-    public PCElementService pcElementService;
-
-    @Autowired
-    public PCScreenElementService pcScreenElementService;
-
-    @Autowired
-    public PCSpeakersElementService pcSpeakersElementService;
-
-    @Autowired
-    public DelayedCommandService delayedCommandService;
-
-    @Autowired
-    private ConditionalCommandService conditionalCommandService;
 
 }
