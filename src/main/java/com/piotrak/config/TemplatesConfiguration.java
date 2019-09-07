@@ -69,7 +69,7 @@ public class TemplatesConfiguration {
         actions.put(servicesConfiguration.getServiceMap().get("PC"), commandOn);
         actions.put(servicesConfiguration.getServiceMap().get("conditional"), new ConditionalCommand((e)-> ((SwitchElement)e).isOn(), new WebCommand("audio-pc"), servicesConfiguration.getServiceMap().get("PC"), 60000));
         actions.put(servicesConfiguration.getServiceMap().get("Desk"), commandOn);
-        actions.put(servicesConfiguration.getServiceMap().get("PC"), commandOn);
+        actions.put(servicesConfiguration.getServiceMap().get("PCScreen"), commandOn);
         actions.put(servicesConfiguration.getServiceMap().get("PCSpeakers"), commandOn);//TODO: ustaw odpoeiednie wyjscia na switchu
         return new TemplateElement("pc", "Pececiarz", actions);
     }
@@ -105,7 +105,7 @@ public class TemplatesConfiguration {
         MultiValuedMap<CommandService, Command> actions = new ArrayListValuedHashMap<>();
         actions.put(servicesConfiguration.getServiceMap().get("Laptop"), commandOn);
         actions.put(servicesConfiguration.getServiceMap().get("Desk"), commandOn);
-        actions.put(servicesConfiguration.getServiceMap().get("PC"), commandOn);
+        actions.put(servicesConfiguration.getServiceMap().get("PCScreen"), commandOn);
         actions.put(servicesConfiguration.getServiceMap().get("PCSpeakers"), commandOn);//TODO: ustaw odpowiednie wyjscia na switchu
         return new TemplateElement("work", "BioRobot", actions);
     }
