@@ -1,17 +1,19 @@
 package com.piotrak.service.technology.mqtt;
 
+import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.Connection;
 import com.piotrak.service.technology.ConnectionException;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Connection using the MQTT technology
@@ -20,7 +22,8 @@ import java.util.logging.Logger;
 @ConfigurationProperties("mqtt")
 public class MQTTConnection extends Connection {
 
-    private Logger LOGGER = Logger.getLogger("MQTTConnection");
+    @Autowired
+    private WebLogger webLogger;
 
     /**
      * MQTT broker host address
@@ -47,6 +50,11 @@ public class MQTTConnection extends Connection {
      */
     private Set<String> subscribeTopics = new HashSet<>();
 
+    @PostConstruct
+    public void setUp(){
+        webLogger.setUp(this.getClass().getName());
+    }
+
     /**
      * Connect to the MQTT broker
      * @throws ConnectionException when unable to connect
@@ -54,12 +62,12 @@ public class MQTTConnection extends Connection {
     @Override
     public void connect() throws ConnectionException {//TODO: aplikacja nie wstaje gdy nie można się połączyć z MQTT
         String uri = protocol + "://" + host + ":" + port;
-        LOGGER.log(Level.INFO, "Connecting to " + uri);
+        webLogger.log(Level.INFO, "Connecting to " + uri);
         try {
             mqttClient = new MqttClient(uri, MqttClient.generateClientId(), new MemoryPersistence());
             setCallback();
             mqttClient.connect();
-            LOGGER.log(Level.INFO, "Connected successfully");
+            webLogger.log(Level.INFO, "Connected successfully");
             subscribeTopics.forEach(this::subscribe);
         } catch (MqttException e) {
             throw new ConnectionException(e.getMessage());
@@ -83,12 +91,12 @@ public class MQTTConnection extends Connection {
      */
     @Override
     public void disconnect() {
-        LOGGER.log(Level.INFO, "Disconnecting");
+        webLogger.log(Level.INFO, "Disconnecting");
         if (isConnected()) {
             try {
                 mqttClient.disconnect();
             } catch (MqttException e) {
-                LOGGER.log(Level.WARNING, "Exception occurred while disconnecting", e);
+                webLogger.log(Level.WARNING, "Exception occurred while disconnecting", e);
             }
         }
     }
@@ -100,7 +108,7 @@ public class MQTTConnection extends Connection {
      */
     @Override
     public void send(Command command) throws ConnectionException {
-        LOGGER.log(Level.INFO, "Sending command: " + command);
+        webLogger.log(Level.INFO, "Sending command: " + command);
         if(!(command instanceof MQTTCommand)){
             throw new ConnectionException("Unable to send command through MQTTConnection");
         }
@@ -133,7 +141,7 @@ public class MQTTConnection extends Connection {
         try {
             mqttClient.subscribe(topic);
         } catch (MqttException e) {
-            LOGGER.log(Level.WARNING, "Unable to subscribe to topic " + topic, e);
+            webLogger.log(Level.WARNING, "Unable to subscribe to topic " + topic, e);
         }
     }
 
@@ -150,16 +158,16 @@ public class MQTTConnection extends Connection {
                  */
                 @Override
                 public void connectionLost(Throwable throwable) {
-                    LOGGER.log(Level.SEVERE, "Connection lost! Retrying", throwable);
+                    webLogger.log(Level.SEVERE, "Connection lost! Retrying", throwable);
                     if(!isConnected()){
                         try {
                             connect();
                         } catch (ConnectionException e) {
-                            LOGGER.log(Level.SEVERE, "Unable to connect", e);
+                            webLogger.log(Level.SEVERE, "Unable to connect", e);
                         }
                     }
                     if(!isConnected()){
-                        LOGGER.log(Level.WARNING, "Unable to reconnect, connection disabled");
+                        webLogger.log(Level.WARNING, "Unable to reconnect, connection disabled");
                     }
                 }
 
@@ -172,7 +180,7 @@ public class MQTTConnection extends Connection {
                 public void messageArrived(String topic, MqttMessage mqttMessage) {
                     String message = new String(mqttMessage.getPayload());
                     MQTTCommand command = new MQTTCommand(topic, message);
-                    LOGGER.log(Level.INFO, "Command received: " + command);
+                    webLogger.log(Level.INFO, "Command received: " + command);
                     getCommandQueue().add(command);
                 }
 
@@ -182,7 +190,7 @@ public class MQTTConnection extends Connection {
                  */
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-                    LOGGER.log(Level.FINE, "Message successfully sent: " + iMqttDeliveryToken);
+                    webLogger.log(Level.FINE, "Message successfully sent: " + iMqttDeliveryToken);
                 }
             });
         }

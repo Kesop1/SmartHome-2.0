@@ -18,6 +18,7 @@ import com.google.api.services.calendar.model.Events;
 import com.piotrak.config.ServicesConfiguration;
 import com.piotrak.service.element.Element;
 import com.piotrak.service.element.TemplateElement;
+import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.time.DelayedCommand;
 import com.piotrak.service.technology.web.WebCommand;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.naming.OperationNotSupportedException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -35,7 +37,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Service for reading Google calendar events
@@ -44,7 +45,8 @@ import java.util.logging.Logger;
 @ConfigurationProperties("calendar")
 public class CalendarService {
 
-    private Logger LOGGER = Logger.getLogger(this.getClass().getName());
+    @Autowired
+    private WebLogger webLogger;
 
     @Autowired
     private ServicesConfiguration servicesConfiguration;
@@ -70,24 +72,28 @@ public class CalendarService {
      */
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
+    @PostConstruct
+    public void setUp(){
+        webLogger.setUp(this.getClass().getName());
+    }
+
     /**
      * Check calendar every hour
      */
     @Scheduled(fixedRate = 3600000)
     public void checkCalendarEvents() {
-        LOGGER.log(Level.INFO, "Checking calendar events...");
-
+        webLogger.log(Level.INFO, "Checking calendar events...");
         try {
             List<Event> items = getCalendarEvents();
             if (items.isEmpty()) {
-                LOGGER.log(Level.INFO, "No upcoming events found.");
+                webLogger.log(Level.INFO, "No upcoming events found.");
             } else {
                 for (Event event : items) {
                     executeDelayedCommand(event);
                 }
             }
         } catch (GeneralSecurityException | IOException | CalendarException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage());
+            webLogger.log(Level.SEVERE, e.getMessage());
         }
     }
 
@@ -105,7 +111,7 @@ public class CalendarService {
         if(delay < 0){
             return;
         }
-        LOGGER.log(Level.INFO, String.format("Setting up calendar command: %s (%s)\n", event.getSummary(), startTime));
+        webLogger.log(Level.INFO, String.format("Setting up calendar command: %s (%s)\n", event.getSummary(), startTime));
         CommandService delayedCommandService = servicesConfiguration.getServiceMap().get("delayed");
         String[] commands = event.getSummary().split(";");
         for (String s : commands) {
@@ -120,7 +126,7 @@ public class CalendarService {
                         Thread.sleep(delay);
                         ((TemplateElement)t).switchElement("ON");
                     } catch (OperationNotSupportedException | InterruptedException e) {
-                        LOGGER.log(Level.WARNING, e.getMessage());
+                        webLogger.log(Level.WARNING, e.getMessage());
                     }
                 }).start());
             } else {

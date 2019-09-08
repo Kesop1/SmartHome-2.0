@@ -1,6 +1,7 @@
 package com.piotrak.service.elementservice;
 
 import com.piotrak.service.element.SwitchElement;
+import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.ir.IRCommand;
 import com.piotrak.service.technology.ir.IRCommunication;
@@ -18,7 +19,6 @@ import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Vacuum service for communication between systems
@@ -27,7 +27,8 @@ import java.util.logging.Logger;
 @ConfigurationProperties("vacuum")
 public class VacuumElementService extends ElementService implements MQTTCommunication, IRCommunication {
 
-    private Logger LOGGER = Logger.getLogger("VacuumElementService");
+    @Autowired
+    private WebLogger webLogger;
 
     private String subscribeTopic = "default/status";
 
@@ -56,8 +57,10 @@ public class VacuumElementService extends ElementService implements MQTTCommunic
      */
     @PostConstruct
     @Override
-    public void setUpElementForMQTT() {
-        LOGGER.log(Level.FINE, "Setting up " + getElement().getName() + " for MQTT Connection");
+    public void setUp() {
+        webLogger.setUp(this.getClass().getName());
+        super.setWebLogger(webLogger);
+        webLogger.log(Level.FINE, "Setting up " + getElement().getName() + " for MQTT Connection");
         assert !StringUtils.isEmpty(getSubscribeTopic());
         ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getSubscribeTopic(), this);
     }
@@ -68,7 +71,7 @@ public class VacuumElementService extends ElementService implements MQTTCommunic
      */
     @Override
     public void commandReceived(@NotNull Command command) {
-        LOGGER.log(Level.INFO, "Command received:\t" + command);
+        webLogger.log(Level.INFO, "Command received:\t" + command);
         try {
             if (command instanceof IRCommand){
                 handleIrCommand((IRCommand) command);
@@ -76,7 +79,7 @@ public class VacuumElementService extends ElementService implements MQTTCommunic
                 throw new OperationNotSupportedException("Command not recognized: " + command);
             }
         } catch (OperationNotSupportedException e){
-            LOGGER.log(Level.WARNING, e.getMessage());
+            webLogger.log(Level.WARNING, e.getMessage());
         }
     }
 

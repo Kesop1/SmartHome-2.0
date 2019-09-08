@@ -1,14 +1,18 @@
 package com.piotrak.service.technology;
 
+import com.piotrak.service.logger.WebLogger;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Class for maintaining the connection
  */
 public abstract class ConnectionService {
 
-    private Logger LOGGER = Logger.getLogger("ConnectionService");
+    @Autowired
+    private WebLogger webLogger;
 
     /**
      * Connection
@@ -18,6 +22,11 @@ public abstract class ConnectionService {
     public ConnectionService(Connection connection) {
         this.connection = connection;
         connect();
+    }
+
+    @PostConstruct
+    public void setUp(){
+        webLogger.setUp(this.getClass().getName());
     }
 
     protected Connection getConnection(){
@@ -50,7 +59,7 @@ public abstract class ConnectionService {
         try {
             connection.connect();
         } catch (ConnectionException e) {
-            LOGGER.log(Level.SEVERE, "Unable to connect to " + connection, e);
+            webLogger.log(Level.SEVERE, "Unable to connect to " + connection, e);
         }
     }
 

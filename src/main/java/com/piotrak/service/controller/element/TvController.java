@@ -3,12 +3,13 @@ package com.piotrak.service.controller.element;
 import com.piotrak.service.controller.ElementController;
 import com.piotrak.service.elementservice.ElementService;
 import com.piotrak.service.elementservice.TvElementService;
+import com.piotrak.service.logger.WebLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.PostConstruct;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Controller for the tv element
@@ -17,12 +18,18 @@ import java.util.logging.Logger;
 @RequestMapping("/tv")
 public class TvController extends ElementController {
 
-    private Logger LOGGER = Logger.getLogger("TvController");
+    @Autowired
+    private WebLogger webLogger;
 
     private TvElementService tvElementService;
 
     public TvController(@Autowired TvElementService tvElementService) {
         this.tvElementService = tvElementService;
+    }
+
+    @PostConstruct
+    public void setUp(){
+        webLogger.setUp(this.getClass().getName());
     }
 
     @Override
@@ -37,7 +44,7 @@ public class TvController extends ElementController {
      */
     @PostMapping
     public ModelAndView handleSwitchCommand(@RequestParam String cmd) {
-        LOGGER.log(Level.INFO, "Command received from web application: " + cmd);
+        webLogger.log(Level.INFO, "Command received from web application: " + cmd);
         return super.handleCommand(getWebCommand(cmd));
     }
 

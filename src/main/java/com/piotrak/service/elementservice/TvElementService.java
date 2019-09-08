@@ -2,6 +2,7 @@ package com.piotrak.service.elementservice;
 
 import com.piotrak.service.DelayedCommandService;
 import com.piotrak.service.element.SwitchElement;
+import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.ir.IRCommand;
 import com.piotrak.service.technology.ir.IRCommunication;
@@ -22,7 +23,6 @@ import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * TV service for communication between systems
@@ -31,7 +31,8 @@ import java.util.logging.Logger;
 @ConfigurationProperties("tv")
 public class TvElementService extends ElementService implements MQTTCommunication, IRCommunication {
 
-    private Logger LOGGER = Logger.getLogger("TvElementService");
+    @Autowired
+    private WebLogger webLogger;
 
     private String subscribeTopic = "default/status";
 
@@ -59,8 +60,10 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
      */
     @PostConstruct//TODO
     @Override
-    public void setUpElementForMQTT() {
-        LOGGER.log(Level.FINE, "Setting up " + getElement().getName() + " for MQTT Connection");
+    public void setUp() {
+        webLogger.setUp(this.getClass().getName());
+        super.setWebLogger(webLogger);
+        webLogger.log(Level.FINE, "Setting up " + getElement().getName() + " for MQTT Connection");
         assert !StringUtils.isEmpty(getSubscribeTopic());
         ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getSubscribeTopic(), this);
     }
@@ -71,7 +74,7 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
      */
     @Override
     public void commandReceived(@NotNull Command command) {
-        LOGGER.log(Level.INFO, "Command received:\t" + command);
+        webLogger.log(Level.INFO, "Command received:\t" + command);
         try {
             if (command instanceof IRCommand) {
                 handleIrCommand((IRCommand) command);
@@ -84,7 +87,7 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
                 }
             }
         } catch (OperationNotSupportedException e){
-            LOGGER.log(Level.WARNING, e.getMessage());
+            webLogger.log(Level.WARNING, e.getMessage());
         }
     }
 
@@ -121,14 +124,14 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
         try {
             handleIrCommand(new IRCommand("off"));
         } catch (OperationNotSupportedException e) {
-            LOGGER.log(Level.INFO, e.getMessage());
+            webLogger.log(Level.INFO, e.getMessage());
         }
         new Thread(() -> {
             try {
                 Thread.sleep(1000);
                 getConnectionService().actOnConnection(translateCommand(command));
             } catch (InterruptedException e) {
-                LOGGER.log(Level.WARNING, e.getMessage());
+                webLogger.log(Level.WARNING, e.getMessage());
             }
         }).start();
     }
@@ -138,7 +141,7 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
      * @param command MQTT command
      */
     private void handleMQTTCommand(MQTTCommand command) throws OperationNotSupportedException {
-        LOGGER.log(Level.INFO, "Sending command to the broker:\t" + command);
+        webLogger.log(Level.INFO, "Sending command to the broker:\t" + command);
         getElement().actOnCommand(command);
     }
 

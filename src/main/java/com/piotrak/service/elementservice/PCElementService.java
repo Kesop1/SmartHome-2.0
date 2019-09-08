@@ -1,6 +1,7 @@
 package com.piotrak.service.elementservice;
 
 import com.piotrak.service.element.SwitchElement;
+import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.mqtt.MQTTCommand;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
@@ -15,7 +16,6 @@ import javax.annotation.PostConstruct;
 import javax.naming.OperationNotSupportedException;
 import javax.validation.constraints.NotNull;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * PC service for communication between systems
@@ -24,7 +24,8 @@ import java.util.logging.Logger;
 @ConfigurationProperties("pc")
 public class PCElementService extends ElementService implements MQTTCommunication {
 
-    private Logger LOGGER = Logger.getLogger("PCElementService");
+    @Autowired
+    private WebLogger webLogger;
 
     private String subscribeTopic = "default/status";
 
@@ -40,7 +41,7 @@ public class PCElementService extends ElementService implements MQTTCommunicatio
      */
     @Override
     public void commandReceived(@NotNull Command command) {
-        LOGGER.log(Level.INFO, "Command received:\t" + command);
+        webLogger.log(Level.INFO, "Command received:\t" + command);
         try {
             String cmd = command.getValue();
             if(command instanceof MQTTCommand) {
@@ -51,7 +52,7 @@ public class PCElementService extends ElementService implements MQTTCommunicatio
                 getConnectionService().actOnConnection(translateCommand(command));
             }
         } catch (OperationNotSupportedException e) {
-            LOGGER.log(Level.WARNING, e.getMessage());
+            webLogger.log(Level.WARNING, e.getMessage());
         }
     }
 
@@ -70,8 +71,10 @@ public class PCElementService extends ElementService implements MQTTCommunicatio
      */
     @PostConstruct
     @Override
-    public void setUpElementForMQTT() {
-        LOGGER.log(Level.FINE, "Setting up " + getElement().getName() + " for MQTT Connection");
+    public void setUp() {
+        webLogger.setUp(this.getClass().getName());
+        super.setWebLogger(webLogger);
+        webLogger.log(Level.FINE, "Setting up " + getElement().getName() + " for MQTT Connection");
         assert !StringUtils.isEmpty(getSubscribeTopic());
         ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getSubscribeTopic(), this);
     }

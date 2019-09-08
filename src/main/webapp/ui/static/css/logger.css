@@ -1,0 +1,10 @@
+.loggerTable {
+    width: 100%;
+    height: 90%;
+    overflow: scroll;
+    display: inline-block;
+}
+
+table, th, td {
+    border: 1px solid black;
+}

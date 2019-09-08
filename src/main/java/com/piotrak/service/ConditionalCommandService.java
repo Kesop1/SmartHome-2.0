@@ -1,18 +1,26 @@
 package com.piotrak.service;
 
 import com.piotrak.service.elementservice.ElementService;
+import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.time.ConditionalCommand;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Service("conditionalCommandService")
 public class ConditionalCommandService extends CommandService {
 
-    private Logger LOGGER = Logger.getLogger(this.getClass().getName());
+    @Autowired
+    private WebLogger webLogger;
+
+    @PostConstruct
+    public void setUp(){
+        webLogger.setUp(this.getClass().getName());
+    }
 
     /**
      * Send the command if the condition is met, if not retry for 10 times
@@ -20,9 +28,9 @@ public class ConditionalCommandService extends CommandService {
      */
     @Override
     public void commandReceived(@NotNull Command command) {
-        LOGGER.log(Level.INFO, "Command received:\t" + command);
+        webLogger.log(Level.INFO, "Command received:\t" + command);
         if(!(command instanceof ConditionalCommand)){
-            LOGGER.log(Level.SEVERE, "Incorrect command type passed to " + this.getClass().getName());
+            webLogger.log(Level.SEVERE, "Incorrect command type passed to " + this.getClass().getName());
             return;
         }
         final ConditionalCommand conditionalCommand = (ConditionalCommand) command;
@@ -35,7 +43,7 @@ public class ConditionalCommandService extends CommandService {
                 try {
                     Thread.sleep(conditionalCommand.getTryTime()/10);
                 } catch (InterruptedException e) {
-                    LOGGER.log(Level.WARNING, e.getMessage());
+                    webLogger.log(Level.WARNING, e.getMessage());
                 }
             }
         }

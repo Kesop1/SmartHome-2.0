@@ -2,19 +2,22 @@ package com.piotrak.service.element;
 
 import com.piotrak.service.action.Inactivable;
 import com.piotrak.service.action.Switchable;
+import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import javax.naming.OperationNotSupportedException;
 import javax.validation.constraints.NotBlank;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Element that can be switched
  */
 public class SwitchElement extends Element implements Switchable, Inactivable {
 
-    private Logger LOGGER = Logger.getLogger(this.getClass().getName());
+    @Autowired
+    private WebLogger webLogger;
 
     /**
      * Element's switch state
@@ -34,6 +37,11 @@ public class SwitchElement extends Element implements Switchable, Inactivable {
         super(name, displayName);
     }
 
+    @PostConstruct
+    public void setUp(){
+        webLogger.setUp(this.getClass().getName());
+    }
+
     /**
      * Is the element ON?
      * @return element's switch state
@@ -47,7 +55,7 @@ public class SwitchElement extends Element implements Switchable, Inactivable {
      * @param on element's switch state
      */
     public void setOn(boolean on) {
-        LOGGER.log(Level.INFO, getName() + " has been switched " + (on ? "on" : "off"));
+        webLogger.log(Level.INFO, getName() + " has been switched " + (on ? "on" : "off"));
         this.on = on;
     }
 

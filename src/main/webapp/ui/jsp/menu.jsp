@@ -7,6 +7,14 @@
     <form action="${pageContext.request.contextPath}/logout" method="post">
         <button type="submit">Logout</button>
     </form>
+    <br/>
+    <form action="${pageContext.request.contextPath}/weblogger" method="get">
+        <button type="submit">logger</button>
+    </form>
+    <br/>
+    <form action="${pageContext.request.contextPath}/main" method="get">
+        <button type="submit">Main screen</button>
+    </form>
 </div>
 </body>
 </html>

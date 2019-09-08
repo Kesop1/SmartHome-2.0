@@ -3,6 +3,7 @@ package com.piotrak.service.controller.element;
 import com.piotrak.service.controller.ElementController;
 import com.piotrak.service.elementservice.ElementService;
 import com.piotrak.service.elementservice.DeskElementService;
+import com.piotrak.service.logger.WebLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.PostConstruct;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Controller for the desk element
@@ -20,12 +21,18 @@ import java.util.logging.Logger;
 @RequestMapping("/desk")
 public class DeskController extends ElementController {
 
-    private Logger LOGGER = Logger.getLogger("DeskController");
+    @Autowired
+    private WebLogger webLogger;
 
     private DeskElementService deskElementService;
 
     public DeskController(@Autowired DeskElementService deskElementService) {
         this.deskElementService = deskElementService;
+    }
+
+    @PostConstruct
+    public void setUp(){
+        webLogger.setUp(this.getClass().getName());
     }
 
     @Override
@@ -40,7 +47,7 @@ public class DeskController extends ElementController {
      */
     @PostMapping
     public ModelAndView handleSwitchCommand(@RequestParam String cmd) {//TODO: @RequestParam String switch
-        LOGGER.log(Level.INFO, "Command received from web application: " + cmd);
+        webLogger.log(Level.INFO, "Command received from web application: " + cmd);
         return super.handleCommand(getWebCommand(cmd));
     }
 }

@@ -26,7 +26,7 @@ public interface MQTTCommunication extends Communication {
      * subscribe to the MQTT topic
      */
     @PostConstruct
-    void setUpElementForMQTT();
+    void setUp();
 
     /**
      * create a MQTT publish command form a command of a different type

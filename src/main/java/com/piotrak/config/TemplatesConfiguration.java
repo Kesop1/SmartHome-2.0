@@ -4,6 +4,7 @@ import com.piotrak.service.CommandService;
 import com.piotrak.service.element.Element;
 import com.piotrak.service.element.SwitchElement;
 import com.piotrak.service.element.TemplateElement;
+import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.ir.IRCommand;
 import com.piotrak.service.technology.time.ConditionalCommand;
@@ -16,9 +17,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PostConstruct;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Templates that group actions, displayed in the templates tile
@@ -26,11 +27,17 @@ import java.util.logging.Logger;
 @Configuration
 @EnableConfigurationProperties()
 public class TemplatesConfiguration {
-    
-    private Logger LOGGER = Logger.getLogger("TemplatesConfiguration");
+
+    @Autowired
+    private WebLogger webLogger;
 
     @Autowired
     private ServicesConfiguration servicesConfiguration;
+
+    @PostConstruct
+    public void setUp(){
+        webLogger.setUp(this.getClass().getName());
+    }
 
     private WebCommand commandOff = new WebCommand("OFF");
 

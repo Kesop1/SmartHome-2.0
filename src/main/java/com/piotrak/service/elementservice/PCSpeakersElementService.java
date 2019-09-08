@@ -1,6 +1,7 @@
 package com.piotrak.service.elementservice;
 
 import com.piotrak.service.element.SwitchElement;
+import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
 import com.piotrak.service.technology.mqtt.MQTTConnectionService;
@@ -11,7 +12,6 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * PC speakers service for communication between systems
@@ -20,7 +20,8 @@ import java.util.logging.Logger;
 @ConfigurationProperties("pc-speakers")
 public class PCSpeakersElementService extends ElementService implements MQTTCommunication {
 
-    private Logger LOGGER = Logger.getLogger("PCSpeakersElementService");
+    @Autowired
+    private WebLogger webLogger;
 
     private String subscribeTopic = "default/status";
 
@@ -45,8 +46,10 @@ public class PCSpeakersElementService extends ElementService implements MQTTComm
      */
     @PostConstruct
     @Override
-    public void setUpElementForMQTT() {
-        LOGGER.log(Level.FINE, "Setting up " + getElement().getName() + " for MQTT Connection");
+    public void setUp() {
+        webLogger.setUp(this.getClass().getName());
+        super.setWebLogger(webLogger);
+        webLogger.log(Level.FINE, "Setting up " + getElement().getName() + " for MQTT Connection");
         assert !StringUtils.isEmpty(getSubscribeTopic());
         ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getSubscribeTopic(), this);
     }

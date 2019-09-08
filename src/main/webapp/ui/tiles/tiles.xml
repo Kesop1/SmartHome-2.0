@@ -18,6 +18,10 @@
         <put-attribute name="content" value="mainViewContent" />
     </definition>
 
+    <definition name="webLoggerView" extends="template">
+        <put-attribute name="content" value="/ui/jsp/weblogger.jsp" />
+    </definition>
+
     <definition name="mainViewContent" template="/ui/jsp/main.jsp">
         <put-attribute name="things" value="/ui/jsp/things.jsp" />
         <put-attribute name="slot1" value="/ui/jsp/templates.jsp" />

@@ -1,5 +1,7 @@
 package com.piotrak.config;
 
+import com.piotrak.service.logger.WebLogger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -16,24 +18,30 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private Logger LOGGER = Logger.getLogger("WebSecurityConfig");
+    @Autowired
+    private WebLogger webLogger;
 
     @Override
     protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
                 .withUser("krys").password(passwordEncoder().encode("password")).roles("ADMIN");
+    }
+
+    @PostConstruct
+    public void setUp(){
+        webLogger.setUp(this.getClass().getName());
     }
 
     @Override
@@ -77,7 +85,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             Authentication auth = SecurityContextHolder.getContext()
                     .getAuthentication();
             if (auth != null) {
-                LOGGER.log(Level.WARNING, "User: " + auth.getName() + " attempted to access the protected URL: " + request.getRequestURI());
+                webLogger.log(Level.WARNING, "User: " + auth.getName() + " attempted to access the protected URL: " + request.getRequestURI());
             }
 
             response.sendRedirect(request.getContextPath() + "/accessDenied");

@@ -3,6 +3,7 @@ package com.piotrak.service.elementservice;
 import com.piotrak.service.action.Inactivable;
 import com.piotrak.service.element.Element;
 import com.piotrak.service.element.SwitchElement;
+import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
 import com.piotrak.service.technology.mqtt.MQTTConnectionService;
@@ -16,7 +17,6 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Listwa1 service for communication between systems
@@ -25,7 +25,8 @@ import java.util.logging.Logger;
 @ConfigurationProperties("listwa1.device")
 public class Listwa1ElementService extends ElementService implements MQTTCommunication {
 
-    private Logger LOGGER = Logger.getLogger(this.getClass().getName());
+    @Autowired
+    private WebLogger webLogger;
 
     private String subscribeTopic = "default/status";
 
@@ -71,8 +72,10 @@ public class Listwa1ElementService extends ElementService implements MQTTCommuni
      */
     @PostConstruct
     @Override
-    public void setUpElementForMQTT() {
-        LOGGER.log(Level.FINE, "Setting up " + getElement().getName() + " for MQTT Connection");
+    public void setUp() {
+        webLogger.setUp(this.getClass().getName());
+        super.setWebLogger(webLogger);
+        webLogger.log(Level.FINE, "Setting up " + getElement().getName() + " for MQTT Connection");
         assert !StringUtils.isEmpty(getSubscribeTopic());
         ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getSubscribeTopic(), this);
     }

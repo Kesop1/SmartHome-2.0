@@ -1,6 +1,7 @@
 package com.piotrak.service.technology.mqtt;
 
 import com.piotrak.service.elementservice.ElementService;
+import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.ConnectionException;
 import com.piotrak.service.technology.ConnectionService;
@@ -9,10 +10,10 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -20,7 +21,8 @@ import java.util.logging.Logger;
 @Service("mqttConnectionService")
 public class MQTTConnectionService extends ConnectionService {
 
-    private Logger LOGGER = Logger.getLogger("MQTTConnectionService");
+    @Autowired
+    private WebLogger webLogger;
 
     /**
      * All the topics to be subscribed to
@@ -29,6 +31,11 @@ public class MQTTConnectionService extends ConnectionService {
 
     public MQTTConnectionService(@Autowired MQTTConnection mqttConnection) {
         super(mqttConnection);
+    }
+
+    @PostConstruct
+    public void setUp(){
+        webLogger.setUp(this.getClass().getName());
     }
 
     /**
@@ -40,7 +47,7 @@ public class MQTTConnectionService extends ConnectionService {
         try {
             getConnection().send(command);
         } catch (ConnectionException e) {
-            LOGGER.log(Level.WARNING, "Unable to send command: " + command, e);
+            webLogger.log(Level.WARNING, "Unable to send command: " + command, e);
         }
     }
 
@@ -50,7 +57,7 @@ public class MQTTConnectionService extends ConnectionService {
      * @param elementService Element listening to the topic
      */
     public void subscribeToTopic(String topic, ElementService elementService){
-        LOGGER.log(Level.INFO, "Subscribing " + elementService.getElement().getName() + " to topic: " + topic);
+        webLogger.log(Level.INFO, "Subscribing " + elementService.getElement().getName() + " to topic: " + topic);
         elementServiceTopicsMap.put(topic, elementService);
         ((MQTTConnection) getConnection()).subscribe(topic);
     }
@@ -62,7 +69,7 @@ public class MQTTConnectionService extends ConnectionService {
     @Async
     @Override
     public void checkForCommands() {
-        LOGGER.log(Level.FINE, "Looking for commands from the MQTT Connection");
+        webLogger.log(Level.FINE, "Looking for commands from the MQTT Connection");
         super.checkForCommands();
     }
 
@@ -76,7 +83,7 @@ public class MQTTConnectionService extends ConnectionService {
         if(service != null){
             service.commandReceived(command);
         } else{
-            LOGGER.log(Level.WARNING, "Unable to localize the ElementService for command: " + command);
+            webLogger.log(Level.WARNING, "Unable to localize the ElementService for command: " + command);
         }
     }
 }

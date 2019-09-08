@@ -1,16 +1,24 @@
 package com.piotrak.service;
 
+import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.time.DelayedCommand;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Service("delayedCommandService")
 public class DelayedCommandService extends CommandService {
 
-    private Logger LOGGER = Logger.getLogger(this.getClass().getName());
+    @Autowired
+    private WebLogger webLogger;
+
+    @PostConstruct
+    public void setUp(){
+        webLogger.setUp(this.getClass().getName());
+    }
 
     /**
      * Send the command after delay time
@@ -18,9 +26,9 @@ public class DelayedCommandService extends CommandService {
      */
     @Override
     public void commandReceived(Command command) {
-        LOGGER.log(Level.INFO, "Command received:\t" + command);
+        webLogger.log(Level.INFO, "Command received:\t" + command);
         if(!(command instanceof DelayedCommand)){
-            LOGGER.log(Level.SEVERE, "Incorrect command type passed to " + this.getClass().getName());
+            webLogger.log(Level.SEVERE, "Incorrect command type passed to " + this.getClass().getName());
             return;
         }
         final DelayedCommand delayedCommand = (DelayedCommand) command;
@@ -29,7 +37,7 @@ public class DelayedCommandService extends CommandService {
                 Thread.sleep(delayedCommand.getDelay());
                 delayedCommand.getCommandService().commandReceived(delayedCommand.getCommand());
             } catch (InterruptedException e) {
-                LOGGER.log(Level.WARNING, e.getMessage());
+                webLogger.log(Level.WARNING, e.getMessage());
             }
         }).start();
     }

@@ -2,6 +2,7 @@ package com.piotrak.service.elementservice;
 
 import com.piotrak.service.CommandService;
 import com.piotrak.service.element.TemplateElement;
+import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
@@ -9,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.naming.OperationNotSupportedException;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Templates service for handling group actions and sending them to the appropriate element services
@@ -22,7 +23,8 @@ import java.util.logging.Logger;
 @ConfigurationProperties("template")
 public class TemplateElementService {
 
-    private Logger LOGGER = Logger.getLogger("TemplateElementService");
+    @Autowired
+    private WebLogger webLogger;
 
     /**
      * Template currently active
@@ -38,6 +40,11 @@ public class TemplateElementService {
     @Autowired
     private List<TemplateElement> templatesList;
 
+    @PostConstruct
+    public void setUp(){
+        webLogger.setUp(this.getClass().getName());
+    }
+
     /**
      * Activate the template, mark the rest as inactive
      * if the "restOff" template is activated, turn all the elements off except for the ones defined in the active template
@@ -45,7 +52,7 @@ public class TemplateElementService {
      */
     public void switchTemplate(String name){
         if(!checkCommand(name)){
-            LOGGER.log(Level.WARNING, "Invalid template name: " + name);
+            webLogger.log(Level.WARNING, "Invalid template name: " + name);
             return;
         }
         if("restOff".equalsIgnoreCase(name)){
@@ -60,7 +67,7 @@ public class TemplateElementService {
                 try {
                     template.switchElement(cmd);
                 } catch (OperationNotSupportedException e) {
-                    LOGGER.log(Level.WARNING, "Unable to switch template " + template.getName(), e);
+                    webLogger.log(Level.WARNING, "Unable to switch template " + template.getName(), e);
                 }
             }
         }
@@ -80,7 +87,7 @@ public class TemplateElementService {
             try {
                 templateRestOff.switchElement("ON");
             } catch (OperationNotSupportedException e) {
-                LOGGER.log(Level.WARNING, "Unable to switch template " + activeTemplate.getName(), e);
+                webLogger.log(Level.WARNING, "Unable to switch template " + activeTemplate.getName(), e);
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.piotrak.service.controller;
 
 import com.piotrak.service.elementservice.TemplateElementService;
+import com.piotrak.service.logger.WebLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.PostConstruct;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Controller for the templates
@@ -18,12 +19,18 @@ import java.util.logging.Logger;
 @RequestMapping("/template")
 public class TemplateController extends AbstractController {
 
-    private Logger LOGGER = Logger.getLogger("TemplateController");
+    @Autowired
+    private WebLogger webLogger;
 
     private TemplateElementService templateElementService;
 
     public TemplateController(@Autowired TemplateElementService templateElementService) {
         this.templateElementService = templateElementService;
+    }
+
+    @PostConstruct
+    public void setUp(){
+        webLogger.setUp(this.getClass().getName());
     }
 
     /**
@@ -33,7 +40,7 @@ public class TemplateController extends AbstractController {
      */
     @PostMapping
     public ModelAndView setTemplate(@RequestParam String name) {
-        LOGGER.log(Level.INFO, "Command received from web application: " + name);
+        webLogger.log(Level.INFO, "Command received from web application: " + name);
         templateElementService.switchTemplate(name);
         return super.getModelAndView();
     }
