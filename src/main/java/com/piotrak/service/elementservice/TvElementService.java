@@ -97,7 +97,6 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
      * @throws OperationNotSupportedException when an incorrect message is received
      */
     private void handleSwitchCommand(Command command) throws OperationNotSupportedException {
-        getElement().actOnCommand(command);
         if(command instanceof WebCommand) {
             if("ON".equalsIgnoreCase(command.getValue())) {
                 handleOnCommand(command);
@@ -141,7 +140,6 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
      * @param command MQTT command
      */
     private void handleMQTTCommand(MQTTCommand command) throws OperationNotSupportedException {
-        webLogger.log(Level.INFO, "Sending command to the broker:\t" + command);
         getElement().actOnCommand(command);
     }
 

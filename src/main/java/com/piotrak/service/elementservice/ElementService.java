@@ -53,13 +53,13 @@ public abstract class ElementService extends CommandService implements Communica
      * @param command Command received
      */
     @Override
-    public void commandReceived(Command command) {//TODO notnull
-        assert command != null;
+    public void commandReceived(@NotNull Command command) {
         webLogger.log(Level.INFO, "Command received:\t" + command);
         try {
-            getElement().actOnCommand(command);
             if(command instanceof WebCommand) {
                 getConnectionService().actOnConnection(translateCommand(command));
+            } else {
+                getElement().actOnCommand(command);
             }
         } catch (OperationNotSupportedException e) {
             webLogger.log(Level.WARNING, e.getMessage());
