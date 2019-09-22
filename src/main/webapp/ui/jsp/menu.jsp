@@ -15,6 +15,10 @@
     <form action="${pageContext.request.contextPath}/main" method="get">
         <button type="submit">Main screen</button>
     </form>
+    <br/>
+    <form action="${pageContext.request.contextPath}/scheduler" method="get">
+        <button type="submit">scheduler</button>
+    </form>
 </div>
 </body>
 </html>
