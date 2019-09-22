@@ -11,13 +11,19 @@ import org.springframework.web.servlet.ModelAndView;
 public class MainController extends AbstractController {
 
     /**
-     * Display the main page
+     * Display the main page, sleep for 1,5 sec to allow device status from MQTT to update
      * @return main page
      */
     @RequestMapping({"/", "/home", "/main"})
     public ModelAndView mainGet() {
-        ModelAndView model = super.getModelAndView();
-        model.setViewName("mainView");
+        ModelAndView model = null;
+        try {
+            model = super.getModelAndView();
+            model.setViewName("mainView");
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return model;
     }
 
