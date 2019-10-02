@@ -1,29 +1,34 @@
 package com.piotrak.service.element;
 
-import com.piotrak.service.CommandService;
 import com.piotrak.service.action.Switchable;
+import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
 import org.apache.commons.collections4.MultiValuedMap;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import javax.naming.OperationNotSupportedException;
 import javax.validation.constraints.NotBlank;
-import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * Template element that can be used to group functions to be performed together
  */
 public class TemplateElement extends Element implements Switchable {
 
+    @Autowired
+    private WebLogger webLogger;
+
     private boolean active = false;
 
     /**
      * Commands to be performed when template is activated
      */
-    private MultiValuedMap<CommandService, Command> elementCommandMap;
+    private MultiValuedMap<String, Command> templateCommands;
 
-    public TemplateElement(@NotBlank String name, String displayName, MultiValuedMap<CommandService, Command> elementCommandMap) {
+    public TemplateElement(@NotBlank String name, String displayName, MultiValuedMap<String, Command> templateCommands) {
         super(name, displayName);
-        this.elementCommandMap = elementCommandMap;
+        this.templateCommands = templateCommands;
     }
 
     /**
@@ -51,8 +56,8 @@ public class TemplateElement extends Element implements Switchable {
         this.active = active;
     }
 
-    public MultiValuedMap<CommandService, Command> getElementCommandMap() {
-        return elementCommandMap;
+    public MultiValuedMap<String, Command> getTemplateCommands() {
+        return templateCommands;
     }
 
     /**
@@ -62,16 +67,16 @@ public class TemplateElement extends Element implements Switchable {
      */
     @Override
     public void switchElement(String command) throws OperationNotSupportedException {
+        webLogger.log(Level.FINE, String.format("Switching %s template %s", command, this.getDisplayName()));
         if ("ON".equalsIgnoreCase(command) || "OFF".equalsIgnoreCase(command)) {
             setActive("ON".equalsIgnoreCase(command));
         } else {
             throw new OperationNotSupportedException("Invalid command: '" + command + "' sent for : " + getName());
         }
-        if(isActive()){
-            for (Map.Entry entry : getElementCommandMap().entries()){
-                CommandService service = (CommandService) entry.getKey();
-                service.commandReceived((Command) entry.getValue());
-            }
-        }
+    }
+
+    @PostConstruct
+    public void setUp(){
+        webLogger.setUp(this.getClass().getName());
     }
 }

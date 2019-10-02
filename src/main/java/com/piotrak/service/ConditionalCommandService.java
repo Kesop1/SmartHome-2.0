@@ -1,6 +1,6 @@
 package com.piotrak.service;
 
-import com.piotrak.service.elementservice.ElementService;
+import com.piotrak.config.ServicesConfiguration;
 import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.time.ConditionalCommand;
@@ -16,6 +16,13 @@ public class ConditionalCommandService extends CommandService {
 
     @Autowired
     private WebLogger webLogger;
+
+    private ServicesConfiguration servicesConfiguration;
+
+    @Autowired
+    public ConditionalCommandService(ServicesConfiguration servicesConfiguration) {
+        this.servicesConfiguration = servicesConfiguration;
+    }
 
     @PostConstruct
     public void setUp(){
@@ -35,8 +42,8 @@ public class ConditionalCommandService extends CommandService {
         }
         final ConditionalCommand conditionalCommand = (ConditionalCommand) command;
         while (!conditionalCommand.isRan() && conditionalCommand.getTryCount() < 10){
-            if(conditionalCommand.getCondition().test(((ElementService)conditionalCommand.getCommandService()).getElement())){
-                conditionalCommand.getCommandService().commandReceived(conditionalCommand.getCommand());
+            if(conditionalCommand.getCondition().test(conditionalCommand.getElement())){
+                servicesConfiguration.getServiceMap().get(conditionalCommand.getElement()).commandReceived(conditionalCommand.getCommand());
                 conditionalCommand.setRan(true);
             } else {
                 conditionalCommand.setTryCount(conditionalCommand.getTryCount() + 1);

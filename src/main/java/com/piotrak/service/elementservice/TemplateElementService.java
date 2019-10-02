@@ -1,5 +1,6 @@
 package com.piotrak.service.elementservice;
 
+import com.piotrak.config.ServicesConfiguration;
 import com.piotrak.service.CommandService;
 import com.piotrak.service.element.TemplateElement;
 import com.piotrak.service.logger.WebLogger;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.naming.OperationNotSupportedException;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -21,7 +23,7 @@ import java.util.logging.Level;
  */
 @Service("templateElementService")
 @ConfigurationProperties("template")
-public class TemplateElementService {
+public class TemplateElementService extends CommandService {
 
     @Autowired
     private WebLogger webLogger;
@@ -31,26 +33,40 @@ public class TemplateElementService {
      */
     private TemplateElement activeTemplate = null;
 
-    @Autowired
     private TemplateElement templateRestOff;
 
-    @Autowired
     private TemplateElement templateAllOff;
 
-    @Autowired
     private List<TemplateElement> templatesList;
+
+    private ServicesConfiguration servicesConfiguration;
+
+    @Autowired
+    public TemplateElementService(TemplateElement templateRestOff, TemplateElement templateAllOff, List<TemplateElement> templatesList,
+                                  ServicesConfiguration servicesConfiguration) {
+        this.templateRestOff = templateRestOff;
+        this.templateAllOff = templateAllOff;
+        this.templatesList = templatesList;
+        this.servicesConfiguration = servicesConfiguration;
+    }
 
     @PostConstruct
     public void setUp(){
         webLogger.setUp(this.getClass().getName());
     }
 
+    @Override
+    public void commandReceived(@NotNull Command command) {
+        switchTemplate(command);
+    }
+
     /**
      * Activate the template, mark the rest as inactive
      * if the "restOff" template is activated, turn all the elements off except for the ones defined in the active template
-     * @param name Template's name
+     * @param command Template's name
      */
-    public void switchTemplate(String name){
+    private void switchTemplate(Command command){
+        String name = command.getValue();
         if(!checkCommand(name)){
             webLogger.log(Level.WARNING, "Invalid template name: " + name);
             return;
@@ -66,6 +82,14 @@ public class TemplateElementService {
                 }
                 try {
                     template.switchElement(cmd);
+                    if(template.isActive()) {
+                        for (Map.Entry<String, Command> templateCommand : template.getTemplateCommands().entries()) {
+                            CommandService service = servicesConfiguration.getServiceMap().get(templateCommand.getKey());
+                            if (service != null) {
+                                service.commandReceived(templateCommand.getValue());
+                            }
+                        }
+                    }
                 } catch (OperationNotSupportedException e) {
                     webLogger.log(Level.WARNING, "Unable to switch template " + template.getName(), e);
                 }
@@ -77,15 +101,21 @@ public class TemplateElementService {
      * Turn all the elements off except for the ones defined in the active template
      */
     private void restOffTemplate(){
-        MultiValuedMap<CommandService, Command> restOffcommands = new ArrayListValuedHashMap<>(templateAllOff.getElementCommandMap());
+        MultiValuedMap<String, Command> restOffcommands = new ArrayListValuedHashMap<>(templateAllOff.getTemplateCommands());
         if(activeTemplate != null){
-            for(Map.Entry activeCommands : activeTemplate.getElementCommandMap().entries()){
-                restOffcommands.remove(activeCommands.getKey());
+            for(Map.Entry<String, Command> activeTemplateCommands : activeTemplate.getTemplateCommands().entries()){
+                restOffcommands.remove(activeTemplateCommands.getKey());
             }
-            templateRestOff.getElementCommandMap().clear();
-            templateRestOff.getElementCommandMap().putAll(restOffcommands);
+            templateRestOff.getTemplateCommands().clear();
+            templateRestOff.getTemplateCommands().putAll(restOffcommands);
             try {
                 templateRestOff.switchElement("ON");
+                for (Map.Entry<String, Command> templateCommand : templateRestOff.getTemplateCommands().entries()) {
+                    CommandService service = servicesConfiguration.getServiceMap().get(templateCommand.getKey());
+                    if (service != null) {
+                        service.commandReceived(templateCommand.getValue());
+                    }
+                }
             } catch (OperationNotSupportedException e) {
                 webLogger.log(Level.WARNING, "Unable to switch template " + activeTemplate.getName(), e);
             }

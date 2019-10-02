@@ -1,6 +1,5 @@
 package com.piotrak.service.technology.time;
 
-import com.piotrak.service.CommandService;
 import com.piotrak.service.technology.Command;
 
 import javax.validation.constraints.Min;
@@ -24,12 +23,12 @@ public class DelayedCommand extends Command {
     /**
      * CommandService that will receive the command
      */
-    private CommandService commandService;
+    private String element;
 
-    public DelayedCommand(@Min(1) long delay, @NotNull Command command, @NotNull CommandService commandService) {
+    public DelayedCommand(@Min(1) long delay, @NotNull Command command, @NotNull String element) {
         this.delay = delay;
         this.command = command;
-        this.commandService = commandService;
+        this.element = element;
     }
 
     public long getDelay() {
@@ -40,8 +39,8 @@ public class DelayedCommand extends Command {
         return command;
     }
 
-    public CommandService getCommandService() {
-        return commandService;
+    public String getElement() {
+        return element;
     }
 
     @Override
@@ -49,7 +48,7 @@ public class DelayedCommand extends Command {
         return "DelayedCommand{" +
                 "delay='" + getDelay() + '\'' +
                 "command='" + getCommand() + '\'' +
-                "commandService='" + getCommandService() + '\'' +
+                "element='" + getElement() + '\'' +
                 '}';
     }
 }

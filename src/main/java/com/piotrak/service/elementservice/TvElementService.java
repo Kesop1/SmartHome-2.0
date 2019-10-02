@@ -112,7 +112,7 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
      */
     private void handleOnCommand(Command command) {
         getConnectionService().actOnConnection(translateCommand(command));
-        getDelayedCommandService().commandReceived(new DelayedCommand(1000, new IRCommand("on"), this));
+        getDelayedCommandService().commandReceived(new DelayedCommand(1000, new IRCommand("on"), getElement().getName()));
     }
 
     /**

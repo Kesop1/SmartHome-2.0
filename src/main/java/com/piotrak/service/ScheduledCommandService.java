@@ -1,6 +1,7 @@
 package com.piotrak.service;
 
 import com.piotrak.config.ServicesConfiguration;
+import com.piotrak.service.elementservice.TemplateElementService;
 import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.time.ScheduledCommand;
@@ -24,9 +25,18 @@ public class ScheduledCommandService extends CommandService {
     @Autowired
     private ServicesConfiguration servicesConfiguration;
 
-    private List<ScheduledCommand> scheduledCommands = new LinkedList<>();
+    private List<ScheduledCommand> scheduledCommands;
 
     private static AtomicLong idCounter = new AtomicLong();
+
+    private TemplateElementService templateElementService;
+
+    @Autowired
+    public ScheduledCommandService(ServicesConfiguration servicesConfiguration, TemplateElementService templateElementService) {
+        this.servicesConfiguration = servicesConfiguration;
+        this.scheduledCommands = new LinkedList<>();
+        this.templateElementService = templateElementService;
+    }
 
     @PostConstruct
     public void setUp(){
@@ -79,7 +89,12 @@ public class ScheduledCommandService extends CommandService {
             ScheduledCommand command = iterator.next();
             if(command.getDate().before(now)){
                 webLogger.log(Level.FINE, String.format("Executing scheduledCommandJob: %s", command));
-                CommandService commandService = servicesConfiguration.getServiceMap().get(command.getElement());
+                CommandService commandService;
+                if("template".equalsIgnoreCase(command.getElement())){
+                    commandService = templateElementService;
+                } else {
+                    commandService = servicesConfiguration.getServiceMap().get(command.getElement());
+                }
                 WebCommand webCommand = new WebCommand(command.getValue());
                 commandService.commandReceived(webCommand);
                 iterator.remove();

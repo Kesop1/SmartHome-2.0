@@ -1,5 +1,6 @@
 package com.piotrak.service;
 
+import com.piotrak.config.ServicesConfiguration;
 import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.time.DelayedCommand;
@@ -14,6 +15,13 @@ public class DelayedCommandService extends CommandService {
 
     @Autowired
     private WebLogger webLogger;
+
+    private ServicesConfiguration servicesConfiguration;
+
+    @Autowired
+    public DelayedCommandService(ServicesConfiguration servicesConfiguration) {
+        this.servicesConfiguration = servicesConfiguration;
+    }
 
     @PostConstruct
     public void setUp(){
@@ -35,7 +43,10 @@ public class DelayedCommandService extends CommandService {
         new Thread(() -> {
             try {
                 Thread.sleep(delayedCommand.getDelay());
-                delayedCommand.getCommandService().commandReceived(delayedCommand.getCommand());
+                CommandService service = servicesConfiguration.getServiceMap().get(delayedCommand.getElement());
+                if(service != null){
+                    service.commandReceived(delayedCommand.getCommand());
+                }
             } catch (InterruptedException e) {
                 webLogger.log(Level.WARNING, e.getMessage());
             }

@@ -17,25 +17,22 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 import com.piotrak.config.ServicesConfiguration;
 import com.piotrak.service.element.Element;
-import com.piotrak.service.element.TemplateElement;
 import com.piotrak.service.logger.WebLogger;
-import com.piotrak.service.technology.time.DelayedCommand;
-import com.piotrak.service.technology.web.WebCommand;
+import com.piotrak.service.technology.time.ScheduledCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import javax.naming.OperationNotSupportedException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.logging.Level;
 
 /**
@@ -48,11 +45,18 @@ public class CalendarService {
     @Autowired
     private WebLogger webLogger;
 
-    @Autowired
     private ServicesConfiguration servicesConfiguration;
 
-    @Autowired
     private List<Element> templatesList;
+
+    private ScheduledCommandService scheduledCommandService;
+
+    @Autowired
+    public CalendarService(ServicesConfiguration servicesConfiguration, List<Element> templatesList, ScheduledCommandService scheduledCommandService) {
+        this.servicesConfiguration = servicesConfiguration;
+        this.templatesList = templatesList;
+        this.scheduledCommandService = scheduledCommandService;
+    }
 
     private String applicationName = "";
     private String name = "primary";
@@ -89,7 +93,7 @@ public class CalendarService {
                 webLogger.log(Level.INFO, "No upcoming events found.");
             } else {
                 for (Event event : items) {
-                    executeDelayedCommand(event);
+                    scheduleCalendarEvent(event);
                 }
             }
         } catch (GeneralSecurityException | IOException | CalendarException e) {
@@ -98,42 +102,28 @@ public class CalendarService {
     }
 
     /**
-     * Create delayed commands for each command (separated with ";") in the event's summary
+     * Create scheduled commands for each command (separated with ";") in the event's summary
      * @param event
      * @throws CalendarException
      */
-    private void executeDelayedCommand(Event event) throws CalendarException {
-        DateTime startTime = event.getStart().getDateTime();
-        if (startTime == null) {
-            startTime = event.getStart().getDate();
+    private void scheduleCalendarEvent(Event event) throws CalendarException {
+        Date startTime;
+        if (event.getStart().getDateTime() != null) {
+            startTime = new Date(event.getStart().getDateTime().getValue());
+        } else {
+            startTime = new Date(event.getStart().getDate().getValue());
         }
-        long delay = startTime.getValue() - System.currentTimeMillis();
-        if(delay < 0){
-            return;
-        }
-        webLogger.log(Level.INFO, String.format("Setting up calendar command: %s (%s)\n", event.getSummary(), startTime));
-        CommandService delayedCommandService = servicesConfiguration.getServiceMap().get("delayed");
+        webLogger.log(Level.FINE, String.format("Setting up calendar command: %s (%s)\n", event.getSummary(), startTime));
         String[] commands = event.getSummary().split(";");
         for (String s : commands) {
             String[] command = s.split(" ");
             if (command.length < 2) {
                 throw new CalendarException(String.format("Invalid calendar command received: %s", s));
             }
-            if("Template".equalsIgnoreCase(command[0])){
-                Optional<Element> template = templatesList.stream().filter(t -> t.getName().equalsIgnoreCase(command[1])).findFirst();
-                template.ifPresent(t -> new Thread(() -> {
-                    try {
-                        Thread.sleep(delay);
-                        ((TemplateElement)t).switchElement("ON");
-                    } catch (OperationNotSupportedException | InterruptedException e) {
-                        webLogger.log(Level.WARNING, e.getMessage());
-                    }
-                }).start());
-            } else {
-                CommandService elementService = servicesConfiguration.getServiceMap().get(command[0]);
-                WebCommand webCommand = new WebCommand(command[1]);
-                delayedCommandService.commandReceived(new DelayedCommand(delay, webCommand, elementService));
-            }
+            String element = command[0];
+            String cmd = command[1];
+            ScheduledCommand scheduledCommand = new ScheduledCommand(startTime, element, cmd);
+            scheduledCommandService.commandReceived(scheduledCommand);
         }
     }
 

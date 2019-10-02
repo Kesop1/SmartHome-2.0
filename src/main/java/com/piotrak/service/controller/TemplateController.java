@@ -2,6 +2,7 @@ package com.piotrak.service.controller;
 
 import com.piotrak.service.elementservice.TemplateElementService;
 import com.piotrak.service.logger.WebLogger;
+import com.piotrak.service.technology.web.WebCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,7 +42,7 @@ public class TemplateController extends AbstractController {
     @PostMapping
     public ModelAndView setTemplate(@RequestParam String name) {
         webLogger.log(Level.INFO, "Command received from web application: " + name);
-        templateElementService.switchTemplate(name);
+        templateElementService.commandReceived(new WebCommand(name));
         return super.getModelAndView();
     }
 }

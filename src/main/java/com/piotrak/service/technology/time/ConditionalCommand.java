@@ -1,7 +1,5 @@
 package com.piotrak.service.technology.time;
 
-import com.piotrak.service.CommandService;
-import com.piotrak.service.element.Element;
 import com.piotrak.service.technology.Command;
 
 import javax.validation.constraints.Min;
@@ -31,7 +29,7 @@ public class ConditionalCommand extends Command {
     /**
      * Condition that needs to be met to run the command
      */
-    private Predicate<Element> condition;
+    private Predicate<String> condition;
 
     /**
      * Command that will be sent
@@ -41,12 +39,12 @@ public class ConditionalCommand extends Command {
     /**
      * CommandService that will receive the command
      */
-    private CommandService commandService;
+    private String element;
 
-    public ConditionalCommand(@NotNull Predicate<Element> condition, @NotNull Command command, @NotNull CommandService commandService, @Min(1) long tryTime) {
+    public ConditionalCommand(@NotNull Predicate<String> condition, @NotNull Command command, @NotNull String element, @Min(1) long tryTime) {
         this.condition = condition;
         this.command = command;
-        this.commandService = commandService;
+        this.element = element;
         this.tryTime = tryTime;
     }
 
@@ -55,12 +53,12 @@ public class ConditionalCommand extends Command {
         return this.getClass().getName() + "{" +
                 "condition='" + getCondition().toString() + '\'' +
                 "command='" + getCommand() + '\'' +
-                "commandService='" + getCommandService() + '\'' +
+                "element='" + getElement() + '\'' +
                 "tryTime='" + getTryTime() + '\'' +
                 '}';
     }
 
-    public Predicate<Element> getCondition() {
+    public Predicate<String> getCondition() {
         return condition;
     }
 
@@ -68,8 +66,8 @@ public class ConditionalCommand extends Command {
         return command;
     }
 
-    public CommandService getCommandService() {
-        return commandService;
+    public String getElement() {
+        return element;
     }
 
     public boolean isRan() {
