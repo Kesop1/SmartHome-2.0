@@ -4,6 +4,7 @@ import com.piotrak.config.ServicesConfiguration;
 import com.piotrak.service.elementservice.TemplateElementService;
 import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
+import com.piotrak.service.technology.ir.IRCommand;
 import com.piotrak.service.technology.time.ScheduledCommand;
 import com.piotrak.service.technology.web.WebCommand;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,8 +96,13 @@ public class ScheduledCommandService extends CommandService {
                 } else {
                     commandService = servicesConfiguration.getServiceMap().get(command.getElement());
                 }
-                WebCommand webCommand = new WebCommand(command.getValue());
-                commandService.commandReceived(webCommand);
+                Command scheduledCommand;
+                if(command.getValue().startsWith("IR_")){
+                    scheduledCommand = new IRCommand(command.getValue().substring("IR_".length()));
+                } else {
+                    scheduledCommand = new WebCommand(command.getValue());
+                }
+                commandService.commandReceived(scheduledCommand);
                 iterator.remove();
             } else {
                 return;
