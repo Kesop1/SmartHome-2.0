@@ -17,7 +17,11 @@
     </form>
     <br/>
     <form action="${pageContext.request.contextPath}/scheduler" method="get">
-        <button type="submit">scheduler</button>
+        <button type="submit">Planowanie</button>
+    </form>
+    <br/>
+    <form action="${pageContext.request.contextPath}/help" method="get">
+        <button type="submit">Pomoc</button>
     </form>
 </div>
 </body>

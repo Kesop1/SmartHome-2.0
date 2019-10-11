@@ -26,6 +26,10 @@
         <put-attribute name="content" value="/ui/jsp/scheduler.jsp" />
     </definition>
 
+    <definition name="helpView" extends="template">
+        <put-attribute name="content" value="/ui/jsp/help.jsp" />
+    </definition>
+
     <definition name="mainViewContent" template="/ui/jsp/main.jsp">
         <put-attribute name="things" value="/ui/jsp/things.jsp" />
         <put-attribute name="slot1" value="/ui/jsp/templates.jsp" />
