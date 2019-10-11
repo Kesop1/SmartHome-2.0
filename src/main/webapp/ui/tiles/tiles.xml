@@ -8,7 +8,7 @@
     <definition name="loginView" template="/ui/jsp/login.jsp"/>
 
     <definition name="template" template="/ui/jsp/template.jsp">
-        <put-attribute name="header" value="Main menu" />
+        <put-attribute name="header" value="Ekran główny" />
         <put-attribute name="menu" value="/ui/jsp/menu.jsp" />
         <put-attribute name="content" value="" />
         <put-attribute name="footer" value="/ui/jsp/footer.jsp" />

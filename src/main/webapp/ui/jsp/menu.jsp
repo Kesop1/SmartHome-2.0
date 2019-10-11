@@ -5,15 +5,15 @@
 <h2>Menu</h2>
 <div>
     <form action="${pageContext.request.contextPath}/logout" method="post">
-        <button type="submit">Logout</button>
+        <button type="submit">Wyloguj</button>
     </form>
     <br/>
     <form action="${pageContext.request.contextPath}/weblogger" method="get">
-        <button type="submit">logger</button>
+        <button type="submit">Logger</button>
     </form>
     <br/>
     <form action="${pageContext.request.contextPath}/main" method="get">
-        <button type="submit">Main screen</button>
+        <button type="submit">Ekran główny</button>
     </form>
     <br/>
     <form action="${pageContext.request.contextPath}/scheduler" method="get">

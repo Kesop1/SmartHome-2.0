@@ -11,7 +11,7 @@
 <body>
 <link href="${loggerCss}" rel="stylesheet" />
     <form action="${path}weblogger?level=${level}&size=${size}" method="post">
-        Level:
+        Poziom:
         <select name="level">
             <option selected>${loglevel}</option>
             <option>OFF</option>
@@ -24,7 +24,7 @@
             <option>FINEST</option>
             <option>ALL</option>
         </select>
-        Size:
+        Rozmiar:
         <select name="size">
             <option selected>${logsize}</option>
             <option>0</option>
@@ -38,10 +38,10 @@
         <input type="submit" class="button"></input>
     </form>
     <table class="loggerTable">
-        <th>Date</th>
-        <th>Class</th>
-        <th>Level</th>
-        <th>Message</th>
+        <th>Data</th>
+        <th>Klasa</th>
+        <th>Poziom</th>
+        <th>Wiadomość</th>
         <c:forEach items="${logs}" var="entry">
             <tr>
                 <td>${entry.dateTime}</td>

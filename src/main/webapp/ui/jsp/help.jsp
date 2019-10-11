@@ -10,7 +10,7 @@
     <link href="${helpCss}" rel="stylesheet" />
     <h1>Pomoc</h1>
 
-    <h2>Dostępne template'y</h2>
+    <h2>Dostępne schematy</h2>
     <c:forEach items="${elementsMap.templatesList}" var="entry">
         ${entry.name},
     </c:forEach>
@@ -26,9 +26,9 @@
        W celu ustawienia zdarzenia kalendarza należy wejść w odpowiedni Kalendarz Google oraz ustawić wydarzenie w odpowiednim formacie:<br>
        1. Element, który ma zadziałać (może to być "Template" lub właściwy element)<br>
        2. Spacja<br>
-       3. Komenda do uruchomienia (Właściwa komenda, komenda z przedrostkiem "IR_" utworzy komendę IR, lub nazwa template)<br><br>
+       3. Komenda do uruchomienia (Właściwa komenda, komenda z przedrostkiem "IR_" utworzy komendę IR, lub nazwa schematu)<br><br>
 
-       Na przykład, żeby ustawić włączenie template radio: "Template radio"<br>
+       Na przykład, żeby ustawić włączenie schematu radio: "Template radio"<br>
        &emsp;&emsp;&emsp;&emsp;&emsp;żeby włączyć Amplituner: "Amplituner on"<br>
        &emsp;&emsp;&emsp;&emsp;&emsp;żeby zgłośnić Amplituner przy pomocy komendy IR: "Amplituner IR_6_volup"<br><br>
 

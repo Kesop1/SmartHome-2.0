@@ -16,12 +16,12 @@
                 <option value="${entry.name}">${entry.displayName}</option>
             </c:forEach>
         </select>
-         Command:
+        Komenda:
         <select name="command">
             <option>ON</option>
             <option>OFF</option>
         </select>
-         Delay:
+        Opóźnienie:
         <select name="delay">
             <option></option>
             <option>10</option>
@@ -32,21 +32,21 @@
             <option>90</option>
             <option>120</option>
         </select>
-         or
-         Time:
+        lub
+        Czas:
         <input type="time" name="time"/>
         <input type="submit" class="button"/>
     </form>
     <br/>
     <br/>
     <br/>
-    <h1>Scheduled jobs:</h1>
+    <h1>Zaplanowane zadania:</h1>
     <form method="post">
         <table class="schedulerTable">
-            <th>Date</th>
+            <th>Data</th>
             <th>Element</th>
-            <th>Command</th>
-            <th>Remove</th>
+            <th>Komenda</th>
+            <th>Usuń</th>
             <c:forEach items="${scheduledCommands}" var="entry">
                 <tr>
                     <td>${entry.date}</td>
