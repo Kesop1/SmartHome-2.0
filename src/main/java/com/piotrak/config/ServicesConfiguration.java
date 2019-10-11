@@ -50,7 +50,7 @@ public class ServicesConfiguration {
     @Autowired
     private ConditionalCommandService conditionalCommandService;
 
-    public Map<String, CommandService> serviceMap = new HashMap<>();
+    private Map<String, CommandService> serviceMap = new HashMap<>();
 
     @PostConstruct
     public void init(){
