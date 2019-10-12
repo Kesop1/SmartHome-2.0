@@ -23,6 +23,10 @@
     <form action="${pageContext.request.contextPath}/help" method="get">
         <button type="submit">Pomoc</button>
     </form>
+    <br/>
+    <form action="${pageContext.request.contextPath}/calendar" method="get">
+        <button type="submit">Kalendarz</button>
+    </form>
 </div>
 </body>
 </html>
