@@ -8,25 +8,29 @@
     <definition name="loginView" template="/ui/jsp/login.jsp"/>
 
     <definition name="template" template="/ui/jsp/template.jsp">
-        <put-attribute name="header" value="Ekran główny" />
+        <put-attribute name="header" value="" />
         <put-attribute name="menu" value="/ui/jsp/menu.jsp" />
         <put-attribute name="content" value="" />
         <put-attribute name="footer" value="/ui/jsp/footer.jsp" />
     </definition>
 
     <definition name="mainView" extends="template">
+        <put-attribute name="header" value="Ekran główny" />
         <put-attribute name="content" value="mainViewContent" />
     </definition>
 
     <definition name="webLoggerView" extends="template">
+        <put-attribute name="header" value="Logger" />
         <put-attribute name="content" value="/ui/jsp/weblogger.jsp" />
     </definition>
 
     <definition name="schedulerView" extends="template">
+        <put-attribute name="header" value="Planowanie zdarzeń" />
         <put-attribute name="content" value="/ui/jsp/scheduler.jsp" />
     </definition>
 
     <definition name="helpView" extends="template">
+        <put-attribute name="header" value="Pomoc" />
         <put-attribute name="content" value="/ui/jsp/help.jsp" />
     </definition>
 
