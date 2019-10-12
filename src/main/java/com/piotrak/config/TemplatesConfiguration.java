@@ -48,6 +48,7 @@ public class TemplatesConfiguration {
         list.add(templatePc());
         list.add(templateMovie());
         list.add(templateWork());
+        list.add(templateMusic());
         list.add(templateRestOff());
         return list;
     }
@@ -72,6 +73,7 @@ public class TemplatesConfiguration {
         MultiValuedMap<String, Command> actions = new ArrayListValuedHashMap<>();
         actions.put("PC", commandOn);
 //        actions.put("conditional", new ConditionalCommand((e)-> ((SwitchElement)e).isOn(), new WebCommand("audio-pc"), "PC"), 60000));//TODO
+        actions.put("delayed", new DelayedCommand(2000, new WebCommand("audio-pc"), "PC"));
         actions.put("delayed", new DelayedCommand(60000, new WebCommand("audio-pc"), "PC"));
         actions.put("Desk", commandOn);
         actions.put("PCScreen", commandOn);
@@ -100,6 +102,7 @@ public class TemplatesConfiguration {
 //        actions.put("conditional", new ConditionalCommand((e)-> e.isOn(), new WebCommand("audio-tv"), "PC"), 60000));//TODO
         actions.put("Amplituner", commandOn);
         actions.put("delayed", new DelayedCommand(2000, new IRCommand("2"), "Amplituner"));
+        actions.put("delayed", new DelayedCommand(6000, new WebCommand("audio-tv"), "PC"));
         actions.put("delayed", new DelayedCommand(60000, new WebCommand("audio-tv"), "PC"));
         actions.put("Speakers", commandOn);
         actions.put("TV", commandOn);
@@ -116,6 +119,14 @@ public class TemplatesConfiguration {
         return new TemplateElement("work", "BioRobot", actions);
     }
 
-
+    @Bean
+    public TemplateElement templateMusic(){
+        MultiValuedMap<String, Command> actions = new ArrayListValuedHashMap<>();
+        actions.put("Amplituner", commandOn);
+        actions.put("Speakers", commandOn);
+        actions.put("delayed", new DelayedCommand(2000, new IRCommand("3"), "Amplituner"));
+        actions.put("delayed", new DelayedCommand(1000, new WebCommand("audio-amp"), "PC"));
+        return new TemplateElement("music", "Muzoman", actions);
+    }
 
 }
