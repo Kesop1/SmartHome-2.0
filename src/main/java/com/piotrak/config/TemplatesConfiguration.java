@@ -49,6 +49,8 @@ public class TemplatesConfiguration {
         list.add(templateMovie());
         list.add(templateWork());
         list.add(templateMusic());
+        list.add(templateTV());
+        list.add(templateLaptop());
         list.add(templateRestOff());
         return list;
     }
@@ -106,6 +108,7 @@ public class TemplatesConfiguration {
         actions.put("delayed", new DelayedCommand(60000, new WebCommand("audio-tv"), "PC"));
         actions.put("Speakers", commandOn);
         actions.put("TV", commandOn);
+        actions.put("delayed", new DelayedCommand(6000, new IRCommand("src-hdmi2"), "TV"));
         return new TemplateElement("movie", "Kinoman", actions);
     }
 
@@ -127,6 +130,28 @@ public class TemplatesConfiguration {
         actions.put("delayed", new DelayedCommand(2000, new IRCommand("3"), "Amplituner"));
         actions.put("delayed", new DelayedCommand(1000, new WebCommand("audio-amp"), "PC"));
         return new TemplateElement("music", "Muzoman", actions);
+    }
+
+    @Bean
+    public TemplateElement templateTV(){
+        MultiValuedMap<String, Command> actions = new ArrayListValuedHashMap<>();
+        actions.put("Amplituner", commandOn);
+        actions.put("Speakers", commandOn);
+        actions.put("TV", commandOn);
+        actions.put("delayed", new DelayedCommand(2000, new IRCommand("3"), "Amplituner"));
+        actions.put("delayed", new DelayedCommand(6000, new IRCommand("src-tv"), "TV"));
+        return new TemplateElement("tv", "Telewidz", actions);
+    }
+
+    @Bean
+    public TemplateElement templateLaptop(){
+        MultiValuedMap<String, Command> actions = new ArrayListValuedHashMap<>();
+        actions.put("Amplituner", commandOn);
+        actions.put("Speakers", commandOn);
+        actions.put("TV", commandOn);
+        actions.put("delayed", new DelayedCommand(2000, new IRCommand("3"), "Amplituner"));
+        actions.put("delayed", new DelayedCommand(6000, new IRCommand("src-hdmi1"), "TV"));
+        return new TemplateElement("laptop", "Laptop", actions);
     }
 
 }
