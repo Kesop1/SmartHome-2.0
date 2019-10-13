@@ -107,6 +107,7 @@ public class TemplatesConfiguration {
         actions.put("Speakers", commandOn);
         actions.put("TV", commandOn);
         actions.put("delayed", new DelayedCommand(6000, new IRCommand("src-hdmi2"), "TV"));
+        actions.put("delayed", new DelayedCommand(2000, new IRCommand("2_volup"), "Amplituner"));
         return new TemplateElement("movie", "Kinoman", actions);
     }
 
