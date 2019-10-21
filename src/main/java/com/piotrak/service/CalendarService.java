@@ -144,13 +144,13 @@ public class CalendarService {
         Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(applicationName)
                 .build();
-//         List the next 10 events from the primary calendar.
+
         DateTime now = new DateTime(System.currentTimeMillis());
         DateTime end = new DateTime(System.currentTimeMillis() + 3600_000);
         Events events = service.events().list(name)
                 .setTimeMin(now)
                 .setTimeMax(end)
-//                .setShowDeleted(false)
+                .setShowDeleted(false)
                 .setOrderBy("startTime")
                 .setSingleEvents(true)
                 .execute();
