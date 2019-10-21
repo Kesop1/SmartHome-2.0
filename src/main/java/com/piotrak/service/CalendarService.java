@@ -93,6 +93,10 @@ public class CalendarService {
                 webLogger.log(Level.INFO, "No upcoming events found.");
             } else {
                 for (Event event : items) {
+                    if("Wakacje".equalsIgnoreCase(event.getSummary())){
+                        webLogger.log(Level.INFO, "Holidays, no events scheduled for today");
+                        return;
+                    }
                     scheduleCalendarEvent(event);
                 }
             }
