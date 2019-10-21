@@ -113,6 +113,9 @@ public class CalendarService {
         } else {
             startTime = new Date(event.getStart().getDate().getValue());
         }
+        if(startTime.before(new Date(System.currentTimeMillis()))) {
+            return;
+        }
         webLogger.log(Level.FINE, String.format("Setting up calendar command: %s (%s)\n", event.getSummary(), startTime));
         String[] commands = event.getSummary().split(";");
         for (String s : commands) {
@@ -143,6 +146,7 @@ public class CalendarService {
         Events events = service.events().list(name)
                 .setTimeMin(now)
                 .setTimeMax(end)
+//                .setShowDeleted(false)
                 .setOrderBy("startTime")
                 .setSingleEvents(true)
                 .execute();
