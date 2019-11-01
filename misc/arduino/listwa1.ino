@@ -20,24 +20,27 @@ const char* MQTT_SERVER = "192.168.1.101";
 const int MQTT_PORT = 1883;
 const String DEVICE_NAME = "listwa1";
 
-const String MESSAGE_WELCOME = DEVICE_NAME + " connected";
-const String MESSAGE_GOODBYE = DEVICE_NAME + " disconnected";
-const String TOPIC_DEVICES = "devices/" + DEVICE_NAME;
+const String MESSAGE_WELCOME = "connected";
+const String MESSAGE_GOODBYE = "disconnected";
 const String SUBTOPIC_IN = "in";
 const String SUBTOPIC_OUT = "out";
+const String SUBTOPIC_STATUS = "status";
 const String PUBLISH_TOPIC = DEVICE_NAME + "/" + SUBTOPIC_OUT + "/";
-const String SENSOR_HUM = "hum";
-const String SENSOR_TEMP = "temp";
-const String SENSOR_WEATHER = "weather";
+const String DHT_HUM = "hum";
+const String DHT_TEMP = "temp";
+const String DHT_ = "dht";
 
 const String SUBSCRIBE_TOPICS[] = {
               DEVICE_NAME + "/" + SUBTOPIC_IN + "/#"
             };
 
+long currentMillis;
+
 dht DHT;
 #define DHT11_PIN 16//D0
-long previousMillis = -700000;
-const long dhtInterval = 600000;
+long previousReadMillis = 0;
+const long dhtInterval = 3000;
+boolean dhtReadSuccessful = false;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -67,6 +70,7 @@ void setup() {
  * if connected proceed with MQTT service and update DHT read-outs
  */
 void loop() {
+  currentMillis = millis();
   if(checkWiFi()){
     checkMQTT();
   }
@@ -74,7 +78,9 @@ void loop() {
     activateOfflineMode();
   } else {
     client.loop();
-    updateDht();
+    if (!dhtReadSuccessful) {
+      getDht();
+    }
   }
 }
 
@@ -147,7 +153,7 @@ void connectMQTT() {
   if(connectMQTTClient()){
     subscribeMQTT();
     setupPinsFromMQTT();
-    client.publish(TOPIC_DEVICES.c_str(), MESSAGE_WELCOME.c_str());
+    client.publish((DEVICE_NAME + "/" + SUBTOPIC_STATUS).c_str(), MESSAGE_WELCOME.c_str());
   }
 }
 
@@ -156,7 +162,7 @@ void connectMQTT() {
  */
 boolean connectMQTTClient(){
   Serial.println("Connecting to MQTT...");
-  if (client.connect(DEVICE_NAME.c_str(), TOPIC_DEVICES.c_str(), 0, true, MESSAGE_GOODBYE.c_str())){
+  if (client.connect(DEVICE_NAME.c_str(), (DEVICE_NAME + "/" + SUBTOPIC_STATUS).c_str(), 0, true, MESSAGE_GOODBYE.c_str())){
     Serial.println(MESSAGE_WELCOME);
     return true;
   } else {
@@ -202,7 +208,7 @@ void activateOfflineMode(){
 /*
  * Act on message arrived from MQTT
  * if received from MQTT switch pins and publish the pin status
- * if reading the pins statuses just switch pins
+ * if reading the pins statuses just switch pins (useful when device just got connected)
  */
 void callback(char* top, byte* payload, unsigned int length) {
   String topic = top;
@@ -212,10 +218,15 @@ void callback(char* top, byte* payload, unsigned int length) {
   topic.remove(0, DEVICE_NAME.length() + 1);
   if (topic.startsWith(SUBTOPIC_IN)) {
     topic.remove(0, SUBTOPIC_IN.length() + 1);
-    int port = topic.substring(0, topic.indexOf("/")).toInt();
+    String element = topic.substring(0, topic.indexOf("/"));
+    if(element.equals("DHT")){
+      dhtReadSuccessful = false;
+    } else {
+    int port = element.toInt();
     actOnCommand(port, msg);
     String publishTopic = PUBLISH_TOPIC + port;
     client.publish(publishTopic.c_str(), msg.c_str(), true);
+    }
   } else if (topic.startsWith(SUBTOPIC_OUT)) {
     topic.remove(0, SUBTOPIC_OUT.length() + 1);
     int port = topic.substring(0, topic.indexOf("/")).toInt();
@@ -230,46 +241,48 @@ void actOnCommand(int port, String msg){
   if(msg.equalsIgnoreCase("ON")){
     digitalWrite(port, HIGH);
   } else if(msg.equalsIgnoreCase("OFF")){
-    digitalWrite(port, LOW);
+    digitalWrite(port, LOW);    
 //  } else{
 //    analogWrite(port, msg.toInt());
   }
 }
 
 /*
- * Read DHT11 values every 10 minutes and publish to the MQTT broker
+ * Read DHT11 values and if successfull publish to the MQTT broker
  */
-void updateDht(){
-  unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis < dhtInterval) {
+void getDht(){
+  if (currentMillis - previousReadMillis < dhtInterval) {
     return;
   }
-  previousMillis = currentMillis;
+  previousReadMillis = currentMillis;
+  Serial.println("reading DHT");
   int chk = DHT.read11(DHT11_PIN);
-  String hum = String(DHT.humidity, 1).c_str();
-  String temp = String(DHT.temperature, 1).c_str();
+  String hum = "";
+  String temp = "";
   Serial.print("DHT: ");
   switch (chk){
     case DHTLIB_OK:
       Serial.println("OK");
+      dhtReadSuccessful = true;
+      hum = String(DHT.humidity, 1).c_str();
+      temp = String(DHT.temperature, 1).c_str();
       break;
     case DHTLIB_ERROR_CHECKSUM:
       Serial.println("Checksum error");
-      hum = "N/A";
-      temp = "N/A";
       break;
     case DHTLIB_ERROR_TIMEOUT:
       Serial.println("Time out error, \t");
-      hum = "N/A";
-      temp = "N/A";
       break;
     default:
       Serial.println("Unknown error, \t");
-      hum = "N/A";
-      temp = "N/A";
       break;
   }
-  String publishTopic = PUBLISH_TOPIC + SENSOR_WEATHER + "/";
-  client.publish((publishTopic + SENSOR_HUM).c_str(), hum.c_str(), true);
-  client.publish((publishTopic + SENSOR_TEMP).c_str(), temp.c_str(), true);
+  if(chk != DHTLIB_OK){
+    Serial.println("Could not read DHT values");
+  } else{
+    Serial.println("Temp: " + temp + ", hum: " + hum);
+    String publishTopic = PUBLISH_TOPIC + DHT_ + "/";
+    client.publish((publishTopic + DHT_HUM).c_str(), hum.c_str(), true);
+    client.publish((publishTopic + DHT_TEMP).c_str(), temp.c_str(), true);
+  }
 }
