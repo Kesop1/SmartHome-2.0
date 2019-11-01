@@ -22,14 +22,14 @@ LISTWA1:
                         messages:	ON
                                     OFF
 
-					devices/${Device name} (retained) - (dis)connected message
-                        messages:	$Device name: connected
-                                    $Device name: disconnected
+					${Device name}/status (retained) - (dis)connected message
+                        messages:	connected
+                                    disconnected
 
-					${Device name}/weather/hum (retained) - DHT11 humidity, updated every 10 minutes
+					${Device name}/out/dht/hum (retained) - DHT11 humidity
                         messages:	#value
 
-					${Device name}/weather/temp (retained) - DHT11 temperature, updated every 10 minutes
+					${Device name}/out/dht/temp (retained) - DHT11 temperature
                         messages:	#value
 
 		subscribe:	${Device name}/in/4 - relay D2
@@ -38,10 +38,13 @@ LISTWA1:
 					${Device name}/in/14 - relay D5
                         messages:	ON
                                     OFF
+				    
+				    ${Device name}/in/dht - DHT sensor
+			messages:	get
 
 	Features:		connect to WiFi
 					connect to MQTT
 					When unable to connect to WiFi or MQTT switch all the pins ON
 					when able to connect download set up of the output pins
-					update DHT11 read-outs every 10 minutes
+					update DHT11 read-outs when requested
 					switch the devices ON or OFF from MQTT
