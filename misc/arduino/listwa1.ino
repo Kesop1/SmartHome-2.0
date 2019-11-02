@@ -222,15 +222,19 @@ void callback(char* top, byte* payload, unsigned int length) {
     if(element.equals("DHT")){
       dhtReadSuccessful = false;
     } else {
-    int port = element.toInt();
-    actOnCommand(port, msg);
-    String publishTopic = PUBLISH_TOPIC + port;
-    client.publish(publishTopic.c_str(), msg.c_str(), true);
+      int port = element.toInt();
+      if(port > 0){
+        actOnCommand(port, msg);
+        String publishTopic = PUBLISH_TOPIC + port;
+        client.publish(publishTopic.c_str(), msg.c_str(), true);
+      }
     }
   } else if (topic.startsWith(SUBTOPIC_OUT)) {
     topic.remove(0, SUBTOPIC_OUT.length() + 1);
     int port = topic.substring(0, topic.indexOf("/")).toInt();
-    actOnCommand(port, msg);
+    if(port >0){
+      actOnCommand(port, msg);
+    }
   }
 }
 

@@ -5,10 +5,12 @@ import com.piotrak.service.element.Element;
 import com.piotrak.service.element.SwitchElement;
 import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
+import com.piotrak.service.technology.mqtt.MQTTCommand;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
 import com.piotrak.service.technology.mqtt.MQTTConnectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -31,6 +33,8 @@ public class Listwa1ElementService extends ElementService implements MQTTCommuni
     private String subscribeTopic = "default/status";
 
     private List<Element> elements = new ArrayList<>();
+
+    private String dhtPublishTopic = "default";
 
     public Listwa1ElementService(@Autowired SwitchElement pc, @Autowired SwitchElement pcScreen, @Autowired SwitchElement pcSpeakers,
                                  @Autowired SwitchElement desk, @Autowired SwitchElement laptop, @Autowired MQTTConnectionService mqttConnectionService) {
@@ -80,6 +84,15 @@ public class Listwa1ElementService extends ElementService implements MQTTCommuni
         ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getSubscribeTopic(), this);
     }
 
+    /**
+     * Ask the MQTT device for DHT read-outs update
+     */
+    @Scheduled(fixedDelay = 1800000L)
+    private void getDhtReadOuts(){
+        webLogger.log(Level.FINE, "Getting DHT read outs");
+        getConnectionService().actOnConnection(new MQTTCommand(dhtPublishTopic, "get"));
+    }
+
     public String getSubscribeTopic() {
         return subscribeTopic;
     }
@@ -90,5 +103,13 @@ public class Listwa1ElementService extends ElementService implements MQTTCommuni
 
     public String getPublishTopic() {
         return "";
+    }
+
+    public String getDhtPublishTopic() {
+        return dhtPublishTopic;
+    }
+
+    public void setDhtPublishTopic(String dhtPublishTopic) {
+        this.dhtPublishTopic = dhtPublishTopic;
     }
 }
