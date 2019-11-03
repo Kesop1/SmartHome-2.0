@@ -46,7 +46,7 @@ public class DeskController extends ElementController {
      * @return main page
      */
     @PostMapping
-    public ModelAndView handleSwitchCommand(@RequestParam String cmd) {//TODO: @RequestParam String switch
+    public ModelAndView handleCommand(@RequestParam String cmd) {
         webLogger.log(Level.INFO, "Command received from web application: " + cmd);
         return super.handleCommand(getWebCommand(cmd));
     }

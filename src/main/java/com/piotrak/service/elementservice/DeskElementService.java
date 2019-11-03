@@ -3,6 +3,7 @@ package com.piotrak.service.elementservice;
 import com.piotrak.service.element.SwitchElement;
 import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
+import com.piotrak.service.technology.mqtt.MQTTCommand;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
 import com.piotrak.service.technology.mqtt.MQTTConnectionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 /**
@@ -27,6 +30,10 @@ public class DeskElementService extends ElementService implements MQTTCommunicat
 
     private String publishTopic = "default";
 
+    private String publishTopicHeight = "default";
+
+    private Map<String, String> positionHeight = new HashMap<>();
+
     public DeskElementService(@Autowired SwitchElement desk, @Autowired MQTTConnectionService mqttConnectionService) {
         super(desk, mqttConnectionService);
     }
@@ -38,7 +45,11 @@ public class DeskElementService extends ElementService implements MQTTCommunicat
      */
     @Override
     protected Command translateCommand(Command command) {
-        return getMQTTPublishCommand(command);
+        if(positionHeight.containsKey(command.getValue().toLowerCase())){
+            return new MQTTCommand(getPublishTopicHeight(), positionHeight.get(command.getValue().toLowerCase()));
+        } else {
+            return getMQTTPublishCommand(command);
+        }
     }
 
     /**
@@ -68,5 +79,21 @@ public class DeskElementService extends ElementService implements MQTTCommunicat
 
     public void setPublishTopic(String publishTopic) {
         this.publishTopic = publishTopic;
+    }
+
+    public Map<String, String> getPositionHeight() {
+        return positionHeight;
+    }
+
+    public void setPositionHeight(Map<String, String> positionHeight) {
+        this.positionHeight = positionHeight;
+    }
+
+    public String getPublishTopicHeight() {
+        return publishTopicHeight;
+    }
+
+    public void setPublishTopicHeight(String publishTopicHeight) {
+        this.publishTopicHeight = publishTopicHeight;
     }
 }
