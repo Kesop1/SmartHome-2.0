@@ -50,6 +50,13 @@
                     </form>
                 </div>
             </td>
+            <td>
+            <br>
+                <form action="${path}desk" method="post">
+                    <input type="text" name="cmd" size="3">
+                    <input type="submit" class="button"/>
+                </form>
+            </td>
         </tr>
     </table>
 </body>

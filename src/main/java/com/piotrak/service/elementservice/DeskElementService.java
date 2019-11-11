@@ -56,7 +56,7 @@ public class DeskElementService extends ElementService implements MQTTCommunicat
         webLogger.log(Level.INFO, "Command received:\t" + command);
         try {
             if(command instanceof WebCommand) {
-                if(positionHeight.containsKey(command.getValue().toLowerCase())){
+                if(positionHeight.containsKey(command.getValue().toLowerCase()) || command.getValue().matches("-?\\d+(\\.\\d+)?")){
                     getConnectionService().actOnConnection(new MQTTCommand(getPublishTopic(),"ON"));
                     getDelayedCommandService().commandReceived(new DelayedCommand(20000, new WebCommand("OFF"), getElement().getName()));
                 }
@@ -76,8 +76,10 @@ public class DeskElementService extends ElementService implements MQTTCommunicat
      */
     @Override
     protected Command translateCommand(Command command) {
-        if(positionHeight.containsKey(command.getValue().toLowerCase())){
+        if(positionHeight.containsKey(command.getValue().toLowerCase())) {
             return new MQTTCommand(getPublishTopicHeight(), positionHeight.get(command.getValue().toLowerCase()));
+        } else if(command.getValue().matches("-?\\d+(\\.\\d+)?")){
+            return new MQTTCommand(getPublishTopicHeight(), command.getValue());
         } else {
             return getMQTTPublishCommand(command);
         }

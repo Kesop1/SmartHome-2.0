@@ -94,7 +94,7 @@ public class TemplatesConfiguration {
     @Bean
     public TemplateElement templateRestOff(){
         return new TemplateElement("restOff", "Reszta off", new ArrayListValuedHashMap<>());
-    }//TODO: jakies akcje tu sa potrzebne
+    }
 
     @Bean
     public TemplateElement templateMovie(){
