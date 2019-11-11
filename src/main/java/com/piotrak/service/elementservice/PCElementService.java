@@ -49,6 +49,11 @@ public class PCElementService extends ElementService implements MQTTCommunicatio
                     getElement().actOnCommand(command);
                 }
             } else if(command instanceof WebCommand) {
+                if(command.getValue().equalsIgnoreCase("ON")){
+                    if(((SwitchElement)getElement()).isOn()){
+                        return;
+                    }
+                }
                 getConnectionService().actOnConnection(translateCommand(command));
             }
         } catch (OperationNotSupportedException e) {

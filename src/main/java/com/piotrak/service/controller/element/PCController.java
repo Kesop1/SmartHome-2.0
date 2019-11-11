@@ -46,7 +46,7 @@ public class PCController extends ElementController {
      * @return main page
      */
     @PostMapping
-    public ModelAndView handleCommand(@RequestParam String cmd) {//TODO: @RequestParam String switch
+    public ModelAndView handleCommand(@RequestParam String cmd) {
         webLogger.log(Level.INFO, "Command received from web application: " + cmd);
         return super.handleCommand(getWebCommand(cmd));
     }
