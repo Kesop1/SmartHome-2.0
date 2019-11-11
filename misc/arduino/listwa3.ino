@@ -24,6 +24,7 @@ const int ULTRASONIC_ECHO = 12;//D6
 
 const int DESK_UP = 13;//D7
 const int DESK_DOWN = 15;//D8
+boolean goUp = false;
 
 const int PC_BUTTON = 3;//RX
 
@@ -31,7 +32,7 @@ const char* WIFI_SSID     = "TP-LINK_5DBD15";
 const char* WIFI_PASSWORD = ""; //WIFI password here
 const char* MQTT_SERVER = "192.168.1.101";
 const int MQTT_PORT = 1883;
-const String DEVICE_NAME = "listwa1";
+const String DEVICE_NAME = "listwa3";
 
 const String MESSAGE_WELCOME = "connected";
 const String MESSAGE_GOODBYE = "disconnected";
@@ -122,6 +123,7 @@ void setupPins(){
   pinMode(ULTRASONIC_ECHO, INPUT);
   pinMode(PC_BUTTON, FUNCTION_3);//override RX
   pinMode(PC_BUTTON, OUTPUT);
+  digitalWrite(PC_BUTTON, HIGH);
 }
 
 /*
@@ -228,10 +230,10 @@ void setupPinsFromMQTT() {
  */
 void activateOfflineMode(){
   Serial.println("Device is offline");
-  digitalWrite(SOCKET_1, HIGH);
-  digitalWrite(SOCKET_2, HIGH);
-  digitalWrite(SOCKET_3, HIGH);
-  digitalWrite(SOCKET_4, HIGH);
+  digitalWrite(SOCKET_1, LOW);
+  digitalWrite(SOCKET_2, LOW);
+  digitalWrite(SOCKET_3, LOW);
+  digitalWrite(SOCKET_4, LOW);
 }
 
 /*
@@ -282,9 +284,9 @@ void callback(char* top, byte* payload, unsigned int length) {
  */
 void actOnCommand(int port, String msg){
   if(msg.equalsIgnoreCase("ON")){
-    digitalWrite(port, HIGH);
-  } else if(msg.equalsIgnoreCase("OFF")){
     digitalWrite(port, LOW);
+  } else if(msg.equalsIgnoreCase("OFF")){
+    digitalWrite(port, HIGH);    
 //  } else{
 //    analogWrite(port, msg.toInt());
   }
@@ -358,18 +360,18 @@ void setDeskHeight(long height){
 
   if(distance > height){
     Serial.println("Going down");
-    digitalWrite(DESK_UP, HIGH);
-    digitalWrite(DESK_DOWN, LOW);
+    goUp = false;
   } else {
     Serial.println("Going up");
-    digitalWrite(DESK_DOWN, HIGH);
-    digitalWrite(DESK_UP, LOW);
+    goUp = true;
   }
+  digitalWrite(DESK_UP, goUp);
+  digitalWrite(DESK_DOWN, !goUp);
 }
 
 void turnOnPc(){
   Serial.println("Turning on the pc");
-  digitalWrite(PC_BUTTON, HIGH);
-  delay(100);
   digitalWrite(PC_BUTTON, LOW);
+  delay(100);
+  digitalWrite(PC_BUTTON, HIGH);
 }

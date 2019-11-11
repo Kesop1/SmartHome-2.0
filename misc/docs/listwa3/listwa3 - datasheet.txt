@@ -1,9 +1,9 @@
-LISTWA1:
+LISTWA3:
 
 	Connected to: 	WiFi: TP-LINK_5DBD15
 					MQTT: 192.168.1.101:1883
-	IP:				192.168.1.111
-	Device name:	listwa1
+	IP:				192.168.1.113
+	Device name:	listwa3
 	MAC:			BC-DD-C2-24-AF-27
 
 	PINOUT:			A0 - NOT USED
