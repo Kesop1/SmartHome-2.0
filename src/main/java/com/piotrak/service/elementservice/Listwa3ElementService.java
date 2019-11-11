@@ -21,11 +21,11 @@ import java.util.List;
 import java.util.logging.Level;
 
 /**
- * Listwa1 service for communication between systems
+ * Listwa3 service for communication between systems
  */
-@Service("listwa1ElementService")
-@ConfigurationProperties("listwa1.device")
-public class Listwa1ElementService extends ElementService implements MQTTCommunication {
+@Service("listwa3ElementService")
+@ConfigurationProperties("listwa3.device")
+public class Listwa3ElementService extends ElementService implements MQTTCommunication {
 
     @Autowired
     private WebLogger webLogger;
@@ -36,7 +36,7 @@ public class Listwa1ElementService extends ElementService implements MQTTCommuni
 
     private String dhtPublishTopic = "default";
 
-    public Listwa1ElementService(@Autowired SwitchElement pc, @Autowired SwitchElement pcScreen, @Autowired SwitchElement pcSpeakers,
+    public Listwa3ElementService(@Autowired SwitchElement pc, @Autowired SwitchElement pcScreen, @Autowired SwitchElement pcSpeakers,
                                  @Autowired SwitchElement desk, @Autowired SwitchElement laptop, @Autowired MQTTConnectionService mqttConnectionService) {
         super(pc, mqttConnectionService);
         elements.add(pc);
@@ -47,7 +47,7 @@ public class Listwa1ElementService extends ElementService implements MQTTCommuni
     }
 
     /**
-     * Enable or disable the elements based on listwa1's status command
+     * Enable or disable the elements based on listwa3's status command
      * @param command Command received
      */
     @Override

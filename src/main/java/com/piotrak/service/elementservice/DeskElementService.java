@@ -1,17 +1,22 @@
 package com.piotrak.service.elementservice;
 
+import com.piotrak.service.DelayedCommandService;
 import com.piotrak.service.element.SwitchElement;
 import com.piotrak.service.logger.WebLogger;
 import com.piotrak.service.technology.Command;
 import com.piotrak.service.technology.mqtt.MQTTCommand;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
 import com.piotrak.service.technology.mqtt.MQTTConnectionService;
+import com.piotrak.service.technology.time.DelayedCommand;
+import com.piotrak.service.technology.web.WebCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
+import javax.naming.OperationNotSupportedException;
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -21,7 +26,7 @@ import java.util.logging.Level;
  */
 @Service("deskElementService")
 @ConfigurationProperties("desk")
-public class DeskElementService extends ElementService implements MQTTCommunication {//TODO: odpowiednia wysokość biurka
+public class DeskElementService extends ElementService implements MQTTCommunication {
 
     @Autowired
     private WebLogger webLogger;
@@ -34,8 +39,34 @@ public class DeskElementService extends ElementService implements MQTTCommunicat
 
     private Map<String, String> positionHeight = new HashMap<>();
 
-    public DeskElementService(@Autowired SwitchElement desk, @Autowired MQTTConnectionService mqttConnectionService) {
+    private DelayedCommandService delayedCommandService;
+
+    public DeskElementService(@Autowired SwitchElement desk, @Autowired MQTTConnectionService mqttConnectionService,
+                              DelayedCommandService delayedCommandService) {
         super(desk, mqttConnectionService);
+        this.delayedCommandService = delayedCommandService;
+    }
+
+    /**
+     * Act on command, it can be an ON/OFF or a desk height setup name
+     * in case a desk height change is requested first turn Desk ON, change height and after 20 seconds turn Desk OFF
+     */
+    @Override
+    public void commandReceived(@NotNull Command command) {
+        webLogger.log(Level.INFO, "Command received:\t" + command);
+        try {
+            if(command instanceof WebCommand) {
+                if(positionHeight.containsKey(command.getValue().toLowerCase())){
+                    getConnectionService().actOnConnection(new MQTTCommand(getPublishTopic(),"ON"));
+                    getDelayedCommandService().commandReceived(new DelayedCommand(20000, new WebCommand("OFF"), getElement().getName()));
+                }
+                getConnectionService().actOnConnection(translateCommand(command));
+            } else {
+                getElement().actOnCommand(command);
+            }
+        } catch (OperationNotSupportedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -95,5 +126,13 @@ public class DeskElementService extends ElementService implements MQTTCommunicat
 
     public void setPublishTopicHeight(String publishTopicHeight) {
         this.publishTopicHeight = publishTopicHeight;
+    }
+
+    public DelayedCommandService getDelayedCommandService() {
+        return delayedCommandService;
+    }
+
+    public void setDelayedCommandService(DelayedCommandService delayedCommandService) {
+        this.delayedCommandService = delayedCommandService;
     }
 }

@@ -14,11 +14,11 @@ import javax.annotation.PostConstruct;
 import java.util.logging.Level;
 
 /**
- * Listwa1 humidity sensor service for communication between systems
+ * Listwa3 humidity sensor service for communication between systems
  */
-@Service("listwa1HumSensorElementService")
-@ConfigurationProperties("listwa1.hum")
-public class Listwa1HumSensorElementService extends ElementService implements MQTTCommunication {
+@Service("listwa3HumSensorElementService")
+@ConfigurationProperties("listwa3.hum")
+public class Listwa3HumSensorElementService extends ElementService implements MQTTCommunication {
 
     @Autowired
     private WebLogger webLogger;
@@ -27,9 +27,9 @@ public class Listwa1HumSensorElementService extends ElementService implements MQ
 
     private final String unit = "%";
 
-    public Listwa1HumSensorElementService(@Autowired SensorElement listwa1HumSensor, @Autowired MQTTConnectionService mqttConnectionService) {
-        super(listwa1HumSensor, mqttConnectionService);
-        listwa1HumSensor.setUnit(unit);
+    public Listwa3HumSensorElementService(@Autowired SensorElement listwa3HumSensor, @Autowired MQTTConnectionService mqttConnectionService) {
+        super(listwa3HumSensor, mqttConnectionService);
+        listwa3HumSensor.setUnit(unit);
     }
     
     @Override

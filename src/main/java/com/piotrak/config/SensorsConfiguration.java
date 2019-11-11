@@ -19,21 +19,21 @@ public class SensorsConfiguration {
     @Bean
     public List<Element> sensorsList(){
         List<Element> sensorsList = new LinkedList<>();
-        sensorsList.add(listwa1HumSensor());
-        sensorsList.add(listwa1TempSensor());
+        sensorsList.add(listwa3HumSensor());
+        sensorsList.add(listwa3TempSensor());
         sensorsList.add(listwa2HumSensor());
         sensorsList.add(listwa2TempSensor());
         return sensorsList;
     }
     
     @Bean
-    public Element listwa1TempSensor(){
-        return new SensorElement("Listwa1TempSensor", "Biurko temp");
+    public Element listwa3TempSensor(){
+        return new SensorElement("Listwa3TempSensor", "Biurko temp");
     }
 
     @Bean
-    public Element listwa1HumSensor(){
-        return new SensorElement("Listwa1HumSensor", "Biurko hum");
+    public Element listwa3HumSensor(){
+        return new SensorElement("Listwa3HumSensor", "Biurko hum");
     }
     
     @Bean
