@@ -33,6 +33,8 @@ public class DeskElementService extends ElementService implements MQTTCommunicat
 
     private String subscribeTopic = "default/status";
 
+    private String subscribeTopicHeight = "default/status";
+
     private String publishTopic = "default";
 
     private String publishTopicHeight = "default";
@@ -49,7 +51,8 @@ public class DeskElementService extends ElementService implements MQTTCommunicat
 
     /**
      * Act on command, it can be an ON/OFF or a desk height setup name
-     * in case a desk height change is requested first turn Desk ON, change height and after 20 seconds turn Desk OFF
+     * in case a desk height change is requested first turn Desk ON then change height
+     * if a desk height was set and message published by the device, turn it OFF
      */
     @Override
     public void commandReceived(@NotNull Command command) {
@@ -58,11 +61,14 @@ public class DeskElementService extends ElementService implements MQTTCommunicat
             if(command instanceof WebCommand) {
                 if(positionHeight.containsKey(command.getValue().toLowerCase()) || command.getValue().matches("-?\\d+(\\.\\d+)?")){
                     getConnectionService().actOnConnection(new MQTTCommand(getPublishTopic(),"ON"));
-                    getDelayedCommandService().commandReceived(new DelayedCommand(20000, new WebCommand("OFF"), getElement().getName()));
                 }
                 getConnectionService().actOnConnection(translateCommand(command));
             } else {
-                getElement().actOnCommand(command);
+                if (command.getValue().matches("-?\\d+(\\.\\d+)?")) {
+                    getConnectionService().actOnConnection(new MQTTCommand(getPublishTopic(), "OFF"));
+                } else {
+                    getElement().actOnCommand(command);
+                }
             }
         } catch (OperationNotSupportedException e) {
             e.printStackTrace();
@@ -96,6 +102,8 @@ public class DeskElementService extends ElementService implements MQTTCommunicat
         webLogger.log(Level.FINE, "Setting up " + getElement().getName() + " for MQTT Connection");
         assert !StringUtils.isEmpty(getSubscribeTopic());
         ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getSubscribeTopic(), this);
+        assert !StringUtils.isEmpty(getSubscribeTopicHeight());
+        ((MQTTConnectionService) getConnectionService()).subscribeToTopic(getSubscribeTopicHeight(), this);
     }
 
     public String getSubscribeTopic() {
@@ -136,5 +144,13 @@ public class DeskElementService extends ElementService implements MQTTCommunicat
 
     public void setDelayedCommandService(DelayedCommandService delayedCommandService) {
         this.delayedCommandService = delayedCommandService;
+    }
+
+    public String getSubscribeTopicHeight() {
+        return subscribeTopicHeight;
+    }
+
+    public void setSubscribeTopicHeight(String subscribeTopicHeight) {
+        this.subscribeTopicHeight = subscribeTopicHeight;
     }
 }

@@ -63,10 +63,10 @@ public class TemplatesConfiguration {
         actions.put("Speakers", commandOff);
         actions.put("PS3", commandOff);
         actions.put("Laptop", commandOff);
-        actions.put("Desk", commandOff);
         actions.put("PC", commandOff);
         actions.put("PCScreen", commandOff);
         actions.put("PCSpeakers", commandOff);
+        actions.put("Desk", new WebCommand("REST"));
         return new TemplateElement("allOff", "Pawsinoga", actions);
     }
 
@@ -76,7 +76,6 @@ public class TemplatesConfiguration {
         actions.put("PC", commandOn);
         actions.put("delayed", new DelayedCommand(2000, new WebCommand("audio-pc"), "PC"));
         actions.put("delayed", new DelayedCommand(60000, new WebCommand("audio-pc"), "PC"));
-        actions.put("Desk", commandOn);
         actions.put("PCScreen", commandOn);
         actions.put("PCSpeakers", commandOn);//TODO: ustaw odpoeiednie wyjscia na switchu
         return new TemplateElement("pc", "Pececiarz", actions);
@@ -115,7 +114,6 @@ public class TemplatesConfiguration {
     public TemplateElement templateWork(){
         MultiValuedMap<String, Command> actions = new ArrayListValuedHashMap<>();
         actions.put("Laptop", commandOn);
-        actions.put("Desk", commandOn);
         actions.put("PCScreen", commandOn);
         actions.put("PCSpeakers", commandOn);//TODO: ustaw odpowiednie wyjscia na switchu
         return new TemplateElement("work", "BioRobot", actions);
