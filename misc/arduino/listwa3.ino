@@ -24,7 +24,6 @@ const int ULTRASONIC_ECHO = 12;//D6
 
 const int DESK_UP = 13;//D7
 const int DESK_DOWN = 15;//D8
-boolean goUp = false;
 
 const int PC_BUTTON = 3;//RX
 
@@ -44,6 +43,7 @@ const String PUBLISH_TOPIC = DEVICE_NAME + "/" + SUBTOPIC_OUT + "/";
 const String DHT_HUM = "hum";
 const String DHT_TEMP = "temp";
 const String DHT_ = "dht";
+const String SUBTOPIC_DESK = "desk";
 
 const String SUBSCRIBE_TOPICS[] = {
               DEVICE_NAME + "/" + SUBTOPIC_IN + "/#",
@@ -56,13 +56,19 @@ dht DHT;
 #define DHT11_PIN 16//D0
 long previousReadMillis = 0;
 const long dhtInterval = 3000;
-boolean dhtReadSuccessful = false;
+boolean readDHT = true;
+int dhtReadTries = 0;
+const int MAX_DHT_READ_TRIES = 30;
+const String DHT_ERR1 = "ERR1";
 
 const long DISTANCE_DELTA = 2;
 long deskHeight = 0;
-boolean heightSetSuccessful = true;
+boolean setHeight = false;
 long previousUltrasonicReadMillis = 0;
 const long ultrasonicInterval = 300;
+int deskChangeTries = 0;
+const int MAX_DESK_CHANGE_TRIES = 30;
+const String DESK_ERR1 = "ERR1";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -100,11 +106,11 @@ void loop() {
     activateOfflineMode();
   } else {
     client.loop();
-    if (!dhtReadSuccessful) {
+    if (readDHT) {
       getDht();
     }
-    if(!heightSetSuccessful){
-      setDeskHeight(deskHeight);
+    if(setHeight){
+      setDeskHeight();
     }
   }
 }
@@ -251,12 +257,14 @@ void callback(char* top, byte* payload, unsigned int length) {
     topic.remove(0, SUBTOPIC_IN.length() + 1);
     String element = topic.substring(0, topic.indexOf("/"));
     if(element.equalsIgnoreCase("DHT")){
-      dhtReadSuccessful = false;
-    } else if(element.equalsIgnoreCase("desk")){
+      readDHT = true;
+      dhtReadTries = 0;
+    } else if(element.equalsIgnoreCase(SUBTOPIC_DESK)){
       int newHeight = msg.toInt();
       if(newHeight > 0){
-        heightSetSuccessful = false;
+        setHeight = true;
         deskHeight = newHeight;
+        deskChangeTries = 0;
       }
     } else {
       int port = element.toInt();
@@ -286,7 +294,7 @@ void actOnCommand(int port, String msg){
   if(msg.equalsIgnoreCase("ON")){
     digitalWrite(port, LOW);
   } else if(msg.equalsIgnoreCase("OFF")){
-    digitalWrite(port, HIGH);    
+    digitalWrite(port, HIGH);
 //  } else{
 //    analogWrite(port, msg.toInt());
   }
@@ -299,6 +307,14 @@ void getDht(){
   if (currentMillis - previousReadMillis < dhtInterval) {
     return;
   }
+  if(dhtReadTries > MAX_DHT_READ_TRIES){
+    readDHT = false;
+    String publishTopic = PUBLISH_TOPIC + DHT_ + "/";
+    client.publish((publishTopic + DHT_HUM).c_str(), DHT_ERR1.c_str(), true);
+    client.publish((publishTopic + DHT_TEMP).c_str(), DHT_ERR1.c_str(), true);
+    return;
+  }
+  dhtReadTries++;
   previousReadMillis = currentMillis;
   Serial.println("reading DHT");
   int chk = DHT.read11(DHT11_PIN);
@@ -308,7 +324,7 @@ void getDht(){
   switch (chk){
     case DHTLIB_OK:
       Serial.println("OK");
-      dhtReadSuccessful = true;
+      readDHT = false;
       hum = String(DHT.humidity, 1).c_str();
       temp = String(DHT.temperature, 1).c_str();
       break;
@@ -335,11 +351,19 @@ void getDht(){
 /*
  * Move the desk up or down
  */
-void setDeskHeight(long height){
+void setDeskHeight(){
   if (currentMillis - previousUltrasonicReadMillis < ultrasonicInterval) {
     return;
   }
-  Serial.println("Setting desk height at " + height);
+  if(deskChangeTries > MAX_DESK_CHANGE_TRIES){
+    setHeight = false;
+    digitalWrite(DESK_UP, LOW);
+    digitalWrite(DESK_DOWN, LOW);
+    client.publish((PUBLISH_TOPIC + SUBTOPIC_DESK).c_str(), DESK_ERR1.c_str(), true);
+    return;
+  }
+  Serial.println("Setting desk height at " + deskHeight);
+  deskChangeTries++;
   previousUltrasonicReadMillis = currentMillis;
   digitalWrite(ULTRASONIC_TRIG, LOW);
   delayMicroseconds(2);
@@ -350,23 +374,29 @@ void setDeskHeight(long height){
   int distance = ultrasonicDuration*0.034/2;
   Serial.println("Distance: " + distance);
 
-  if((distance > (height - DISTANCE_DELTA)) && (distance < (height + DISTANCE_DELTA))){
+  if((distance > (deskHeight - DISTANCE_DELTA)) && (distance < (deskHeight + DISTANCE_DELTA))){
     Serial.println("Desk set at " + deskHeight);
-    heightSetSuccessful = true;
+    setHeight = false;
     digitalWrite(DESK_UP, LOW);
     digitalWrite(DESK_DOWN, LOW);
+    String height = String(deskHeight);
+    client.publish((PUBLISH_TOPIC + SUBTOPIC_DESK).c_str(), height.c_str(), true);
     return;
   }
 
-  if(distance > height){
+  if(distance > deskHeight){
     Serial.println("Going down");
-    goUp = false;
+    digitalWrite(DESK_DOWN, LOW);
+    digitalWrite(DESK_UP, LOW);
+    digitalWrite(DESK_DOWN, HIGH);
+    delay(50);
   } else {
     Serial.println("Going up");
-    goUp = true;
+    digitalWrite(DESK_UP, LOW);
+    digitalWrite(DESK_DOWN, LOW);
+    digitalWrite(DESK_UP, HIGH);
+    delay(50);
   }
-  digitalWrite(DESK_UP, goUp);
-  digitalWrite(DESK_DOWN, !goUp);
 }
 
 void turnOnPc(){

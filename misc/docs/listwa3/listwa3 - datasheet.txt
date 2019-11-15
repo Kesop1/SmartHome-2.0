@@ -28,9 +28,15 @@ LISTWA3:
 
 					${Device name}/out/dht/hum (retained) - DHT11 humidity
                         messages:	#value
+                                    ERR1 - can't read humidity value in 30 tries
 
 					${Device name}/out/dht/temp (retained) - DHT11 temperature
                         messages:	#value
+                                    ERR1 - can't read temperature value in 30 tries
+
+                    ${Device name}/out/desk (retained) - desk height
+                        messages:	#value
+                                    ERR1 - failed to set the height in 30 tries
 
 		subscribe:	${Device name}/in/5 - SOCKET_1
 					${Device name}/in/4 - SOCKET_2
