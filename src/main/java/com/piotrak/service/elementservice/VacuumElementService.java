@@ -38,7 +38,8 @@ public class VacuumElementService extends ElementService implements MQTTCommunic
 
     private Map<String, String> irCode = new HashMap<>();
 
-    public VacuumElementService(@Autowired SwitchElement vacuum, @Autowired MQTTConnectionService mqttConnectionService) {//TODO: SwitchElement vacuum można usunąć, tylko IR commands są używane
+    @Autowired
+    public VacuumElementService(SwitchElement vacuum, MQTTConnectionService mqttConnectionService) {//TODO: SwitchElement vacuum można usunąć, tylko IR commands są używane
         super(vacuum, mqttConnectionService);
     }
 
@@ -90,6 +91,16 @@ public class VacuumElementService extends ElementService implements MQTTCommunic
     private void handleIrCommand(IRCommand command) {
         String irCode = getIRCodeForCommand(command.getValue().toLowerCase());
         getConnectionService().actOnConnection(new MQTTCommand(getIrPublishTopic(), irCode));
+        if(command.getValue().equalsIgnoreCase("clean")){
+            new Thread(() -> {
+                try {
+                    Thread.sleep(1000);
+                    getConnectionService().actOnConnection(new MQTTCommand(getIrPublishTopic(), irCode));
+                } catch (InterruptedException e) {
+                    webLogger.log(Level.WARNING, e.getMessage());
+                }
+            }).start();
+        }
     }
 
     @Override

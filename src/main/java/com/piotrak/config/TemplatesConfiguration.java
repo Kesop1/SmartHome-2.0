@@ -78,6 +78,7 @@ public class TemplatesConfiguration {
         actions.put("delayed", new DelayedCommand(60000, new WebCommand("audio-pc"), "PC"));
         actions.put("PCScreen", commandOn);
         actions.put("PCSpeakers", commandOn);//TODO: ustaw odpoeiednie wyjscia na switchu
+        //TODO: nie obnizaj biurka
         return new TemplateElement("pc", "Pececiarz", actions);
     }
 
@@ -102,11 +103,10 @@ public class TemplatesConfiguration {
         actions.put("Amplituner", commandOn);
         actions.put("delayed", new DelayedCommand(2000, new IRCommand("2"), "Amplituner"));
         actions.put("delayed", new DelayedCommand(6000, new WebCommand("audio-tv"), "PC"));
-        actions.put("delayed", new DelayedCommand(60000, new WebCommand("audio-tv"), "PC"));
+        actions.put("delayed", new DelayedCommand(60000, new WebCommand("audio-tv"), "PC"));//TODO:pc/status
         actions.put("Speakers", commandOn);
         actions.put("TV", commandOn);
-        actions.put("delayed", new DelayedCommand(6000, new IRCommand("src-hdmi2"), "TV"));
-        actions.put("delayed", new DelayedCommand(2000, new IRCommand("2_volup"), "Amplituner"));
+        actions.put("delayed", new DelayedCommand(8000, new IRCommand("src-hdmi2"), "TV"));
         return new TemplateElement("movie", "Kinoman", actions);
     }
 
@@ -126,7 +126,7 @@ public class TemplatesConfiguration {
         actions.put("Speakers", commandOn);
         actions.put("PC", commandOn);
         actions.put("delayed", new DelayedCommand(2000, new IRCommand("3"), "Amplituner"));
-        actions.put("delayed", new DelayedCommand(1000, new WebCommand("audio-amp"), "PC"));
+        actions.put("delayed", new DelayedCommand(1000, new WebCommand("audio-amp"), "PC"));//TODO:pc/status
         return new TemplateElement("music", "Muzoman", actions);
     }
 
@@ -137,7 +137,7 @@ public class TemplatesConfiguration {
         actions.put("Speakers", commandOn);
         actions.put("TV", commandOn);
         actions.put("delayed", new DelayedCommand(2000, new IRCommand("3"), "Amplituner"));
-        actions.put("delayed", new DelayedCommand(6000, new IRCommand("src-tv"), "TV"));
+        actions.put("delayed", new DelayedCommand(8000, new IRCommand("src-tv"), "TV"));
         return new TemplateElement("tv", "Telewidz", actions);
     }
 
@@ -148,7 +148,7 @@ public class TemplatesConfiguration {
         actions.put("Speakers", commandOn);
         actions.put("TV", commandOn);
         actions.put("delayed", new DelayedCommand(2000, new IRCommand("3"), "Amplituner"));
-        actions.put("delayed", new DelayedCommand(6000, new IRCommand("src-hdmi1"), "TV"));
+        actions.put("delayed", new DelayedCommand(8000, new IRCommand("src-hdmi1"), "TV"));
         return new TemplateElement("laptop", "Laptop", actions);
     }
 
