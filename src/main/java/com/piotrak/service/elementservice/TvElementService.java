@@ -10,7 +10,6 @@ import com.piotrak.service.technology.mqtt.MQTTCommand;
 import com.piotrak.service.technology.mqtt.MQTTCommunication;
 import com.piotrak.service.technology.mqtt.MQTTConnectionService;
 import com.piotrak.service.technology.time.DelayedCommand;
-import com.piotrak.service.technology.web.WebCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
@@ -82,27 +81,14 @@ public class TvElementService extends ElementService implements MQTTCommunicatio
                 handleMQTTCommand((MQTTCommand) command);
             } else {
                 String cmd = command.getValue();
-                if ("ON".equalsIgnoreCase(cmd) || "OFF".equalsIgnoreCase(cmd)) {
-                    handleSwitchCommand(command);
+                if ("ON".equalsIgnoreCase(cmd) && !((SwitchElement)getElement()).isOn()){
+                    handleOnCommand(command);
+                } else if ("OFF".equalsIgnoreCase(cmd)) {
+                    handleOffCommand(command);
                 }
             }
         } catch (OperationNotSupportedException e){
             webLogger.log(Level.WARNING, e.getMessage());
-        }
-    }
-
-    /**
-     * ON or OFF command received, if WebCommand then send it also to the MQTT broker
-     * @param command ON or OFF command
-     * @throws OperationNotSupportedException when an incorrect message is received
-     */
-    private void handleSwitchCommand(Command command) throws OperationNotSupportedException {
-        if(command instanceof WebCommand) {
-            if("ON".equalsIgnoreCase(command.getValue())) {
-                handleOnCommand(command);
-            } else {
-                handleOffCommand(command);
-            }
         }
     }
 
