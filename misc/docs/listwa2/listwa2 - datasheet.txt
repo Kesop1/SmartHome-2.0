@@ -7,10 +7,10 @@ LISTWA2:
 	MAC:			BC-DD-C2-24-B1-03
 	
 	PINOUT:			A0 - NOT USED
-					D0 - DHT11 DATA
-					D1 - RELAY(5)
+					D0 - RELAY(16)
+					D1 - NOT USED
 					D2 - IR transmitter
-					D3 - NOT USED
+					D3 - DHT11 DATA
 					D4 - NOT USED
 					D5 - RELAY (14)
 					D6 - RELAY (12)
@@ -22,30 +22,35 @@ LISTWA2:
 						messages:	ON
 									OFF
 						
-					devices/${Device name} (retained) - (dis)connected message
-						messages:	${Device name}: connected
-									${Device name}: disconnected
-						
-					${Device name}/weather/hum (retained) - DHT11 humidity, updated every 10 minutes
-						messages:	#value
-						
-					${Device name}/weather/temp (retained) - DHT11 temperature, updated every 10 minutes
-						messages:	#value
+					${Device name}/status (retained) - (dis)connected message
+                        messages:	connected
+                                    disconnected
+
+                    ${Device name}/out/dht/hum (retained) - DHT11 humidity
+                        messages:	#value
+                                    ERR1 - can't read humidity value in 30 tries
+
+                    ${Device name}/out/dht/temp (retained) - DHT11 temperature
+                        messages:	#value
+                                    ERR1 - can't read temperature value in 30 tries
 		
-		subscribe:	${Device name}/in/5 - relay D1
+		subscribe:	${Device name}/in/16 - relay D0
 					${Device name}/in/12 - relay D6
 					${Device name}/in/13 - relay D7
 					${Device name}/in/14 - relay D5
 						messages:	ON
 									OFF
 						
-					${Device name}/ir
+					${Device name}/ir/${element}
 						messages:	IR codes
+
+					 ${Device name}/in/dht - DHT sensor
+                        messages:	get
 					
 	Features:		connect to WiFi
 					connect to MQTT
 					When unable to connect to WiFi or MQTT switch all the pins ON
 					when able to connect download set up of the output pins
-					update DHT11 read-outs every 10 minutes
+					update DHT11 read-outs when requested
 					switch the devices ON or OFF from MQTT
 					send IR codes from MQTT

@@ -18,13 +18,18 @@
 #include <dht.h>
 
 const char* WIFI_SSID     = "TP-LINK_5DBD15";
-const char* WIFI_PASSWORD = ""; //WIFI password here
+const char* WIFI_PASSWORD = "";
 const char* MQTT_SERVER = "192.168.1.101";
 const int MQTT_PORT = 1883;
 const String DEVICE_NAME = "listwa2";
 
 const uint16_t kIrLed = 4;  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
 IRsend irsend(kIrLed);  // Set the GPIO to be used to sending the message.
+
+const int SOCKET_1 = 13;//D7
+const int SOCKET_2 = 12;//D6
+const int SOCKET_3 = 14;//D5
+const int SOCKET_4 = 16;//D0
 
 const String MESSAGE_WELCOME = "connected";
 const String MESSAGE_GOODBYE = "disconnected";
@@ -45,21 +50,16 @@ const String SUBSCRIBE_TOPICS[] = {
               DEVICE_NAME + "/" + SUBTOPIC_IR + "/#"
             };
 
-uint16_t TV_ON[67] = {4500,4450, 550,1700, 550,1650, 550,1700, 600,550,
-                      550,600, 550,550, 600,550, 550,600, 550,1700,
-                      550,1700, 550,1650, 550,600, 550,600, 550,600,
-                      550,600, 550,550, 600,550, 600,1650, 550,600,
-                      550,600, 550,600, 550,550, 600,550, 550,600,
-                      550,1700, 550,600, 550,1650, 550,1700, 550,1700,
-                      550,1650, 600,1650, 550,1700, 550};
-
 long currentMillis;
 
 dht DHT;
-#define DHT11_PIN 16//D0
+#define DHT11_PIN 0//D3
 long previousReadMillis = 0;
 const long dhtInterval = 3000;
-boolean dhtReadSuccessful = false;
+boolean readDHT = true;
+int dhtReadTries = 0;
+const int MAX_DHT_READ_TRIES = 30;
+const String DHT_ERR1 = "ERR1";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -99,7 +99,7 @@ void loop() {
     activateOfflineMode();
   } else {
     client.loop();
-    if (!dhtReadSuccessful) {
+    if (readDHT) {
       getDht();
     }
   }
@@ -109,11 +109,10 @@ void loop() {
  * Set up device pins
  */
 void setupPins(){
-//  pinMode(4, OUTPUT);//D2
-  pinMode(5, OUTPUT);//D1
-  pinMode(12, OUTPUT);//D6
-  pinMode(13, OUTPUT);//D7
-  pinMode(14, OUTPUT);//D5
+  pinMode(SOCKET_1, OUTPUT);
+  pinMode(SOCKET_2, OUTPUT);
+  pinMode(SOCKET_3, OUTPUT);
+  pinMode(SOCKET_4, OUTPUT);
 }
 
 /*
@@ -174,7 +173,7 @@ void connectMQTT() {
   if(connectMQTTClient()){
     subscribeMQTT();
     setupPinsFromMQTT();
-    client.publish((DEVICE_NAME + "/" + SUBTOPIC_STATUS).c_str(), MESSAGE_WELCOME.c_str());
+    client.publish((DEVICE_NAME + "/" + SUBTOPIC_STATUS).c_str(), MESSAGE_WELCOME.c_str(), true);
   }
 }
 
@@ -241,8 +240,9 @@ void callback(char* top, byte* payload, unsigned int length) {
   if (topic.startsWith(SUBTOPIC_IN)) {
     topic.remove(0, SUBTOPIC_IN.length() + 1);
     String element = topic.substring(0, topic.indexOf("/"));
-    if(element.equals("DHT")){
-      dhtReadSuccessful = false;
+    if(element.equalsIgnoreCase("DHT")){
+      readDHT = true;
+      dhtReadTries = 0;
     } else {
       int port = element.toInt();
       if(port > 0){
@@ -286,16 +286,19 @@ void actOnIrCommand(String device, String msg){
     repeat = msg.substring(0, msg.indexOf("_")).toInt();
     msg.remove(0, msg.indexOf("_") + 1);
   }
-  long signal = strtol((char*)msg.c_str(), NULL, 16);
+
   for(int i = 0; i<repeat; i++){
-    if(IR_DEVICE_TV.equals(device)){
-      irsend.sendRaw(TV_ON, 67, 38);
+    if(IR_DEVICE_TV.equalsIgnoreCase(device)){
+      int32_t signal = strtoul((char*)msg.c_str() , NULL, 16 );
+      irsend.sendSAMSUNG(signal, 32);
+      delay(40);
     } else {
+      long signal = strtol((char*)msg.c_str(), NULL, 16);
       irsend.sendNEC(signal, 32);
+      delay(100);
+      irsend.sendNEC(0xFFFFFFFF, 32);
+      delay(40);
     }
-    delay(100);
-    irsend.sendNEC(0xFFFFFFFF, 32);
-    delay(40);
   }
 }
 
@@ -306,6 +309,14 @@ void getDht(){
   if (currentMillis - previousReadMillis < dhtInterval) {
     return;
   }
+  if(dhtReadTries > MAX_DHT_READ_TRIES){
+    readDHT = false;
+    String publishTopic = PUBLISH_TOPIC + DHT_ + "/";
+    client.publish((publishTopic + DHT_HUM).c_str(), DHT_ERR1.c_str(), true);
+    client.publish((publishTopic + DHT_TEMP).c_str(), DHT_ERR1.c_str(), true);
+    return;
+  }
+  dhtReadTries++;
   previousReadMillis = currentMillis;
   Serial.println("reading DHT");
   int chk = DHT.read11(DHT11_PIN);
@@ -315,7 +326,7 @@ void getDht(){
   switch (chk){
     case DHTLIB_OK:
       Serial.println("OK");
-      dhtReadSuccessful = true;
+      readDHT = false;
       hum = String(DHT.humidity, 1).c_str();
       temp = String(DHT.temperature, 1).c_str();
       break;
