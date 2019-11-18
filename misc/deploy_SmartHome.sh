@@ -1,13 +1,13 @@
 REPO_HOME=$HOME
 PROJECT_NAME=SmartHome-2.0
-PROJECT_VERSION=1.0-SNAPSHOT
+PROJECT_VERSION=2.0
 echo "REPO_HOME=$REPO_HOME"
 echo "PROJECT_NAME=$PROJECT_NAME"
 echo "---- Folders clean-up ----"
 #sudo chown -R pi $REPO_HOME
 rm -rf $REPO_HOME/$PROJECT_NAME
 echo "---- Cloning the repoository ----"
-sudo git clone https://github.com/Kesop1/SmartHome-2.0.git $REPO_HOME/$PROJECT_NAME
+sudo git clone https://github.com/Kesop1/$PROJECT_NAME.git $REPO_HOME/$PROJECT_NAME
 echo "---- Building the application ----"
 mvn -f $REPO_HOME/$PROJECT_NAME clean install -DskipTests=true
 echo "---- Deploying the application  ----"
