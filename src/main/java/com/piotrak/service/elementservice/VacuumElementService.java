@@ -94,7 +94,7 @@ public class VacuumElementService extends ElementService implements MQTTCommunic
         if(command.getValue().equalsIgnoreCase("clean")){
             new Thread(() -> {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(1500);
                     getConnectionService().actOnConnection(new MQTTCommand(getIrPublishTopic(), irCode));
                 } catch (InterruptedException e) {
                     webLogger.log(Level.WARNING, e.getMessage());
