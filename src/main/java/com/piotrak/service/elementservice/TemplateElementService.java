@@ -99,6 +99,9 @@ public class TemplateElementService extends CommandService {
 
     /**
      * Turn all the elements off except for the ones defined in the active template
+     * 1. get the list of all commands for elements defined in AllOff template
+     * 2. remove from it all the commands from the active template
+     * 3. turn off the rest of the elements
      */
     private void restOffTemplate(){
         MultiValuedMap<String, Command> restOffcommands = new ArrayListValuedHashMap<>(templateAllOff.getTemplateCommands());

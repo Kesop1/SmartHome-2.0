@@ -77,8 +77,8 @@ public class TemplatesConfiguration {
         actions.put("delayed", new DelayedCommand(2000, new WebCommand("audio-pc"), "PC"));
         actions.put("delayed", new DelayedCommand(60000, new WebCommand("audio-pc"), "PC"));
         actions.put("PCScreen", commandOn);
-        actions.put("PCSpeakers", commandOn);//TODO: ustaw odpoeiednie wyjscia na switchu
-        //TODO: nie obnizaj biurka
+        actions.put("PCSpeakers", commandOn);//TODO: ustaw odpowiednie wyjscia na switchu
+        actions.put("Desk", new WebCommand(""));
         return new TemplateElement("pc", "Pececiarz", actions);
     }
 
@@ -117,6 +117,7 @@ public class TemplatesConfiguration {
         actions.put("Laptop", commandOn);
         actions.put("PCScreen", commandOn);
         actions.put("PCSpeakers", commandOn);//TODO: ustaw odpowiednie wyjscia na switchu
+        actions.put("Desk", new WebCommand(""));
         return new TemplateElement("work", "BioRobot", actions);
     }
 
