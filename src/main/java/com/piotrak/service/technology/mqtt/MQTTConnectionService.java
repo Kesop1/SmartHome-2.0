@@ -65,10 +65,10 @@ public class MQTTConnectionService extends ConnectionService {
     /**
      * Check for the MQTT commands in the queue
      */
-    @Scheduled(fixedDelay = 1000)//TODO: nie działa scheduled????
+    @Scheduled(fixedDelay = 1000)
     @Async
     @Override
-    public void checkForCommands() { //TODO: tu sie nie pokazuje
+    public void checkForCommands() {
         webLogger.log(Level.INFO, "Looking for commands from the MQTT Connection");
         super.checkForCommands();
     }
@@ -78,8 +78,8 @@ public class MQTTConnectionService extends ConnectionService {
      * @param command Command to be sent
      */
     @Override
-    public void sendCommandToElementService(Command command){ //TODO: tu sie nie pokazuje
-        webLogger.log(Level.INFO, "Sendiong a command from the MQTT Connection to the service");
+    public void sendCommandToElementService(Command command) {
+        webLogger.log(Level.INFO, "Sending command from the MQTT Connection to the service");
         ElementService service = elementServiceTopicsMap.get(((MQTTCommand) command).getTopic());
         if(service != null){
             service.commandReceived(command);
