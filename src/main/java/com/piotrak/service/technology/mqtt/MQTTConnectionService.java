@@ -69,7 +69,7 @@ public class MQTTConnectionService extends ConnectionService {
     @Async
     @Override
     public void checkForCommands() {
-        webLogger.log(Level.FINE, "Looking for commands from the MQTT Connection");
+        webLogger.log(Level.INFO, "Looking for commands from the MQTT Connection");
         super.checkForCommands();
     }
 
@@ -79,6 +79,7 @@ public class MQTTConnectionService extends ConnectionService {
      */
     @Override
     public void sendCommandToElementService(Command command) {
+        webLogger.log(Level.INFO, "Sending command from the MQTT Connection to the service");
         ElementService service = elementServiceTopicsMap.get(((MQTTCommand) command).getTopic());
         if(service != null){
             service.commandReceived(command);
