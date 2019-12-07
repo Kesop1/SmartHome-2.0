@@ -46,7 +46,7 @@
                         <button type="submit" class="button">Siedź</button>
                     </form>
                     <form action="${path}desk?cmd=STAND" method="post">
-                        <button type="submit" class="button">Postój</button>
+                        <button type="submit" class="button">Stać</button>
                     </form>
                 </div>
             </td>
