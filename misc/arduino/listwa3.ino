@@ -85,11 +85,15 @@ int mqttRetryCount = 0;
 void setup() {
   Serial.begin(115200);
   delay(10);
+  Serial.println("Starting device: " + DEVICE_NAME);
   WiFi.mode(WIFI_STA);
   WiFi.setAutoConnect(false);
+  WiFi.hostname(DEVICE_NAME.c_str());
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  delay(1000);
   setupPins();
-  connectWiFi();
-  connectMQTT();
+  checkWiFi();
+  checkMQTT();
 }
 
 /*
@@ -99,18 +103,17 @@ void setup() {
  */
 void loop() {
   currentMillis = millis();
-  if(checkWiFi()){
-    checkMQTT();
-  }
-  if(wifiRetryCount == 5 || mqttRetryCount == 5){
-    activateOfflineMode();
-  } else {
+  if(checkWiFi() && checkMQTT()){
     client.loop();
     if (readDHT) {
       getDht();
     }
     if(setHeight){
       setDeskHeight();
+    }
+  } else {
+    if(wifiRetryCount == 5 || mqttRetryCount == 5){
+      activateOfflineMode();
     }
   }
 }
@@ -141,8 +144,8 @@ boolean checkWiFi(){
     return true;
   } else {
     mqttRetryCount = 0;
-    connectWiFi();
     wifiRetryCount++;
+    connectWiFi();
     return false;
   }
 }
@@ -150,12 +153,14 @@ boolean checkWiFi(){
 /*
  * check MQTT connection status, connect if necessary
  */
-void checkMQTT(){
+boolean checkMQTT(){
   if (client.connected()) {
     mqttRetryCount = 0;
+    return true;
   } else {
     connectMQTT();
     mqttRetryCount++;
+    return false;
   }
 }
 
@@ -163,20 +168,10 @@ void checkMQTT(){
  * Connect to WiFi
  */
 void connectWiFi(){
-  Serial.print("Connecting to WIFI: ");
-  Serial.println(WIFI_SSID);
-  WiFi.hostname(DEVICE_NAME.c_str());
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-
+  Serial.println("Connecting to WIFI: " + String(WIFI_SSID) + " with password: " + String(WIFI_PASSWORD) + " ...");
   if (WiFi.status() != WL_CONNECTED) {
-    delay(5000);
-  } else {
-    Serial.println("");
-    Serial.println(" connected");
-
-    // Print the IP address
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+    Serial.println(" failed. Connection try number: " + ((String)wifiRetryCount));
+    delay(2000);
   }
 }
 
@@ -198,13 +193,12 @@ void connectMQTT() {
  * Connect to the MQTT broker
  */
 boolean connectMQTTClient(){
-  Serial.println("Connecting to MQTT...");
+  Serial.println("Connecting to MQTT server...");
   if (client.connect(DEVICE_NAME.c_str(), (DEVICE_NAME + "/" + SUBTOPIC_STATUS).c_str(), 0, true, MESSAGE_GOODBYE.c_str())){
     Serial.println(MESSAGE_WELCOME);
     return true;
   } else {
-    Serial.print("failed with state ");
-    Serial.println(client.state());
+    Serial.println("failed with state: " + client.state());
     delay(5000);
   }
   return false;
@@ -362,7 +356,7 @@ void setDeskHeight(){
     client.publish((PUBLISH_TOPIC + SUBTOPIC_DESK).c_str(), DESK_ERR1.c_str(), true);
     return;
   }
-  Serial.println("Setting desk height at " + deskHeight);
+  Serial.println("Setting desk height at " + String(deskHeight));
   deskChangeTries++;
   previousUltrasonicReadMillis = currentMillis;
   digitalWrite(ULTRASONIC_TRIG, LOW);
@@ -372,10 +366,10 @@ void setDeskHeight(){
   digitalWrite(ULTRASONIC_TRIG, LOW);
   long ultrasonicDuration = pulseIn(ULTRASONIC_ECHO, HIGH);
   int distance = ultrasonicDuration*0.034/2;
-  Serial.println("Distance: " + distance);
+  Serial.println("Distance: " + String(distance));
 
   if((distance > (deskHeight - DISTANCE_DELTA)) && (distance < (deskHeight + DISTANCE_DELTA))){
-    Serial.println("Desk set at " + deskHeight);
+    Serial.println("Desk set at " + String(deskHeight));
     setHeight = false;
     digitalWrite(DESK_UP, LOW);
     digitalWrite(DESK_DOWN, LOW);
