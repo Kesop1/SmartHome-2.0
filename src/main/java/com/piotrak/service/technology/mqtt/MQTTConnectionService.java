@@ -66,7 +66,7 @@ public class MQTTConnectionService extends ConnectionService {
      * Check for the MQTT commands in the queue
      */
     @Scheduled(cron = "* * * * * *")
-//    @Async
+    @Async
     @Override
     public void checkForCommands() {
         webLogger.log(Level.FINE, "Looking for commands from the MQTT Connection");

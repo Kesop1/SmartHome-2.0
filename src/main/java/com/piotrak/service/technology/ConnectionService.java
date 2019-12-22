@@ -44,7 +44,6 @@ public abstract class ConnectionService {
     /**
      * Scan connection command queue
      */
-    @Scheduled(cron = "* * * * * ?")
     public void checkForCommands(){
         Command command;
         do {
