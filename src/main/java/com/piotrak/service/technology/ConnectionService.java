@@ -2,6 +2,7 @@ package com.piotrak.service.technology;
 
 import com.piotrak.service.logger.WebLogger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.PostConstruct;
 import java.util.logging.Level;
@@ -39,9 +40,11 @@ public abstract class ConnectionService {
      */
     public abstract void actOnConnection(Command command);
 
+
     /**
      * Scan connection command queue
      */
+    @Scheduled(cron = "* * * * * ?")
     public void checkForCommands(){
         Command command;
         do {
